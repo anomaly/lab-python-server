@@ -1,0 +1,46 @@
+# The aim of this docker compose file is to provide a good known
+# way to build your docker-compose file for Anomaly projects
+# 
+# This file provides you a template for your development environment
+
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+version: "3.8"
+
+volumes:
+  postgres-data:
+  redis-data:
+  minio-data:
+
+services:
+
+  # Postgres:
+  # - In development we read secrets from .env.development
+  #   refer to the production config to see how to use secrets
+  #   via Kubernetes
+  db:
+    image: postgres:14-bullseye
+    container_name: lab-postgres
+    restart: unless-stopped
+    env_file:
+      - .env.development
+    volumes:
+      - postgres-data:/var/lib/postgresql/data/
+
+  redis:
+    image: redis:7-bullseye
+    container_name: lab-redis
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: src/Dockerfile.api
+    env_file:
+      - .env.development
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./api:/opt/api

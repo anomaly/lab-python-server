@@ -1,0 +1,22 @@
+# While optional this tells the Docker builder of the version
+# syntax=docker/dockerfile:1
+
+# Base image for Python applications
+# This image is particularly for a web server using uvicorn
+FROM python:3.10-slim-buster
+
+# Expose ports which is proxied via traefik
+EXPOSE 80
+
+WORKDIR /opt/api
+COPY ./src/api/pyproject.toml pyproject.toml
+COPY ./src/api/labs/. .
+
+RUN pip3 install poetry
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev --no-root
+
+WORKDIR /opt/
+ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--reload"]
+
+CMD []
