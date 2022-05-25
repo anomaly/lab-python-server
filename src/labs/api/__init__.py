@@ -13,9 +13,9 @@
 __name__ = "Labs"
 __version__ = "0.0.1"
 
+from fastapi import FastAPI
 
-from turtle import title
-from fastapi import FastAPI, Request, status
+from .routers import router as router_misc
 
 """A FastAPI application that serves handlers
 """
@@ -23,13 +23,7 @@ app = FastAPI(
     title=__name__,
     root_path="/api",
     docs_url="/docs",
+    openapi_tags=["misc"],
     )
 
-@app.get("/echo")
-async def echo(request: Request):
-    """Echo back a response to say hello.
-
-    Purpose of this endpoint is to echo back what was received, this merely
-    validated that the server is up and running.
-    """
-    return {"hello": "world"}
+app.include_router(router_misc, prefix="/misc")
