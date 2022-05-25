@@ -1,4 +1,0 @@
-"""Routers for the API
-
-"""
-
