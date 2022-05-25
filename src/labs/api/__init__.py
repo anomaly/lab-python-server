@@ -26,4 +26,4 @@ app = FastAPI(
     openapi_tags=["misc"],
     )
 
-app.include_router(router_misc, prefix="/misc")
+app.include_router(router_misc, prefix="/ext")
