@@ -8,15 +8,20 @@ FROM python:3.10-slim-buster
 # Expose ports which is proxied via traefik
 EXPOSE 80
 
-COPY ./src/api/pyproject.toml pyproject.toml
+RUN apt-get update \
+    && apt-get -y upgrade \
+    && apt-get install -y --no-install-recommends python3-tk \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 
 # Copy the apps files to the container
 WORKDIR /opt/labs
-COPY ./src/api/labs/. .
+COPY ./src/. .
 
-# RUN pip3 install poetry
-# RUN poetry config virtualenvs.create false
-# RUN poetry install --no-dev --no-root
+RUN pip3 install poetry
+RUN poetry config virtualenvs.create false
+RUN poetry install --no-dev --no-root
 
 WORKDIR /opt/
 ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--reload"]

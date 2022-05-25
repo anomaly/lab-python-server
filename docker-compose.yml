@@ -36,11 +36,11 @@ services:
   api:
     build:
       context: .
-      dockerfile: src/Dockerfile.api
+      dockerfile: Dockerfile.api
     env_file:
       - .env.development
     restart: unless-stopped
     ports:
       - "8000:80"
     volumes:
-      - ./api:/opt/api
+      - ./src/labs:/opt/labs
