@@ -17,3 +17,9 @@ multiple env files
 
 
 https://traefik.io/resources/traefik-fastapi-kuberrnetes-ai-ml/
+
+Debugging
+https://www.howtogeek.com/devops/how-to-inspect-a-docker-images-content-without-starting-a-container/
+
+
+https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-namespace-or-find-namespace-packages
