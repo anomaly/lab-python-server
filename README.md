@@ -19,7 +19,7 @@ python -m venv .env
 .dockerignore file
 multiple env files
 
-# Dokcer in Production
+# Docker in Production
 
 Multi staged builds
 https://docs.docker.com/develop/develop-images/multistage-build/
@@ -29,10 +29,15 @@ https://www.uvicorn.org/deployment/
 
 # Resources
 
+Traefik
 https://traefik.io/resources/traefik-fastapi-kuberrnetes-ai-ml/
 
 Debugging
 https://www.howtogeek.com/devops/how-to-inspect-a-docker-images-content-without-starting-a-container/
 
 
+Poetry sub packages
+https://github.com/python-poetry/poetry/issues/2270
+
+Setup tools
 https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-namespace-or-find-namespace-packages
