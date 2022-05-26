@@ -27,6 +27,8 @@ https://docs.docker.com/develop/develop-images/multistage-build/
 gunicorn vs uvicorn
 https://www.uvicorn.org/deployment/
 
+Providing root path --root-path on unicorn
+
 # Resources
 
 Traefik
