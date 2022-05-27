@@ -11,11 +11,11 @@
 
 """
 __name__ = "Labs"
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 from fastapi import FastAPI, Request
 
-from .routers import router as router_misc
+from .routers import router_ext
 
 """A FastAPI application that serves handlers
 """
@@ -41,10 +41,12 @@ app = FastAPI(
     ]
     )
 
-app.include_router(router_misc, prefix="/ext")
+app.include_router(router_ext, prefix="/ext", tags=[])
 
 @app.get("/")
 async def root(request: Request):
+  """Placeholder for the root endpoint
+  """
   return {
     "message": "Welcome to the {} API".format(__name__),
     "root_path": request.scope.get("root_path")

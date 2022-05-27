@@ -1,16 +1,8 @@
 """Routers for the API
 
+Aggregates all the sub-routers for the API. This is ultimately used
+by the top level FastAPI application.
+
 """
 
-from fastapi import APIRouter, Request, status
-
-router = APIRouter(tags=["misc"])
-
-@router.get("/echo")
-async def echo(request: Request):
-    """Echo back a response to say hello.
-
-    Purpose of this endpoint is to echo back what was received, this merely
-    validated that the server is up and running.
-    """
-    return {"hello": "world"}
+from .ext import router as router_ext
