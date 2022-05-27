@@ -10,9 +10,7 @@
   API endpoints are built and served using the FastAPI micro-framework.
 
 """
-__name__ = "Labs"
-__version__ = "0.1.0"
-
+from .. import __title__, __version__
 from fastapi import FastAPI, Request
 
 from .routers import router_ext
@@ -20,7 +18,8 @@ from .routers import router_ext
 """A FastAPI application that serves handlers
 """
 app = FastAPI(
-    title=__name__,
+    title=__title__,
+    version=__version__,
     description="Sample API",
     docs_url="/docs",
     terms_of_service="https://github.com/anomaly/labs",
@@ -51,3 +50,6 @@ async def root(request: Request):
     "message": "Welcome to the {} API".format(__name__),
     "root_path": request.scope.get("root_path")
   }
+
+# Hook up any events worth responding to
+# https://fastapi.tiangolo.com/advanced/events/
