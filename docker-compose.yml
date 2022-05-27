@@ -9,6 +9,7 @@ version: "3.8"
 volumes:
   postgres-data:
   redis-data:
+  fluentd-data:
   minio-data:
 
 services:
@@ -32,6 +33,13 @@ services:
     volumes:
       - redis-data:/data
     restart: unless-stopped
+
+  fluentd:
+    image: fluentd:v1.14-1
+    container_name: lab-fluentd
+    restart: unless-stopped
+    volumes:
+      - fluentd-data:/fluentd/etc
 
   api:
     build:
