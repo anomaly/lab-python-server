@@ -7,6 +7,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
 - [ ] Worker processes that will process tasks in the background (using Celery)
 - [ ] Provide `Dockerfile` for development and production
+- [ ] Log aggregation and monitoring (fluentd)
 
 In production (see [Terraform lab project](https://github.com/anomaly/lab-tf-linode)) we will use `Terraform` and `Helm` provision infrastructure and deploy the app in pods. Ideally `Postgres` and `Redis` would be provisioned as a hosted products (Linode is yet to offer this), in the short term they will be installed from official `Charts`.
 
@@ -60,13 +61,12 @@ https://www.uvicorn.org/deployment/
 
 Providing root path --root-path on unicorn
 
-# Resources
+## Resources
 
 - [Deploying FastAPI apps with HTTPS powered by Traefik](https://traefik.io/resources/traefik-fastapi-kuberrnetes-ai-ml/) by Sebastián Ramírez
 - [How to Inspect a Docker Image’s Content Without Starting a Container](https://www.howtogeek.com/devops/how-to-inspect-a-docker-images-content-without-starting-a-container/) by James Walker
-
-
 - [Poetry sub packages](https://github.com/python-poetry/poetry/issues/2270), an open issue to support sub packages in Poetry, which will be handy in splitting up our code base further.
+- [Using find namespaces or find namespace package](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-namespace-or-find-namespace-packages)
 
-Setup tools
-https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-namespace-or-find-namespace-packages
+## License
+Content of this repository are licensed under the Apache 2.0 license.
