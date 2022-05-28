@@ -17,6 +17,9 @@ class Config(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
 
+    # fluentd configuration
+    FLUENTD_HOST: str
+    FLUENTD_PORT: int
 
     @property
     def postgres_dsn(self) -> PostgresDsn:
