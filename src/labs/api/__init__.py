@@ -11,9 +11,20 @@
 
 """
 from .. import __title__, __version__
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends, status
+from fastapi.responses import JSONResponse
+from fastapi_csrf_protect import CsrfProtect
+from fastapi_csrf_protect.exceptions import CsrfProtectError
+from pydantic import BaseModel
 
 from .routers import router_ext
+from ..core.config import CsrfConfig
+
+@CsrfProtect.load_config
+def get_csrf_config():
+  """Produces a configuration that the xsrf plugin accept
+  """
+  return CsrfConfig()
 
 """A FastAPI application that serves handlers
 """
@@ -40,16 +51,31 @@ app = FastAPI(
     ]
     )
 
+# Additional routers of the application described in the routers package
 app.include_router(router_ext, prefix="/ext", tags=[])
 
-@app.get("/")
-async def root(request: Request):
-  """Placeholder for the root endpoint
+@app.exception_handler(CsrfProtectError)
+def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
+  """Handles an exception for the CSRF protection
   """
-  return {
-    "message": "Welcome to the {} API".format(__name__),
-    "root_path": request.scope.get("root_path")
-  }
+  return JSONResponse(
+    status_code=exc.status_code,
+      content={ 'detail':  exc.message
+    }
+  )
+
+@app.get("/")
+async def root(request: Request, csrf_protect:CsrfProtect = Depends()):
+  """Placeholder for the root endpoint
+
+  """
+  return JSONResponse(
+    status_code=status.HTTP_200_OK,
+    content={
+      "message": "Welcome to the {} API".format(__name__),
+      "root_path": request.scope.get("root_path")
+    }
+  )
 
 # Hook up any events worth responding to
 # https://fastapi.tiangolo.com/advanced/events/

@@ -2,7 +2,7 @@
 
 """
 
-from pydantic import BaseSettings, PostgresDsn
+from pydantic import BaseModel, BaseSettings, PostgresDsn
 
 class Config(BaseSettings):
     """Configuration for the application
@@ -21,6 +21,10 @@ class Config(BaseSettings):
     FLUENTD_HOST: str
     FLUENTD_PORT: int
 
+    # Secrets that the application requires for session
+    # and cross domain checking
+    CSRF_SECRET: str
+
     @property
     def postgres_dsn(self) -> PostgresDsn:
         """Construct the Postgres DSN from the configuration
@@ -33,3 +37,10 @@ class Config(BaseSettings):
 
 # A singleton instance of the configuration
 config = Config()
+
+class CsrfConfig(BaseModel):
+  """A model required by the CSRF protection plugin
+
+  The FastAPI initialiser registers a decorated instance.
+  """
+  secret_key:str = config.CSRF_SECRET
