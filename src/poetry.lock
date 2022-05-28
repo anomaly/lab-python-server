@@ -209,6 +209,22 @@ doc = ["mkdocs (>=1.1.2,<2.0.0)", "mkdocs-material (>=8.1.4,<9.0.0)", "mdx-inclu
 test = ["pytest (>=6.2.4,<7.0.0)", "pytest-cov (>=2.12.0,<4.0.0)", "mypy (==0.910)", "flake8 (>=3.8.3,<4.0.0)", "black (==22.3.0)", "isort (>=5.0.6,<6.0.0)", "requests (>=2.24.0,<3.0.0)", "httpx (>=0.14.0,<0.19.0)", "email_validator (>=1.1.1,<2.0.0)", "sqlalchemy (>=1.3.18,<1.5.0)", "peewee (>=3.13.3,<4.0.0)", "databases[sqlite] (>=0.3.2,<0.6.0)", "orjson (>=3.2.1,<4.0.0)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0,<6.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "flask (>=1.1.2,<3.0.0)", "anyio[trio] (>=3.2.1,<4.0.0)", "types-ujson (==4.2.1)", "types-orjson (==3.6.2)", "types-dataclasses (==0.6.5)"]
 
 [[package]]
+name = "fastapi-csrf-protect"
+version = "0.2.2"
+description = "Simple integration of Cross-Site Request Forgery (XSRF) Protection by using either Cookies or Context combined with Headers"
+category = "main"
+optional = false
+python-versions = ">=3.6.1,<4.0.0"
+
+[package.dependencies]
+fastapi = ">=0,<1"
+itsdangerous = ">=2.0.1,<3.0.0"
+pydantic = ">=1.7.2,<2.0.0"
+
+[package.extras]
+examples = ["uvicorn[examples] (>=0.15.0,<0.16.0)", "Jinja2[examples] (>=3.0.1,<4.0.0)"]
+
+[[package]]
 name = "fluent-logger"
 version = "0.10.0"
 description = "A Python logging handler for Fluentd event collector"
@@ -259,6 +275,14 @@ description = "Internationalized Domain Names in Applications (IDNA)"
 category = "main"
 optional = false
 python-versions = ">=3.5"
+
+[[package]]
+name = "itsdangerous"
+version = "2.1.2"
+description = "Safely pass data to untrusted environments and back."
+category = "main"
+optional = false
+python-versions = ">=3.7"
 
 [[package]]
 name = "kombu"
@@ -569,7 +593,7 @@ python-versions = ">=3.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "6c05e38eb680b82dd11b71def1b3906575e9ab9a7ee97d683c63ccf624b0f6d9"
+content-hash = "7013b07fff4675770e78918913f8eff14f40ca4f467dcbca38bb57dc8d97fee2"
 
 [metadata.files]
 alembic = [
@@ -627,6 +651,10 @@ colorama = [
 fastapi = [
     {file = "fastapi-0.78.0-py3-none-any.whl", hash = "sha256:15fcabd5c78c266fa7ae7d8de9b384bfc2375ee0503463a6febbe3bab69d6f65"},
     {file = "fastapi-0.78.0.tar.gz", hash = "sha256:3233d4a789ba018578658e2af1a4bb5e38bdd122ff722b313666a9b2c6786a83"},
+]
+fastapi-csrf-protect = [
+    {file = "fastapi-csrf-protect-0.2.2.tar.gz", hash = "sha256:5c8fc8b6db22a84d6479726acf1b2b0b5c36b93806a763afd2ef731980f446b1"},
+    {file = "fastapi_csrf_protect-0.2.2-py3-none-any.whl", hash = "sha256:50b9077fc4929f76a11291de4c9f64c98fb8f85ad3de2d4822e05c61a201662f"},
 ]
 fluent-logger = [
     {file = "fluent-logger-0.10.0.tar.gz", hash = "sha256:678bda90c513ff0393964b64544ce41ef25669d2089ce6c3b63d9a18554b9bfa"},
@@ -700,6 +728,10 @@ h11 = [
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
     {file = "idna-3.3.tar.gz", hash = "sha256:9d643ff0a55b762d5cdb124b8eaa99c66322e2157b69160bc32796e824360e6d"},
+]
+itsdangerous = [
+    {file = "itsdangerous-2.1.2-py3-none-any.whl", hash = "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44"},
+    {file = "itsdangerous-2.1.2.tar.gz", hash = "sha256:5dbbc68b317e5e42f327f9021763545dc3fc3bfe22e6deb96aaf1fc38874156a"},
 ]
 kombu = [
     {file = "kombu-5.2.4-py3-none-any.whl", hash = "sha256:8b213b24293d3417bcf0d2f5537b7f756079e3ea232a8386dcc89a59fd2361a4"},
