@@ -9,6 +9,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [ ] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring (fluentd)
 - [ ] CSRF protection
+- [ ] Basic endpoints for authentication
 
 In production (see [Terraform lab project](https://github.com/anomaly/lab-tf-linode)) we will use `Terraform` and `Helm` provision infrastructure and deploy the app in pods. Ideally `Postgres` and `Redis` would be provisioned as a hosted products (Linode is yet to offer this), in the short term they will be installed from official `Charts`.
 
@@ -44,7 +45,8 @@ The following Python packages make the standard set of tools for our projects:
 - **fluent-logger** - A Python logging library that supports fluentd
 - **pendulum** - A timezone aware datetime library
 
-## FastAPI based server
+Packages are managed using `poetry`, docs available [here](https://python-poetry.org/docs/).
+## App directory structure
 
 Directory structure for our application:
 ```
@@ -60,12 +62,12 @@ Directory structure for our application:
 
 ```
 
-## Worker
+### API
 
+### Worker
 
-## Python package and Poetry
+### Schema migrations
 
-python -m venv .env
 
 ## Docker in Development
 
