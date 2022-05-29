@@ -11,14 +11,14 @@
 
 """
 from .. import __title__, __version__
+
 from fastapi import FastAPI, Request, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
-from pydantic import BaseModel
 
+from ..core.config import config, CsrfConfig
 from .routers import router_ext
-from ..core.config import CsrfConfig
 
 @CsrfProtect.load_config
 def get_csrf_config():
@@ -67,7 +67,6 @@ def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
 @app.get("/")
 async def root(request: Request, csrf_protect:CsrfProtect = Depends()):
   """Placeholder for the root endpoint
-
   """
   return JSONResponse(
     status_code=status.HTTP_200_OK,

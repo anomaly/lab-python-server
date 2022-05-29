@@ -21,6 +21,10 @@ class Config(BaseSettings):
     FLUENTD_HOST: str
     FLUENTD_PORT: int
 
+    # redis is used by celery for workers
+    REDIS_HOST: str
+    REDIS_PORT: int
+
     # Secrets that the application requires for session
     # and cross domain checking
     CSRF_SECRET: str
@@ -34,6 +38,12 @@ class Config(BaseSettings):
             user=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
         )
+
+    @property
+    def celery_dsn(self) -> str:
+        """Construct the DSN for the celery broker
+        """
+        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
 
 # A singleton instance of the configuration
 config = Config()
