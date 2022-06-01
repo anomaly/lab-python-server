@@ -12,7 +12,7 @@
 """
 from . import __title__, __version__
 
-from fastapi import FastAPI, Request, Depends, status
+from fastapi import FastAPI, Request, Depends, status, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
@@ -75,6 +75,13 @@ async def root(request: Request, csrf_protect:CsrfProtect = Depends()):
       "root_path": request.scope.get("root_path")
     }
   )
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+  await websocket.accept()
+  while True:
+    data = await websocket.receive_text()
+    await websocket.send_text(f"Message text was: {data}")
 
 # Hook up any events worth responding to
 # https://fastapi.tiangolo.com/advanced/events/
