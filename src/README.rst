@@ -11,7 +11,7 @@ At the root of the package we have:
 - ``__init__.py`` which declare the Python package
 - ``db.py``, providing the database connection
 - ``config.py``, providing the configuration of the application read from the environment
-- ``api.py```, providing the API application run by the containerized service
+- ``api.py``, providing the API application run by the containerized service
 - ``celery.py`` providing the `Celery` application used both to queue and consume the tasks
 - ``models`` is a folder that houses the SQLAlchemy models
 - ``schema`` is a folder that houses the `pydantic` models used to consume and produce the API payloads
@@ -23,7 +23,7 @@ Drawing attention to the ``acts`` folder, this is where the functionality of the
 Each ``act`` has two packages one called ``scenes`` and the other ``tasks``:
 
 - ``scenes`` is where the playable or actions live, e.g API endpoint handlers
-- ``tasks``` are where background tasks or things that happen outside of the ``scene`` live, but occur as a result or or to support a ``scene``
+- ``tasks`` are where background tasks or things that happen outside of the ``scene`` live, but occur as a result or or to support a ``scene``
 
 ``tasks`` are consumed and managed by the ``celery:app``.
 
