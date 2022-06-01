@@ -1,7 +1,7 @@
 """
 """
 
-from fastapi import APIRouter, Request, status
+from fastapi import APIRouter, Request
 
 from ....config import config
 
