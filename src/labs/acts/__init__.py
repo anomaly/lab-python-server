@@ -1,2 +1,2 @@
-"""
+"""Aggregated acts
 """

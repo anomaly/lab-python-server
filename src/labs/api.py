@@ -10,15 +10,15 @@
   API endpoints are built and served using the FastAPI micro-framework.
 
 """
-from .. import __title__, __version__
+from . import __title__, __version__
 
 from fastapi import FastAPI, Request, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 
-from ..core.config import config, CsrfConfig
-from .routers import router_ext
+from .config import CsrfConfig
+from .acts.ext import router as router_ext
 
 @CsrfProtect.load_config
 def get_csrf_config():
