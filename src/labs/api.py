@@ -10,15 +10,15 @@
   API endpoints are built and served using the FastAPI micro-framework.
 
 """
-from .. import __title__, __version__
+from . import __title__, __version__
+
 from fastapi import FastAPI, Request, Depends, status
 from fastapi.responses import JSONResponse
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
-from pydantic import BaseModel
 
-from .routers import router_ext
-from ..core.config import CsrfConfig
+from .config import CsrfConfig
+from .acts.ext import router as router_ext
 
 @CsrfProtect.load_config
 def get_csrf_config():
@@ -67,7 +67,6 @@ def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
 @app.get("/")
 async def root(request: Request, csrf_protect:CsrfProtect = Depends()):
   """Placeholder for the root endpoint
-
   """
   return JSONResponse(
     status_code=status.HTTP_200_OK,
