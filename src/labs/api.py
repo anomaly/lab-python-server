@@ -17,7 +17,7 @@ from fastapi.responses import JSONResponse
 from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 
-from .config import CsrfConfig
+from .config import CsrfConfig, config
 from .acts.ext import router as router_ext
 
 @CsrfProtect.load_config

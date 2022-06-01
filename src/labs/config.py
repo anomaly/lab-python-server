@@ -16,6 +16,8 @@ class Config(BaseSettings):
     POSTGRES_DB: str
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
+    POSTGRES_HOST: str
+    POSTGRES_PORT: int
 
     # fluentd configuration
     FLUENTD_HOST: str
@@ -33,8 +35,16 @@ class Config(BaseSettings):
     def postgres_dsn(self) -> PostgresDsn:
         """Construct the Postgres DSN from the configuration
         """
+        db_url="postgresql+asyncpg://{}:{}@{}:{}/{}".format(
+            self.POSTGRES_USER,
+            self.POSTGRES_PASSWORD,
+            self.POSTGRES_HOST,
+            self.POSTGRES_PORT,
+            self.POSTGRES_DB
+            )
         return PostgresDsn(
-            database=self.POSTGRES_DB,
+            url=db_url,
+            scheme="postgresql+asyncpg",
             user=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
         )
