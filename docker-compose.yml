@@ -27,6 +27,10 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data/
 
+  # Redis:
+  # - In development we read secrets from .env.development
+  #   used by Clerey to broker tasks between the api endpoints
+  #   and worker tasks
   redis:
     image: redis:7-bullseye
     container_name: lab-redis
@@ -34,13 +38,14 @@ services:
       - redis-data:/data
     restart: unless-stopped
 
-  fluentd:
-    image: fluentd:v1.14-1
-    container_name: lab-fluentd
+  fluent-bit:
+    image: fluent/fluent-bit:1.5
+    container_name: lab-fluentbit
     restart: unless-stopped
-    volumes:
-      - fluentd-data:/fluentd/etc
 
+  # Applicaiton API:
+  # - In development we read secrets from .env.development
+  # - Provides a FastAPI based API that runs using uvicorn in development
   api:
     build:
       context: .
