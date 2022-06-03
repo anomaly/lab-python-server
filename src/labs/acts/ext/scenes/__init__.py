@@ -4,6 +4,7 @@
 from fastapi import APIRouter, Request
 
 from ....db import session_context
+from .... import logger
 
 router = APIRouter(tags=["ext"])
 
@@ -25,3 +26,13 @@ async def healthcheck(request: Request):
     """
     async with session_context() as session:
         return {"message": "ok"}
+
+
+@router.get("/log")
+async def log(request: Request):
+    """Log a message.
+
+    Purpose of this endpoint is to log a message to the logger.
+    """
+    logger.emit('follow', {'from': 'userA', 'to': 'userB'})
+    return {"message": "ok"}
