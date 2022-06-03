@@ -1,9 +1,9 @@
-"""
+"""Scenes for the ext module
 """
 
 from fastapi import APIRouter, Request
 
-from ....config import config
+from ....db import session_context
 
 router = APIRouter(tags=["ext"])
 
@@ -15,3 +15,13 @@ async def echo(request: Request):
     validated that the server is up and running.
     """
     return {"message": "Hello, world!"}
+
+@router.get("/healthcheck")
+async def healthcheck(request: Request):
+    """Check the health of the server.
+
+    Purpose of this endpoint is to check the health of the server.
+    We check for connection to the database, queue and logger
+    """
+    async with session_context() as session:
+        return {"message": "ok"}

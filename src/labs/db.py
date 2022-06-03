@@ -1,27 +1,33 @@
 """SQLAlchemy context
 
+  This database configuration is configured using asyncio
+  https://docs.sqlalchemy.org/en/14/orm/extensions/asyncio.html
+
+
 """
 
-from contextlib import contextmanager
+import asyncio
+from contextlib import asynccontextmanager
 
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 
 from .config import config
 
 # SQLAlchemy engine that connects to Postgres
-engine = create_engine(config.postgres_dsn)
-# Session local
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_async_engine(config.postgres_dsn, echo=True)
+# Get an async session from the engine
+async_session = AsyncSession(engine, expire_on_commit=False)
 
-@contextmanager
-def session_scope():
-    session = SessionLocal()
+@asynccontextmanager
+async def session_context():
+    """Provide a transactional scope around a series of operations.
+    """
+    session = async_session()
     try:
         yield session
-        session.commit()
+        await session.commit()
     except:  # noqa: E722
-        session.rollback()
+        await session.rollback()
         raise
     finally:
-        session.close()
+        await session.close()
