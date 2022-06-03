@@ -2,7 +2,7 @@
 
 """
 
-from pydantic import BaseModel, BaseSettings, PostgresDsn
+from pydantic import BaseModel, BaseSettings, PostgresDsn, RedisDsn
 
 class Config(BaseSettings):
     """Configuration for the application
@@ -35,13 +35,9 @@ class Config(BaseSettings):
     def postgres_dsn(self) -> PostgresDsn:
         """Construct the Postgres DSN from the configuration
         """
-        db_url="postgresql+asyncpg://{}:{}@{}:{}/{}".format(
-            self.POSTGRES_USER,
-            self.POSTGRES_PASSWORD,
-            self.POSTGRES_HOST,
-            self.POSTGRES_PORT,
-            self.POSTGRES_DB
-            )
+        db_url=f'postgresql+asyncpg://{self.POSTGRES_USER}:\
+            {self.POSTGRES_PASSWORD}\@{self.POSTGRES_HOST}:\
+                {self.POSTGRES_PORT}/{self.POSTGRES_DB}'        
         return PostgresDsn(
             url=db_url,
             scheme="postgresql+asyncpg",
@@ -50,10 +46,11 @@ class Config(BaseSettings):
         )
 
     @property
-    def celery_dsn(self) -> str:
+    def celery_dsn(self) -> RedisDsn:
         """Construct the DSN for the celery broker
         """
-        return f"redis://{self.REDIS_HOST}:{self.REDIS_PORT}"
+        db_url=f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
+        return RedisDsn(url=db_url)
 
 # A singleton instance of the configuration
 config = Config()
