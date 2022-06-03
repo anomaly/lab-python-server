@@ -1,14 +1,14 @@
 # Lab - Containerised Python server
 
 This lab aims to outline a recipe for building a standardised Python server that can be run in a container. Our major aims are to be able to:
-- [ ] Expose an API that will eventually sit behind a reverse proxy
-- [ ] A Postgres server for development
-- [ ] A Redis server for development
+- [X] Expose an API that will eventually sit behind a reverse proxy
+- [X] A Postgres server for development
+- [X] A Redis server for development
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
 - [ ] Worker processes that will process tasks in the background (using Celery)
 - [ ] Provide `Dockerfile` for development and production
-- [ ] Log aggregation and monitoring (fluentd)
-- [ ] CSRF protection
+- [ ] Log aggregation and monitoring (fluent-bit)
+- [X] CSRF protection
 - [ ] Basic endpoints for authentication
 
 In production (see [Terraform lab project](https://github.com/anomaly/lab-tf-linode)) we will use `Terraform` and `Helm` provision infrastructure and deploy the app in pods. Ideally `Postgres` and `Redis` would be provisioned as a hosted products (Linode is yet to offer this), in the short term they will be installed from official `Charts`.
