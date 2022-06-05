@@ -35,4 +35,4 @@ async def log(request: Request):
     Purpose of this endpoint is to log a message to the logger.
     """
     logger.emit('follow', {'from': 'userA', 'to': 'userB'})
-    return {"message": "ok"}
+    return {"message": str(logger.host)}
