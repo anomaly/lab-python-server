@@ -95,6 +95,16 @@ https://www.uvicorn.org/deployment/
 
 Providing root path --root-path on unicorn
 
+## Distribution
+
+```
+docker build -t anomalyhq/python-lab-server-api:v0.1.0 -f Dockerfile.api .
+```
+
+```
+docker push anomalyhq/python-labe-server-api:v0.1.0
+```
+
 ## Resources
 
 - [Deploying FastAPI apps with HTTPS powered by Traefik](https://traefik.io/resources/traefik-fastapi-kuberrnetes-ai-ml/) by Sebastián Ramírez
