@@ -10,8 +10,12 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import declarative_base
 
 from .config import config
+
+
+Base = declarative_base()
 
 # SQLAlchemy engine that connects to Postgres
 engine = create_async_engine(config.postgres_dsn, echo=True)

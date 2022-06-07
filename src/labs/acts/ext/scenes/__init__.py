@@ -1,9 +1,11 @@
 """Scenes for the ext module
 """
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Request, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from ....db import session_context
+from ....db import session_context, session_context
+from ....config import config
 from .... import logger
 
 router = APIRouter(tags=["ext"])
@@ -29,10 +31,13 @@ async def healthcheck(request: Request):
 
 
 @router.get("/log")
-async def log(request: Request):
+async def log(request: Request, session: AsyncSession = Depends(session_context)):
     """Log a message.
 
     Purpose of this endpoint is to log a message to the logger.
     """
+    import logging
+    logging.error(session)
+    logging.error(config.postgres_dsn)
     logger.emit('follow', {'from': 'userA', 'to': 'userB'})
     return {"message": str(logger.host)}
