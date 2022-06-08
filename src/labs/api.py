@@ -18,7 +18,7 @@ from fastapi_csrf_protect import CsrfProtect
 from fastapi_csrf_protect.exceptions import CsrfProtectError
 
 from .config import CsrfConfig
-from .acts import router_ext
+from .acts import router_ext, router_auth
 
 @CsrfProtect.load_config
 def get_csrf_config():
@@ -53,6 +53,7 @@ app = FastAPI(
 
 # Additional routers of the application described in the routers package
 app.include_router(router_ext, prefix="/ext", tags=[])
+app.include_router(router_auth, prefix="/auth", tags=[])
 
 @app.exception_handler(CsrfProtectError)
 def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
