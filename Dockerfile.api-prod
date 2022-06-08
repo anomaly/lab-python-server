@@ -6,10 +6,7 @@
 
 # Base image for Python applications
 # This image is particularly for a web server using uvicorn
-FROM python:3.10-slim-buster
-
-# Expose ports which is proxied via traefik
-EXPOSE 80
+FROM python:3.10-slim-buster as build-image
 
 # Update the based image to latest versions of packages
 # python 3.10 seems to want python3-tk installed
@@ -30,3 +27,41 @@ RUN pip3 install --upgrade pip
 RUN pip3 install poetry
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev --no-root
+
+# Build the wheels and then remove files to make the 
+# image smaller
+RUN poetry build -f wheel -n && \
+    pip install --no-deps dist/*.whl && \
+    rm -rf dist *.egg-info
+
+### Stage 2
+
+FROM python:3.10-slim-buster as run-image
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONFAULTHANDLER=1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Update the based image to latest versions of packages
+# python 3.10 seems to want python3-tk installed
+RUN apt-get update \
+    && apt-get -y upgrade \
+    && apt-get install -y --no-install-recommends libpq-dev python3-tk \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG USER=bilum
+ARG GROUP=bilum
+ARG UID=1000
+ARG GID=1000
+RUN groupadd --gid "${GID}" "${GROUP}"
+RUN useradd --uid "${UID}" --gid "${GID}" --create-home "${USER}"
+USER "${USER}"
+
+# Expose ports which is proxied via traefik
+EXPOSE 80
+
+
+ENTRYPOINT ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "labs.api:app"]
+CMD []
