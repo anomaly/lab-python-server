@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ....db import session_context, session_context
 from ....config import config
-from .... import logger
 
 router = APIRouter(tags=["ext"])
 
@@ -39,5 +38,4 @@ async def log(request: Request, session: AsyncSession = Depends(session_context)
     import logging
     logging.error(session)
     logging.error(config.postgres_dsn)
-    logger.emit('follow', {'from': 'userA', 'to': 'userB'})
-    return {"message": str(logger.host)}
+    return {"message": ""}
