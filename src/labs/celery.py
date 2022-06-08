@@ -10,4 +10,4 @@ from celery import Celery
 from . import __title__
 from .config import config
 
-app=Celery(__title__, broker=config.celery_dsn)
+app=Celery(__title__, broker=config.redis_dsn)

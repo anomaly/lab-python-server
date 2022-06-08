@@ -46,11 +46,12 @@ class Config(BaseSettings):
         )
 
     @property
-    def celery_dsn(self) -> RedisDsn:
+    def redis_dsn(self) -> RedisDsn:
         """Construct the DSN for the celery broker
         """
-        db_url=f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
-        return RedisDsn(url=db_url)
+        redis_url=f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
+        return RedisDsn(url=redis_url, 
+            scheme="redis")
 
 # A singleton instance of the configuration
 config = Config()
