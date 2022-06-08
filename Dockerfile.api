@@ -23,10 +23,11 @@ COPY ./src/. .
 
 # Ask poetry to install all packages including the app
 # not in virtual machine as we are in a container
+# In prodduction add --no-dev to poetry installation
 RUN pip3 install --upgrade pip
 RUN pip3 install poetry
 RUN poetry config virtualenvs.create false
-RUN poetry install --no-dev --no-root
+RUN poetry install --no-root
 
 # The app package will be located in /opt/appname so run
 # uvicorn at this level so it sees the package

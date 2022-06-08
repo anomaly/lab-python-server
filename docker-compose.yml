@@ -21,6 +21,9 @@ services:
   db:
     image: postgres:14-bullseye
     container_name: lab-postgres
+    # Expose for development purposes
+    ports:
+      - "5432:5432"
     restart: unless-stopped
     env_file:
       - .env.development
@@ -38,10 +41,10 @@ services:
       - redis-data:/data
     restart: unless-stopped
 
-  fluent-bit:
-    image: fluent/fluent-bit:1.5
-    container_name: lab-fluentbit
-    restart: unless-stopped
+  # fluent-bit:
+  #   image: fluent/fluent-bit:1.5
+  #   container_name: lab-fluentbit
+  #   restart: unless-stopped
 
   # Applicaiton API:
   # - In development we read secrets from .env.development
@@ -55,5 +58,17 @@ services:
     restart: unless-stopped
     ports:
       - "8000:80"
+    volumes:
+      - ./src/labs:/opt/labs
+
+
+  # Worker: is a celery based worker process that runs in the background
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    env_file:
+      - .env.development
+    restart: unless-stopped
     volumes:
       - ./src/labs:/opt/labs
