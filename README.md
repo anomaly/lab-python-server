@@ -16,6 +16,8 @@ In production (see [Terraform lab project](https://github.com/anomaly/lab-tf-lin
 TODO:
 - [ ] Convert the project to be a [Cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/) template
 
+> The approach taken in this guide is to document the tools and commands are they are and not build additional tooling or abstractions. The aim is to educate the user on the tools and how to use them.
+
 ## General notes
 
 Python 3.10 requires the Tinker package to be installed, not sure why this is the case and why the the base Docker image does not contain this. Take a look at the `Dockerfile` where we install this package via `apt`.
@@ -31,7 +33,7 @@ Use `openssl` to generate a random `base64` string where the `20` is th length:
 ```
 openssl rand -base64 20
 ```
-> This can be used to generate secrets
+> This can be used to generate secrets which the application uses, folllow more notes on how to cycle secrets in this guide.
 
 ## Python packages
 
@@ -46,6 +48,12 @@ The following Python packages make the standard set of tools for our projects:
 - **pendulum** - A timezone aware datetime library
 
 Packages are managed using `poetry`, docs available [here](https://python-poetry.org/docs/).
+
+> `alembic` does not yet have support for `asyncio`, to add `psycopg2` to the `pyproject.toml` 
+
+Install `psycopg2 to your `pyproject.toml` on `macOS`:
+- You will need to install `postgres` via `brew` to get the linked libraries
+
 ## App directory structure
 
 Directory structure for our application:
@@ -64,10 +72,20 @@ Directory structure for our application:
 
 ### API
 
+FastAPI
+
 ### Worker
+
+During development the following package are used
+
+[watchdog](https://github.com/gorakhargosh/watchdog)
+
 
 ### Schema migrations
 
+```
+docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m 'init db'"
+```
 
 ## Docker in Development
 
@@ -113,4 +131,4 @@ docker push anomalyhq/python-labe-server-api:v0.1.0
 - [Using find namespaces or find namespace package](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-namespace-or-find-namespace-packages)
 
 ## License
-Content of this repository are licensed under the Apache 2.0 license.
+Contents of this repository are licensed under the Apache 2.0 license.
