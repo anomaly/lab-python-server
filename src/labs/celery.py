@@ -5,9 +5,6 @@
 
 """
 
-from celery import Celery
+from .utils import create_celery_app
 
-from . import __title__
-from .config import config
-
-app=Celery(__title__, broker=config.redis_dsn)
+app=create_celery_app()
