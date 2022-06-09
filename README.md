@@ -56,9 +56,11 @@ Directory structure for our application:
  src/
  ├─ tests/
  ├─ labs
- |   └─ api/
- |   └─ core/
- |   └─ worker
+ |   └─ routers/
+ |   └─ tasks/
+ |   └─ models/
+ |   └─ schema/
+ |   └─ alembic/
  |   └─ __init__.py
  ├─ pyproject.toml
  ├─ poetry.lock  
@@ -90,13 +92,44 @@ app.include_router(router_auth, prefix="/auth")
 app.include_router(router_ext, prefix="/ext")
 ```
 
-### Worker
+### Celery based workers
 
-During development the following package are used
+The projects use `Celery` to manage a queue backed by `redis` to schedule and process background tasks. The celery app is run a separate container. In development we use [watchdog](https://github.com/gorakhargosh/watchdog) to watch for changes to the Python files, this is obviously uncessary in production.
 
-[watchdog](https://github.com/gorakhargosh/watchdog)
+The celery app is configured in `celery.py` which reads from the `redis` configuration in `config.py`.
 
+Each task is defined in the `tasks` package with appropriate subpackages. 
 
+To schedule tasks, the API endpoints need to import the task
+```python
+from ...tasks.email import verification_email
+```
+and call the `delay` method on the task:
+```python
+verification_email.delay()
+```
+
+A pieced together example of scheduling a task:
+
+```python
+from fastapi import APIRouter, Request, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from ...db import session_context, session_context
+from ...tasks.email import verification_email
+from ...config import config
+
+router = APIRouter()
+
+@router.get("/verify")
+async def log(request: Request):
+    """Verify an account
+    """
+    verification_email.delay()
+    return {"message": "hello world"}
+```
+
+> We recommend reading design documentation for the `Celery` project [here](https://docs.celeryproject.org/en/latest/userguide/tasks.html), the general principle is send meta data that the task can use to complete the task not complete, heavy objects. i.e send an ID with some context as opposed to a fully formed object.
 ### Schema migrations
 
 To initialise `alembic` activate the virtualenv created by `poetry`:
