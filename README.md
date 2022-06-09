@@ -153,8 +153,8 @@ target_metadata = Base.metadata
 
 And finally you should be able to run your initial migration:
 
-```
-➜  lab-python-server git:(main) ✗ docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m 'init db'"
+```sh
+docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m 'init db'"
 ```
 producing the following output:
 ```
@@ -163,8 +163,8 @@ INFO  [alembic.runtime.migration] Will assume transactional DDL.
   Generating /opt/labs/alembic/versions/4b2dfa16da8f_init_db.py ...  done
 ```
 followed by upgrading to the latest revision:
-```
-➜  lab-python-server git:(main) ✗ docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head" 
+```sh
+docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head" 
 ```
 producing the following output
 ```
