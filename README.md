@@ -83,6 +83,29 @@ During development the following package are used
 
 ### Schema migrations
 
+Since we want the `alembic` to configure itself dynamically (e.g Development container, Production container) we need to drop empty out the value set in `alembic.ini`
+
+```
+# From
+sqlalchemy.url = driver://user:pass@localhost/dbname
+
+# to, as it will be configured in env.py
+sqlalchemy.url =
+```
+
+and then in `env.py` import the application configuration and set the environment variable, I've decided to do this just after the `config` variable is assigned
+
+```
+# this is the Alembic Config object, which provides
+# access to the values within the .ini file in use.
+config = context.config
+
+# Read the app config and set sqlalchemy.url
+config.set_main_option("sqlalchemy.url", app_config.postgres_dsn)
+```
+
+> alembic does not support using the async driver, so make sure you are using a DSN that uses the non-async driver
+
 ```
 docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m 'init db'"
 ```

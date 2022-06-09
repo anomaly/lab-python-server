@@ -2,6 +2,7 @@
 
 """
 
+from functools import lru_cache
 from pydantic import BaseModel, BaseSettings, PostgresDsn, RedisDsn
 
 class Config(BaseSettings):
@@ -32,8 +33,11 @@ class Config(BaseSettings):
     CSRF_SECRET: str
 
     @property
-    def postgres_dsn(self) -> PostgresDsn:
+    def postgres_async_dsn(self) -> PostgresDsn:
         """Construct the Postgres DSN from the configuration
+
+          This uses the async driver for asyncio based operations in
+          SQLAlchemy
         """
         db_url=f'postgresql+asyncpg://{self.POSTGRES_USER}:\
             {self.POSTGRES_PASSWORD}\@{self.POSTGRES_HOST}:\
@@ -44,6 +48,24 @@ class Config(BaseSettings):
             user=self.POSTGRES_USER,
             password=self.POSTGRES_PASSWORD,
         )
+
+    @property
+    def postgres_dsn(self) -> PostgresDsn:
+        """Construct the Postgres DSN from the configuration
+          
+          This produces the sync version which is used by alembic as
+          it does not support the async driver
+        """
+        db_url=f'postgresql://{self.POSTGRES_USER}:\
+            {self.POSTGRES_PASSWORD}\@{self.POSTGRES_HOST}:\
+                {self.POSTGRES_PORT}/{self.POSTGRES_DB}'        
+        return PostgresDsn(
+            url=db_url,
+            scheme="postgresql",
+            user=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+        )
+
 
     @property
     def redis_dsn(self) -> RedisDsn:
@@ -62,3 +84,4 @@ class CsrfConfig(BaseModel):
   The FastAPI initialiser registers a decorated instance.
   """
   secret_key:str = config.CSRF_SECRET
+

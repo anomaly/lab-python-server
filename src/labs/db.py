@@ -18,7 +18,7 @@ from .config import config
 Base = declarative_base()
 
 # SQLAlchemy engine that connects to Postgres
-engine = create_async_engine(config.postgres_dsn, echo=True)
+engine = create_async_engine(config.postgres_async_dsn, echo=True)
 # Get an async session from the engine
 async_session = AsyncSession(engine, expire_on_commit=False)
 
