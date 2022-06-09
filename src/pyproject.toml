@@ -18,7 +18,6 @@ fluent-logger = "^0.10.0"
 fastapi-csrf-protect = "^0.2.2"
 redis = "^4.3.1"
 asyncpg = "^0.25.0"
-psycopg2 = "^2.9.3"
 gevent = "^21.12.0"
 
 [tool.poetry.dev-dependencies]
