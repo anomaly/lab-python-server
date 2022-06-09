@@ -18,6 +18,8 @@ TODO:
 
 > The approach taken in this guide is to document the tools and commands are they are and not build additional tooling or abstractions. The aim is to educate the user on the tools and how to use them.
 
+Ultimately the output of this lab will be consumed as the `app` and `worker` for the [Terramform Lab](https://github.com/anomaly/lab-tf-linode).
+
 ## General notes
 
 Python 3.10 requires the Tinker package to be installed, not sure why this is the case and why the the base Docker image does not contain this. Take a look at the `Dockerfile` where we install this package via `apt`.
@@ -91,6 +93,8 @@ app = FastAPI(
 app.include_router(router_auth, prefix="/auth")
 app.include_router(router_ext, prefix="/ext")
 ```
+
+> FastAPI camel cases the method name as the short description and uses the docstring as documentation for each endpoint. Markdown is allowed in the docstring.
 
 ### Celery based workers
 
