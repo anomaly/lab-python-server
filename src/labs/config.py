@@ -48,22 +48,6 @@ class Config(BaseSettings):
         )
 
     @property
-    def postgres_dsn(self) -> PostgresDsn:
-        """Construct the Postgres DSN from the configuration
-          
-          This produces the sync version which is used by alembic as
-          it does not support the async driver
-        """
-        db_url=f'postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'        
-        return PostgresDsn(
-            url=db_url,
-            scheme="postgresql",
-            user=self.POSTGRES_USER,
-            password=self.POSTGRES_PASSWORD,
-        )
-
-
-    @property
     def redis_dsn(self) -> RedisDsn:
         """Construct the DSN for the celery broker
         """
