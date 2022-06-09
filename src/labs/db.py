@@ -10,17 +10,29 @@ import asyncio
 from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import declarative_base, configure_mappers
 
 from .config import config
 
-
-Base = declarative_base()
-
 # SQLAlchemy engine that connects to Postgres
 engine = create_async_engine(config.postgres_async_dsn, echo=True)
+configure_mappers()
 # Get an async session from the engine
 async_session = AsyncSession(engine, expire_on_commit=False)
+
+# Used by the ORM layer to describe models
+Base = declarative_base()
+
+
+async def init_models():
+    """Initialises the models in the database
+
+    References:
+    https://stribny.name/blog/fastapi-asyncalchemy/
+    """
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+        await conn.run_sync(Base.metadata.create_all)
 
 @asynccontextmanager
 async def session_context():
