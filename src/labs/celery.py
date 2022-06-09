@@ -7,4 +7,4 @@
 
 from .utils import create_celery_app
 
-app=create_celery_app()
+app=create_celery_app(include=["labs.tasks"])

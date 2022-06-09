@@ -17,8 +17,12 @@ def create_celery_app(include=None):
     from . import __title__
     from .config import config
 
-    app = Celery(__title__, broker=config.config.redis_dsn)
+    app = Celery(__title__, broker=config.redis_dsn)
     app.autodiscover_tasks()
+
+    if include:
+        app.conf.update(include=include)
+
     return app
 
 
