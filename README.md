@@ -83,9 +83,34 @@ During development the following package are used
 
 ### Schema migrations
 
+To initialise `alembic` activate the virtualenv created by `poetry`:
+
+```sh
+cd src/
+poetry shell
+```
+
+and run the initialiser script for async mode:
+
+```sh
+alembic init -t async alembic
+```
+
+In `alembic.ini` the first parameter is the location of the alembic script, set to the following by default:
+
+```ini
+script_location = alembic
+```
+
+change this to be relative to the project:
+
+```init
+script_location = labs:alembic
+```
+
 Since we want the `alembic` to configure itself dynamically (e.g Development container, Production container) we need to drop empty out the value set in `alembic.ini`
 
-```
+```ini
 # From
 sqlalchemy.url = driver://user:pass@localhost/dbname
 
@@ -93,9 +118,17 @@ sqlalchemy.url = driver://user:pass@localhost/dbname
 sqlalchemy.url =
 ```
 
-and then in `env.py` import the application configuration and set the environment variable, I've decided to do this just after the `config` variable is assigned
+you need to import the following in `env.py`, relative imports don't seem to be allowed (pending investigation):
 
+```python
+# App level imports
+from labs.config import config as app_config
+from labs.db import Base
 ```
+
+and then in `env.py` import the application configuration and set the environment variable, I've decided to do this just after the `config` variable is assigned:
+
+```python
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
@@ -104,10 +137,40 @@ config = context.config
 config.set_main_option("sqlalchemy.url", app_config.postgres_dsn)
 ```
 
-> alembic does not support using the async driver, so make sure you are using a DSN that uses the non-async driver
+lastly you have to assign your `declerative_base` to the `target_metadata` varaible in `env.py`, so find the line:
+
+```python
+target_metadata = None
+```
+
+and change it to:
+
+```python
+target_metadata = Base.metadata
+```
+
+> Note that the `Base` comes from the above imports
+
+And finally you should be able to run your initial migration:
 
 ```
-docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m 'init db'"
+➜  lab-python-server git:(main) ✗ docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m 'init db'"
+```
+producing the following output:
+```
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+  Generating /opt/labs/alembic/versions/4b2dfa16da8f_init_db.py ...  done
+```
+followed by upgrading to the latest revision:
+```
+➜  lab-python-server git:(main) ✗ docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head" 
+```
+producing the following output
+```
+INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
+INFO  [alembic.runtime.migration] Will assume transactional DDL.
+INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 ```
 
 ## Docker in Development
