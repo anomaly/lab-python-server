@@ -1,15 +1,19 @@
-"""Scenes for the ext module
+""" Verification submodule
+
+ This is a submodule that contains API endpoint
+
 """
 
-from fastapi import Request, Depends
+from fastapi import APIRouter, Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ....db import session_context, session_context
-from . import router
+from ...db import session_context, session_context
+from ...config import config
 
+router = APIRouter()
 
 @router.get("/verify")
-async def log(request: Request, session: AsyncSession = Depends(session_context)):
+async def log(request: Request):
     """Verify an account
     """
     return {"message": "hello world"}

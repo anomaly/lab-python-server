@@ -4,8 +4,8 @@
 from fastapi import APIRouter, Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ....db import session_context, session_context
-from ....config import config
+from ...db import session_context, session_context
+from ...config import config
 
 router = APIRouter(tags=["ext"])
 
@@ -35,7 +35,4 @@ async def log(request: Request, session: AsyncSession = Depends(session_context)
 
     Purpose of this endpoint is to log a message to the logger.
     """
-    import logging
-    logging.error(session)
-    logging.error(config.postgres_dsn)
     return {"message": ""}
