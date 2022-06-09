@@ -3,17 +3,22 @@
 """
 
 
-def create_celery_app():
+def create_celery_app(include=None):
     """Create a Celery app
+    
+    If an array of packages if provided then we load the tasks
+    this is used when the worker is started.
 
+    Otherwise we return a connection to the broker to delay
+    or schedule tasks.
     """
     from celery import Celery
 
     from . import __title__
     from .config import config
 
-    app=Celery(__title__, broker=config.redis_dsn)
-
+    app = Celery(__title__, broker=config.config.redis_dsn)
+    app.autodiscover_tasks()
     return app
 
 
