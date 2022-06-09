@@ -14,7 +14,7 @@ from ...config import config
 router = APIRouter()
 
 @router.get("/verify")
-async def log(request: Request):
+async def verify_user_account(request: Request):
     """Verify an account
     """
     verification_email.delay()

@@ -26,12 +26,22 @@ def get_csrf_config():
   """
   return CsrfConfig()
 
+api_description = """
+This project provides a reference Python API built using FastAPI, the 
+aim of the project is:
+
+- To maintain a good know source of habits
+- Demonstrate how applications are meant to be put together at Anomaly
+- Democratize design of robust API
+
+"""
+
 """A FastAPI application that serves handlers
 """
 app = FastAPI(
     title=__title__,
     version=__version__,
-    description="Sample API",
+    description=api_description,
     docs_url="/docs",
     terms_of_service="https://github.com/anomaly/labs",
     contact={

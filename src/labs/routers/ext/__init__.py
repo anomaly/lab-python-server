@@ -19,7 +19,7 @@ async def echo(request: Request):
     return {"message": "Hello, world!"}
 
 @router.get("/healthcheck")
-async def healthcheck(request: Request):
+async def perform_healthcheck(request: Request):
     """Check the health of the server.
 
     Purpose of this endpoint is to check the health of the server.
@@ -30,7 +30,7 @@ async def healthcheck(request: Request):
 
 
 @router.get("/log")
-async def log(request: Request, session: AsyncSession = Depends(session_context)):
+async def write_to_logger(request: Request, session: AsyncSession = Depends(session_context)):
     """Log a message.
 
     Purpose of this endpoint is to log a message to the logger.
