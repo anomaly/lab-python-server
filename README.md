@@ -177,6 +177,7 @@ you need to import the following in `env.py`, relative imports don't seem to be 
 # App level imports
 from labs.config import config as app_config
 from labs.db import Base
+from labs.models import *
 ```
 
 and then in `env.py` import the application configuration and set the environment variable, I've decided to do this just after the `config` variable is assigned:
@@ -202,7 +203,7 @@ and change it to:
 target_metadata = Base.metadata
 ```
 
-> Note that the `Base` comes from the above imports
+> Note that the `Base` comes from the above imports and we import everything from our models package so alembic tracks all the models in the application.
 
 And finally you should be able to run your initial migration:
 
