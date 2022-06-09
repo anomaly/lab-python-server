@@ -6,9 +6,15 @@
 
 """
 from fastapi import APIRouter
+
+from ...models import User
 from .verify import router as router_verify
  
 """Mounts all the sub routers for the authentication module"""
 router = APIRouter(tags=["auth"])
 
 router.include_router(router_verify)
+
+@router.get("/me")
+async def get_me():
+  return {}
