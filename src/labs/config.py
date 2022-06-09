@@ -39,9 +39,7 @@ class Config(BaseSettings):
           This uses the async driver for asyncio based operations in
           SQLAlchemy
         """
-        db_url=f'postgresql+asyncpg://{self.POSTGRES_USER}:\
-            {self.POSTGRES_PASSWORD}\@{self.POSTGRES_HOST}:\
-                {self.POSTGRES_PORT}/{self.POSTGRES_DB}'        
+        db_url=f'postgresql+asyncpg://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'        
         return PostgresDsn(
             url=db_url,
             scheme="postgresql+asyncpg",
@@ -56,9 +54,7 @@ class Config(BaseSettings):
           This produces the sync version which is used by alembic as
           it does not support the async driver
         """
-        db_url=f'postgresql://{self.POSTGRES_USER}:\
-            {self.POSTGRES_PASSWORD}\@{self.POSTGRES_HOST}:\
-                {self.POSTGRES_PORT}/{self.POSTGRES_DB}'        
+        db_url=f'postgresql://{self.POSTGRES_USER}:{self.POSTGRES_PASSWORD}@{self.POSTGRES_HOST}:{self.POSTGRES_PORT}/{self.POSTGRES_DB}'        
         return PostgresDsn(
             url=db_url,
             scheme="postgresql",
