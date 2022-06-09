@@ -49,11 +49,6 @@ The following Python packages make the standard set of tools for our projects:
 
 Packages are managed using `poetry`, docs available [here](https://python-poetry.org/docs/).
 
-> `alembic` does not yet have support for `asyncio`, to add `psycopg2` to the `pyproject.toml` 
-
-Install `psycopg2 to your `pyproject.toml` on `macOS`:
-- You will need to install `postgres` via `brew` to get the linked libraries
-
 ## App directory structure
 
 Directory structure for our application:
