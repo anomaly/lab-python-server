@@ -67,7 +67,28 @@ Directory structure for our application:
 
 ### API
 
-FastAPI
+FastAPI is a Python framework for building HTTP APIs. It is a simple, flexible, and powerful framework for building APIs and builds upon the popular `pydantic` and `typing` libraries. Our general design for API end points is to break them into packages.
+
+Each submodule must defined a `router` where the handlers defined in the submodule are mounted on. This router should then be bubbled up to the main `router` in the `__init__.py` file and so on until we reach the top of the `routers` package.
+
+In the `routers` package we import the top level routers as `router_modulename` e.g:
+
+```
+from .auth import router as router_auth
+```
+
+finally the `api.py` imports all the top level routers and mounts them with a prefix:
+
+```python
+from .routers import router_auth, router_ext
+
+app = FastAPI(
+    .... # other config
+    )
+
+app.include_router(router_auth, prefix="/auth")
+app.include_router(router_ext, prefix="/ext")
+```
 
 ### Worker
 
