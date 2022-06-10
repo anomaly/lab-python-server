@@ -5,7 +5,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [X] A Postgres server for development
 - [X] A Redis server for development
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
-- [ ] Worker processes that will process tasks in the background (using Celery)
+- [X] Worker processes that will process tasks in the background (using Celery)
 - [ ] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring (fluentd)
 - [X] CSRF protection
