@@ -260,7 +260,7 @@ docker build -t anomalyhq/python-lab-server-api:v0.1.0 -f Dockerfile.api .
 ```
 
 ```
-docker push anomalyhq/python-labe-server-api:v0.1.0
+docker push anomalyhq/python-lab-server-api:v0.1.0
 ```
 
 ## Resources
