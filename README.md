@@ -251,7 +251,15 @@ https://docs.docker.com/develop/develop-images/multistage-build/
 gunicorn vs uvicorn
 https://www.uvicorn.org/deployment/
 
-Providing root path --root-path on unicorn
+When running behind a Reverse Proxy (which would almost always be the case for our applications), FastAPI can accept the root path in numerous ways. This tells FastAPI where to mount the application i.e how the requests are going to be forwarded to the top router so it can stripe away the prefix before routing the requests. So for example the `root` FastAPI application might be mounted on `/api` and the FastAPI will need to strip away the `/api` before handling the request.
+
+FastAPI's [Behind a Proxy](https://fastapi.tiangolo.com/advanced/behind-a-proxy/) document describes how to set this up. Where possible the recommend way is to pass this in via the `uvicorn` invocation, see `Dockerfile` for the `api` container:
+
+```Dockerfile
+ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
+```
+
+> Failing everything you can pass the argument in the FastAPI constructor.
 
 ## Distribution
 
