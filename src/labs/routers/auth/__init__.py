@@ -19,6 +19,12 @@ router.include_router(router_verify)
 
 @router.get("/me")
 async def get_me(session: AsyncSession = Depends(session_context)):
+  """Get the currently logged in user or myself
+
+  This endpoint will return the currently logged in user or raise
+  and exception if the user is not logged in.
+  """
+  
   return {}
 
 
