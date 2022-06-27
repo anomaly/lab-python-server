@@ -255,13 +255,21 @@ Providing root path --root-path on unicorn
 
 ## Distribution
 
-```
+We recommend the use of a registry such as [Docker Hub](https://hub.docker.com) to host your images. Assuming you are using Docker Hub, you can build your images using the following command:
+
+```sh
 docker build -t anomalyhq/python-lab-server-api:v0.1.0 -f Dockerfile.api .
 ```
 
-```
+where `v0.1.0` is the version of the image and `Docker.api` is the the `Dockerfile` to use. `python-lab-server` is the the name of the package that will be published on Docker Hub. To publish the image use the following command:
+
+```sh
 docker push anomalyhq/python-lab-server-api:v0.1.0
 ```
+
+where `anomalyhq` is the organisation on Docker Hub and `v0.1.0` is the version of the image.
+
+> Ensure you tag the release on your version control system and write thorough release notes.
 
 ## Resources
 
