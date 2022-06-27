@@ -13,12 +13,24 @@ class User(Base, IdentifierMixin, DateTimeMixin):
     
     __tablename__ = "user"
 
-    email = Column(String, unique=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
-    verified = Column(Boolean, server_default=expression.false(), nullable=False)
+    email = Column(String,
+        unique=True,
+        nullable=False)
 
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
+    hashed_password = Column(String,
+        nullable=False)
 
-    is_admin = Column(Boolean, server_default=expression.false(), nullable=False)
+    verified = Column(Boolean,
+        server_default=expression.false(), 
+        nullable=False)
+
+    first_name = Column(String,
+        nullable=False)
+
+    last_name = Column(String,
+        nullable=False)
+
+    is_admin = Column(Boolean, 
+        server_default=expression.false(), 
+        nullable=False)
 
