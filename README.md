@@ -1,4 +1,5 @@
 # Lab - Containerised Python server
+![Docker Pulls](https://img.shields.io/docker/pulls/anomalyhq/lab-python-mock-server)
 
 This lab aims to outline a recipe for building a standardised Python server that can be run in a container. Our major aims are to be able to:
 - [X] Expose an API that will eventually sit behind a reverse proxy
