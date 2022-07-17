@@ -9,7 +9,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [ ] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring (fluentd)
 - [X] CSRF protection
-- [ ] Basic endpoints for authentication
+- [ ] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
 
 In production (see [Terraform lab project](https://github.com/anomaly/lab-tf-linode)) we will use `Terraform` and `Helm` provision infrastructure and deploy the app in pods. Ideally `Postgres` and `Redis` would be provisioned as a hosted products (Linode is yet to offer this), in the short term they will be installed from official `Charts`.
 
@@ -41,13 +41,14 @@ openssl rand -base64 20
 
 The following Python packages make the standard set of tools for our projects:
 
-- **SQLAlchemy** - A Python object relational mapper (ORM)
-- **alembic** - A database migration tool
-- **fastapi-csrf-protect** - A fastapi middleware that protects against cross-site request forgery
-- **FastAPI** - A fast, simple, and flexible framework for building HTTP APIs
-- **Celery** - A task queue
+- [**SQLAlchemy**](https://www.sqlalchemy.org) - A Python object relational mapper (ORM)
+- [**alembic**](https://alembic.sqlalchemy.org/en/latest/) - A database migration tool
+- [**fastapi-csrf-protect**](https://github.com/aekasitt/fastapi-csrf-protect) - A fastapi middleware that protects against cross-site request forgery
+- [**FastAPI**](http://fastapi.tiangolo.com) - A fast, simple, and flexible framework for building HTTP APIs
+- [**Celery**](https://docs.celeryq.dev/en/stable/getting-started/introduction.html) - A task queue
 - **fluent-logger** - A Python logging library that supports fluentd
-- **pendulum** - A timezone aware datetime library
+- [**pendulum**](https://pendulum.eustace.io) - A timezone aware datetime library
+- [**pyotp**](https://pyauth.github.io/pyotp/) - A One-Time Password (OTP) generator
 
 Packages are managed using `poetry`, docs available [here](https://python-poetry.org/docs/).
 
