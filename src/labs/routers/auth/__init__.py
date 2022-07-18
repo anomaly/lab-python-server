@@ -16,13 +16,13 @@ from ...db import session_context, get_async_session
 from ...models import User
 from ...schema import User as UserSchema, LoginRequest, OTPVerifyRequest, AuthResponse
 
-from .verify import router as router_verify
+from .create import router as router_account_create
 from .otp import router as router_otp
  
 """Mounts all the sub routers for the authentication module"""
 router = APIRouter(tags=["auth"])
 
-router.include_router(router_verify)
+router.include_router(router_account_create)
 router.include_router(router_otp, prefix="/otp")
 
 @router.post("/login", response_model=AuthResponse)
@@ -51,15 +51,17 @@ async def refresh_jwt_token(request: Request,
   session: AsyncSession = Depends(session_context)):
   """ Provides a refresh token for the JWT session.
   """
+  Authorize.jwt_refresh_token_required()
+
+  current_user = Authorize.get_jwt_subject()
+  new_access_token = Authorize\
+    .create_access_token(subject=current_user,
+    fresh=False)
   return {}
 
 
 @router.post("/logout")
 async def logout_user(session: AsyncSession = Depends(session_context)):
-  return {}
-
-@router.post("/signup")
-async def signup_user(session: AsyncSession = Depends(session_context)):
   return {}
 
 @router.get("/me", response_model=UserSchema)

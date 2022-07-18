@@ -13,6 +13,11 @@ from ...config import config
 
 router = APIRouter()
 
+@router.post("/signup")
+async def signup_user(session: AsyncSession = Depends(session_context)):
+  return {}
+
+
 @router.get("/verify")
 async def verify_user_account(request: Request):
     """Verify an account
