@@ -5,4 +5,5 @@
 
 """
 
-from .user import User
+from .user import *
+from .auth import *

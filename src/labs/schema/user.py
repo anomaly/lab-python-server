@@ -1,8 +1,3 @@
-
-from datetime import datetime
-from typing import List, Optional
-from pydantic import BaseModel, NoneStr
-
 from .utils import IdentityMixin, DateTimeMixin
 
 class User(IdentityMixin, DateTimeMixin):
