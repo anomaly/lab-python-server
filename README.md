@@ -11,6 +11,10 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [X] CSRF protection
 - [ ] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
 
+Additionally, we provide:
+- [ ] Examples of working with Stripe for payments including handling webhooks
+- [ ] Provide a pattern on separating the API endpoints for the hooks for scale
+
 In production (see [Terraform lab project](https://github.com/anomaly/lab-tf-linode)) we will use `Terraform` and `Helm` provision infrastructure and deploy the app in pods. Ideally `Postgres` and `Redis` would be provisioned as a hosted products (Linode is yet to offer this), in the short term they will be installed from official `Charts`.
 
 TODO:
