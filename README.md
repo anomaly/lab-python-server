@@ -291,5 +291,10 @@ where `anomalyhq` is the organisation on Docker Hub and `v0.1.0` is the version 
 - [Poetry sub packages](https://github.com/python-poetry/poetry/issues/2270), an open issue to support sub packages in Poetry, which will be handy in splitting up our code base further.
 - [Using find namespaces or find namespace package](https://setuptools.pypa.io/en/latest/userguide/package_discovery.html#using-find-namespace-or-find-namespace-packages)
 
+SQLAlchemy speciific resources:
+
+- [FastAPI with Async SQLAlchemy, SQLModel, and Alembic](https://testdriven.io/blog/fastapi-sqlmodel/) by [Michael Herman](https://testdriven.io/authors/herman/)
+- [SQLAlchemy Async ORM is Finally Here!](https://ahmed-nafies.medium.com/sqlalchemy-async-orm-is-finally-here-d560dfaa335d) by [Ahmed Nafies](https://ahmed-nafies.medium.com/)
+
 ## License
 Contents of this repository are licensed under the Apache 2.0 license.
