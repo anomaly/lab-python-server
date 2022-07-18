@@ -12,7 +12,7 @@ from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-from ...db import session_context, async_session
+from ...db import session_context, get_async_session
 from ...models import User
 from ...schema import User as UserSchema, LoginRequest, OTPVerifyRequest, AuthResponse
 from .verify import router as router_verify
@@ -24,11 +24,12 @@ router.include_router(router_verify)
 
 @router.post("/login", response_model=AuthResponse)
 async def login_user(request: LoginRequest, 
-  Authorize: AuthJWT = Depends()):
+  Authorize: AuthJWT = Depends(),
+  session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
   
   """
-  user = await User.get_by_email(async_session, request.username)
+  user = await User.get_by_email(session, request.username)
 
   if user is None:
     raise HTTPException(status_code=401, detail="Failed to authenticate user")
