@@ -37,6 +37,12 @@ class User(Base, IdentifierMixin, DateTimeMixin):
         server_default=expression.false(), 
         nullable=False)
 
+    mobile_number = Column(String,
+        nullable=True)
+
+    otp_secret = Column(String,
+        nullable=True)
+
     @classmethod
     async def get_by_email(cls, session, email):
         query = select(cls).where(cls.email == email)
