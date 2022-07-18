@@ -20,6 +20,8 @@ redis = "^4.3.1"
 asyncpg = "^0.25.0"
 gevent = "^21.12.0"
 email-validator = "^1.2.1"
+pyotp = "^2.6.0"
+redmail = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
