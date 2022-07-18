@@ -7,13 +7,14 @@
 """
 from datetime import datetime
 from uuid import UUID
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-from ...db import session_context, session_context
+from ...db import session_context, async_session
 from ...models import User
-from ...schema import User as UserSchema
+from ...schema import User as UserSchema, LoginRequest, OTPVerifyRequest, AuthResponse
 from .verify import router as router_verify
  
 """Mounts all the sub routers for the authentication module"""
@@ -21,14 +22,52 @@ router = APIRouter(tags=["auth"])
 
 router.include_router(router_verify)
 
+@router.post("/login", response_model=AuthResponse)
+async def login_user(request: LoginRequest, 
+  Authorize: AuthJWT = Depends()):
+  """ Attempt to authenticate a user and issue JWT token
+  
+  """
+  user = await User.get_by_email(async_session, request.username)
+
+  if user is None:
+    raise HTTPException(status_code=401, detail="Failed to authenticate user")
+
+  access_token = Authorize.create_access_token(subject=user.email,fresh=True)
+  refresh_token = Authorize.create_refresh_token(subject=user.email)
+
+  return AuthResponse(access_token=access_token,
+                      refresh_token=refresh_token,
+                      token_type="Bearer",
+                      expires_in=100)
+
+@router.post("/refresh")
+async def refresh_jwt_token(request: Request,
+  Authorize: AuthJWT = Depends(),
+  session: AsyncSession = Depends(session_context)):
+  """ Provides a refresh token for the JWT session.
+  """
+  return {}
+
+
+@router.post("/logout")
+async def logout_user(session: AsyncSession = Depends(session_context)):
+  return {}
+
+@router.post("/signup")
+async def signup_user(session: AsyncSession = Depends(session_context)):
+  return {}
+
 @router.get("/me", response_model=UserSchema)
-async def get_me(session: AsyncSession = Depends(session_context)):
+async def get_me(request: Request,
+  Authorize: AuthJWT = Depends(),
+  session: AsyncSession = Depends(session_context)):
   """Get the currently logged in user or myself
 
   This endpoint will return the currently logged in user or raise
   and exception if the user is not logged in.
   """
-
+  Authorize.jwt_required()
   model = UserSchema(
     id = UUID('{12345678-1234-5678-1234-567812345678}'),
     first_name="Dev",
@@ -42,21 +81,3 @@ async def get_me(session: AsyncSession = Depends(session_context)):
   
   return model
 
-
-@router.post("/login")
-async def login_user(session: AsyncSession = Depends(session_context)):
-  """Login a user."""
-  return {}
-
-
-@router.post("/logout")
-async def logout_user(session: AsyncSession = Depends(session_context)):
-  return {}
-
-@router.post("/signup")
-async def signup_user(session: AsyncSession = Depends(session_context)):
-  return {}
-
-@router.post("/account")
-async def login(session: AsyncSession = Depends(session_context)):
-  return {}
