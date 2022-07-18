@@ -32,6 +32,16 @@ class Config(BaseSettings):
     # and cross domain checking
     CSRF_SECRET: str
 
+    # SMTP and SMS related configuration
+    SMTP_HOST: str
+    SMTP_PORT: int
+    SMTP_USER: str
+    SMTP_PASSWORD: str
+    
+    SMS_API_KEY: str
+    SMS_API_SECRET: str
+
+
     @property
     def postgres_async_dsn(self) -> PostgresDsn:
         """Construct the Postgres DSN from the configuration
