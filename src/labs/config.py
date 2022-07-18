@@ -31,6 +31,7 @@ class Config(BaseSettings):
     # Secrets that the application requires for session
     # and cross domain checking
     CSRF_SECRET: str
+    JWT_SECRET: str
 
     # SMTP and SMS related configuration
     SMTP_HOST: str
@@ -79,10 +80,9 @@ class Config(BaseSettings):
 # A singleton instance of the configuration
 config = Config()
 
-class CsrfConfig(BaseModel):
-  """A model required by the CSRF protection plugin
+class JWTAuthConfig(BaseModel):
+  """A model required by the JWT auth plugin
 
   The FastAPI initialiser registers a decorated instance.
   """
-  secret_key:str = config.CSRF_SECRET
-
+  authjwt_secret_key:str = config.JWT_SECRET

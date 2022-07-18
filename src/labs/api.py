@@ -14,17 +14,11 @@ from . import __title__, __version__
 
 from fastapi import FastAPI, Request, Depends, status, WebSocket
 from fastapi.responses import JSONResponse
-from fastapi_csrf_protect import CsrfProtect
-from fastapi_csrf_protect.exceptions import CsrfProtectError
+from fastapi_jwt_auth import AuthJWT
+from fastapi_jwt_auth.exceptions import AuthJWTException
 
-from .config import CsrfConfig
+from .config import JWTAuthConfig
 from .routers import router_auth, router_ext
-
-@CsrfProtect.load_config
-def get_csrf_config():
-  """Produces a configuration that the xsrf plugin accept
-  """
-  return CsrfConfig()
 
 api_description = """
 This project provides a reference Python API built using FastAPI, the 
@@ -35,6 +29,12 @@ aim of the project is:
 - Democratize design of robust API
 
 """
+
+@AuthJWT.load_config
+def get_jwt_authconfig():
+  """ Get the JWT auth config from the config
+  """
+  return JWTAuthConfig()
 
 """A FastAPI application that serves handlers
 """
@@ -65,18 +65,16 @@ app = FastAPI(
 app.include_router(router_auth, prefix="/auth")
 app.include_router(router_ext, prefix="/ext")
 
-@app.exception_handler(CsrfProtectError)
-def csrf_protect_exception_handler(request: Request, exc: CsrfProtectError):
-  """Handles an exception for the CSRF protection
-  """
-  return JSONResponse(
-    status_code=exc.status_code,
-      content={ 'detail':  exc.message
-    }
-  )
+# Exception handler for the JWT auth plugin
+@app.exception_handler(AuthJWTException)
+def authjwt_exception_handler(request: Request, exc: AuthJWTException):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.message}
+    )
 
 @app.get("/")
-async def root(request: Request, csrf_protect:CsrfProtect = Depends()):
+async def root(request: Request):
   """Placeholder for the root endpoint
   """
   return JSONResponse(
