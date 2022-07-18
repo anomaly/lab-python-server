@@ -30,7 +30,6 @@ class Config(BaseSettings):
 
     # Secrets that the application requires for session
     # and cross domain checking
-    CSRF_SECRET: str
     JWT_SECRET: str
 
     # SMTP and SMS related configuration
