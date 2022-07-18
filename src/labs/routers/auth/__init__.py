@@ -15,12 +15,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...db import session_context, get_async_session
 from ...models import User
 from ...schema import User as UserSchema, LoginRequest, OTPVerifyRequest, AuthResponse
+
 from .verify import router as router_verify
+from .otp import router as router_otp
  
 """Mounts all the sub routers for the authentication module"""
 router = APIRouter(tags=["auth"])
 
 router.include_router(router_verify)
+router.include_router(router_otp, prefix="/otp")
 
 @router.post("/login", response_model=AuthResponse)
 async def login_user(request: LoginRequest, 
