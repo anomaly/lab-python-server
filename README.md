@@ -24,6 +24,13 @@ TODO:
 
 Ultimately the output of this lab will be consumed as the `app` and `worker` for the [Terramform Lab](https://github.com/anomaly/lab-tf-linode).
 
+## Using this template
+
+All `docker-compose` files depend on the following environment variables, which can be set by either exporting them before you run the commands or by declaring them in your `.env` file.
+
+- `PROJ_NAME` is a prefix that is used to label resources, object stores
+- `PROJ_DOMAIN` is the domain name of the application, this can be set
+
 ## General notes
 
 Python 3.10 requires the Tinker package to be installed, not sure why this is the case and why the the base Docker image does not contain this. Take a look at the `Dockerfile` where we install this package via `apt`.
@@ -223,7 +230,7 @@ INFO  [alembic.runtime.migration] Will assume transactional DDL.
 ```
 followed by upgrading to the latest revision:
 ```sh
-docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head" 
+docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head"
 ```
 producing the following output
 ```

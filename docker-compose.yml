@@ -20,7 +20,7 @@ services:
   #   via Kubernetes
   db:
     image: postgres:14-bullseye
-    container_name: lab-postgres
+    container_name: ${PROJ_NAME}-postgres
     # Expose for development purposes
     ports:
       - "5432:5432"
@@ -36,20 +36,21 @@ services:
   #   and worker tasks
   redis:
     image: redis:7-bullseye
-    container_name: lab-redis
+    container_name: ${PROJ_NAME}-redis
     volumes:
       - redis-data:/data
     restart: unless-stopped
 
   # fluent-bit:
   #   image: fluent/fluent-bit:1.5
-  #   container_name: lab-fluentbit
+  #   container_name: ${PROJ_NAME}-fluentbit
   #   restart: unless-stopped
 
   # Applicaiton API:
   # - In development we read secrets from .env.development
   # - Provides a FastAPI based API that runs using uvicorn in development
   api:
+    container_name: ${PROJ_NAME}-api
     build:
       context: .
       dockerfile: Dockerfile.api
@@ -64,6 +65,7 @@ services:
 
   # Worker: is a celery based worker process that runs in the background
   worker:
+    container_name: ${PROJ_NAME}-worker
     build:
       context: .
       dockerfile: Dockerfile.worker
@@ -72,3 +74,23 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/labs:/opt/labs
+
+  # MinIO server used during development, replaced by object store in prod
+  minio:
+    image: minio/minio
+    container_name: ${PROJ_NAME}-minio
+    restart: unless-stopped
+    hostname: s3.${PROJ_DOMAIN}
+    volumes:
+      - minio-data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    env_file:
+      - .env.development
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
