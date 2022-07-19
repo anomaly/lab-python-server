@@ -19,4 +19,4 @@ def setup_periodic_tasks(sender, **kwargs):
 @app.task
 def check_every_so_often(arg):
     import logging
-    logging.info(arg)
+    logging.error(arg)
