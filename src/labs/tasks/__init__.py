@@ -12,3 +12,4 @@
 
 from .email import *
 from .periodic import *
+from .otp import *
