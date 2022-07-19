@@ -70,12 +70,17 @@ Directory structure for our application:
  src/
  ├─ tests/
  ├─ labs
- |   └─ routers/
- |   └─ tasks/
- |   └─ models/
- |   └─ schema/
- |   └─ alembic/
+ |   └─ routers/         -- FastAPI routers
+ |   └─ tasks/           -- Celery tasks
+ |   └─ models/          -- SQLAlchemy models
+ |   └─ schema/          -- Pydantic schemas
+ |   └─ alembic/         -- Alembic migrations
  |   └─ __init__.py
+ |   └─ api.py
+ |   └─ celery.py
+ |   └─ config.py
+ |   └─ db.py
+ |   └─ utils.py
  ├─ pyproject.toml
  ├─ poetry.lock  
 
@@ -120,9 +125,9 @@ To schedule tasks, the API endpoints need to import the task
 ```python
 from ...tasks.email import verification_email
 ```
-and call the `delay` method on the task:
+and call the `apply_async` method on the task:
 ```python
-verification_email.delay()
+verification_email.apply_async()
 ```
 
 A pieced together example of scheduling a task:
@@ -141,9 +146,17 @@ router = APIRouter()
 async def log(request: Request):
     """Verify an account
     """
-    verification_email.delay()
+    verification_email.apply_async()
     return {"message": "hello world"}
 ```
+
+You can send position arguments to the task, for example:
+
+```python
+verification_email.apply_async(args=[user_id])
+```
+
+which would be recieved by the task as `user_id` as a positional argument.
 
 > We recommend reading design documentation for the `Celery` project [here](https://docs.celeryproject.org/en/latest/userguide/tasks.html), the general principle is send meta data that the task can use to complete the task not complete, heavy objects. i.e send an ID with some context as opposed to a fully formed object.
 ### Schema migrations
