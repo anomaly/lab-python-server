@@ -4,11 +4,16 @@ class LoginRequest(BaseModel):
     username: str
     password: str
 
-class OTPTriggerRequest(BaseModel):
+class OTPTriggerEmailRequest(BaseModel):
+    email: str
+class OTPTriggerSMSRequest(BaseModel):
     phone_number: str
 
 class OTPVerifyRequest(BaseModel):
     otp: str
+
+class OTPTriggerResponse(BaseModel):
+    success: bool
 
 class AuthResponse(BaseModel):
     """Response from the authentication endpoint
