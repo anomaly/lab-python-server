@@ -74,14 +74,14 @@ class ModelCRUDMixin:
     - https://bit.ly/3OmhtPw
     """
     @classmethod
-    async def create(cls, **kwargs):
+    async def create(cls, async_db_session, **kwargs):
         new_instance = cls(**kwargs)
         async_db_session.add(new_instance)
         await async_db_session.commit()
         return new_instance
 
     @classmethod
-    async def update(cls, id, **kwargs):
+    async def update(cls, async_db_session, id, **kwargs):
         query = (
             sqlalchemy_update(cls)
             .where(cls.id == id)
@@ -93,7 +93,7 @@ class ModelCRUDMixin:
         await async_db_session.commit()
 
     @classmethod
-    async def get(cls, id):
+    async def get(cls, async_db_session, id):
         query = select(cls).where(cls.id == id)
         results = await async_db_session.execute(query)
         (result,) = results.one()
