@@ -4,6 +4,7 @@
 
 from functools import lru_cache
 from pydantic import BaseModel, BaseSettings, PostgresDsn, RedisDsn
+from pydantic.types import SecretStr
 
 class Config(BaseSettings):
     """Configuration for the application
@@ -16,7 +17,7 @@ class Config(BaseSettings):
     # Configuration required to construct the Postgres DSN
     POSTGRES_DB: str
     POSTGRES_USER: str
-    POSTGRES_PASSWORD: str
+    POSTGRES_PASSWORD: SecretStr
     POSTGRES_HOST: str
     POSTGRES_PORT: int
 
@@ -28,18 +29,26 @@ class Config(BaseSettings):
     REDIS_HOST: str
     REDIS_PORT: int
 
+    # S3 related configuration
+    S3_ENDPOINT: str
+    S3_PORT: int = 443 # Overriden for development
+    S3_ACCESS_KEY: SecretStr
+    S3_SECRET_KEY: SecretStr
+    S3_REGION: str = "ap-south-1" # Set to Linode Singapore
+    S3_USE_SSL: bool = True # Should only be relaxed for development
+
     # Secrets that the application requires for session
     # and cross domain checking
-    JWT_SECRET: str
+    JWT_SECRET: SecretStr
 
     # SMTP and SMS related configuration
     SMTP_HOST: str
     SMTP_PORT: int
     SMTP_USER: str
-    SMTP_PASSWORD: str
+    SMTP_PASSWORD: SecretStr
     
     SMS_API_KEY: str
-    SMS_API_SECRET: str
+    SMS_API_SECRET: SecretStr
 
 
     @property
@@ -53,7 +62,7 @@ class Config(BaseSettings):
             "postgresql+asyncpg://",
             self.POSTGRES_USER,
             ":",
-            self.POSTGRES_PASSWORD,
+            self.POSTGRES_PASSWORD.get_secret_value(),
             "@",
             self.POSTGRES_HOST,
             ":",
@@ -84,4 +93,4 @@ class JWTAuthConfig(BaseModel):
 
   The FastAPI initialiser registers a decorated instance.
   """
-  authjwt_secret_key:str = config.JWT_SECRET
+  authjwt_secret_key:str = config.JWT_SECRET.get_secret_value()

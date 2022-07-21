@@ -11,9 +11,9 @@ email_sender = EmailSender(
     host=config.SMTP_HOST,
     port=config.SMTP_PORT,
     username=config.SMTP_USER,
-    password=config.SMTP_PASSWORD,
+    password=config.SMTP_PASSWORD.get_secret_value(),
     use_starttls=False,
-    )
+)
 
 def send_sms_message(phone_number: str, message: str):
     """ Warpper to send SMS messages
@@ -27,7 +27,7 @@ def send_sms_message(phone_number: str, message: str):
     # Configuration required by clicksend_client
     _cs_config = clicksend_client.Configuration()
     _cs_config.username = config.SMS_API_KEY
-    _cs_config.password = config.SMS_API_SECRET
+    _cs_config.password = config.SMS_API_SECRET.get_secret_value()
 
     # Clicksend overarching client
     sms_client = clicksend_client\

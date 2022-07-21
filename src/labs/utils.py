@@ -1,7 +1,18 @@
-"""Utility functions shared across the app
+""" Utility functions shared across the app
 
 """
 
+from minio import Minio
+
+from .config import config
+
+minio_client = Minio(
+    f"{config.S3_ENDPOINT}:{config.S3_PORT}",
+    access_key=config.S3_ACCESS_KEY.get_secret_value(),
+    secret_key=config.S3_SECRET_KEY.get_secret_value(),
+    secure=config.S3_USE_SSL,
+    region="any",
+)
 
 def create_celery_app(include=None):
     """Create a Celery app
