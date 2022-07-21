@@ -20,13 +20,16 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
+
+    The user has provided us their email address and we will
+    attempt to authenticate them via OTP.
   
   """
   # Get the user account
-  user = await User.get_by_email(session, request.username)
+  user = await User.get_by_email(session, request.email)
 
   if user is None:
-    user = await User.create(session, request.dict())
+    user = await User.create(session, **request.dict())
 
   # If not found make a user account with the mobile
 
@@ -41,6 +44,9 @@ async def initiate_otp_request(request: OTPTriggerSMSRequest,
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
+
+    The user has provided a mobile number and we will text them
+    their OTP and let them login. 
   
   """
   # Get the user account

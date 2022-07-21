@@ -8,13 +8,15 @@ from fastapi import APIRouter, Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import session_context, session_context
+from ...schema import SignupRequest
 from ...tasks.email import verification_email
 from ...config import config
 
 router = APIRouter()
 
 @router.post("/signup")
-async def signup_user(session: AsyncSession = Depends(session_context)):
+async def signup_user(request: SignupRequest, 
+  session: AsyncSession = Depends(session_context)):
   return {}
 
 

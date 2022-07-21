@@ -4,6 +4,10 @@ class PasswordLoginRequest(BaseModel):
     username: str
     password: str
 
+class SignupRequest(BaseModel):
+    password: str
+    email: str
+
 class OTPTriggerEmailRequest(BaseModel):
     email: str
 
