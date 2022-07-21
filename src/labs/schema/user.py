@@ -1,3 +1,5 @@
+from typing import Optional
+
 from .utils import IdentityMixin, DateTimeMixin
 
 class UserRequest(IdentityMixin, DateTimeMixin):
