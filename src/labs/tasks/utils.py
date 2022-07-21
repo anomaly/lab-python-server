@@ -2,7 +2,8 @@
 """
 
 from redmail import EmailSender
-import clicksend_client 
+import clicksend_client
+from clicksend_client.rest import ApiException
 
 from ..config import config
 
