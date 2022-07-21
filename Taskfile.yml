@@ -1,0 +1,9 @@
+version: '3'
+
+tasks:
+  db-rev:
+    cmds:
+      - docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m {{.CLI_ARGS}}"
+  db-migrate:
+    cmds:
+      - docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head"
