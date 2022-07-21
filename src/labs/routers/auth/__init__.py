@@ -83,7 +83,7 @@ async def get_me(request: Request,
     verified=True,
     created_at=datetime.now(),
     updated_at=datetime.now()
-    )
+  )
   
   return model
 

@@ -7,6 +7,7 @@ from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import session_context, get_async_session
+from ...models import User
 from ...schema import OTPTriggerEmailRequest, \
   OTPTriggerSMSRequest, OTPVerifyRequest, OTPTriggerResponse
 from ...tasks.otp import initiate_otp_via_email, \
@@ -22,6 +23,11 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
   
   """
   # Get the user account
+  user = await User.get_by_email(session, request.username)
+
+  if user is None:
+    raise HTTPException(status_code=401, detail="Failed to authenticate user")
+
 
   # If not found make a user account with the mobile
 
