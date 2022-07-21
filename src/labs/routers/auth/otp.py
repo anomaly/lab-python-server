@@ -6,7 +6,7 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...db import session_context, get_async_session
+from ...db import get_async_session
 from ...models import User
 from ...schema import OTPTriggerEmailRequest, \
   OTPTriggerSMSRequest, OTPVerifyRequest, OTPTriggerResponse
