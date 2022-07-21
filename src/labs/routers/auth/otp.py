@@ -26,7 +26,7 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
   user = await User.get_by_email(session, request.username)
 
   if user is None:
-    use = User.create(session, request.dict())
+    user = await User.create(session, request.dict())
 
   # If not found make a user account with the mobile
 
@@ -44,14 +44,11 @@ async def initiate_otp_request(request: OTPTriggerSMSRequest,
   
   """
   # Get the user account
-  user = await User.get_by_phone(session, request.phone_number)
-
-  import logging
-  logging.error(request.dict())
+  user = await User.get_by_phone(session, request.mobile_number)
 
   # If not found make a user account with the mobile
   if user is None:
-    user = User.create(session, request.dict())
+    user = await User.create(session, **request.dict())
 
   # Initiate the OTP process
   initiate_otp_via_sms.apply_async(args=[user.id])
