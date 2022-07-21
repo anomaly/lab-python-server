@@ -86,7 +86,7 @@ Directory structure for our application:
 
 ```
 
-### API
+## API
 
 FastAPI is a Python framework for building HTTP APIs. It is a simple, flexible, and powerful framework for building APIs and builds upon the popular `pydantic` and `typing` libraries. Our general design for API end points is to break them into packages.
 
@@ -113,7 +113,7 @@ app.include_router(router_ext, prefix="/ext")
 
 > FastAPI camel cases the method name as the short description and uses the docstring as documentation for each endpoint. Markdown is allowed in the docstring.
 
-### Celery based workers
+## Celery based workers
 
 The projects use `Celery` to manage a queue backed by `redis` to schedule and process background tasks. The celery app is run a separate container. In development we use [watchdog](https://github.com/gorakhargosh/watchdog) to watch for changes to the Python files, this is obviously uncessary in production.
 
@@ -159,7 +159,7 @@ verification_email.apply_async(args=[user_id])
 which would be recieved by the task as `user_id` as a positional argument.
 
 > We recommend reading design documentation for the `Celery` project [here](https://docs.celeryproject.org/en/latest/userguide/tasks.html), the general principle is send meta data that the task can use to complete the task not complete, heavy objects. i.e send an ID with some context as opposed to a fully formed object.
-### Schema migrations
+## Schema migrations
 
 To initialise `alembic` activate the virtualenv created by `poetry`:
 
@@ -251,6 +251,13 @@ INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
 INFO  [alembic.runtime.migration] Will assume transactional DDL.
 INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 ```
+
+## Taskfile
+
+[Task](https://taskfile.dev) is a task runner / build tool that aims to be simpler and easier to use than, for example, GNU Make. Wile it's useful to know the actual commands it's easy to use a tool like task to make things easier on a daily basis:
+
+- `task db-revision -- "commit message"` - creates a new revision in the database and uses the parameter as the commit message
+- `task db-migrate` - migrates the schema to the latest version
 
 ## Docker in Development
 
