@@ -1,11 +1,15 @@
 version: '3'
 
 tasks:
-  db-rev:
+  build:image:
+    desc: builds a publishable docker image
+    cmds:
+      - docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER} -f Dockerfile.api .
+  db:rev:
     desc: create a database migration, pass a string as commit string
     cmds:
       - docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m {{.CLI_ARGS}}"
-  db-migrate:
+  db:migrate:
     desc: migrates models to HEAD
     cmds:
       - docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head"
