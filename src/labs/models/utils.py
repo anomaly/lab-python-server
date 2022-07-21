@@ -12,6 +12,22 @@ from sqlalchemy.future import select
 from sqlalchemy import update as sqlalchemy_update,\
     delete as sqlalchemy_delete
 
+from passlib.context import CryptContext
+
+_pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto"
+)
+
+def verify_password(plain_password, hashed_password) -> bool:
+    return _pwd_context.verify(
+        plain_password,
+        hashed_password
+    )
+
+def hash_password(password) -> str:
+    return _pwd_context.hash(password)
+
 class IdentifierMixin(object):
     """An ID for a given object
 
@@ -116,3 +132,5 @@ class ModelCRUDMixin:
             await async_db_session.rollback()
             raise
         return True
+
+
