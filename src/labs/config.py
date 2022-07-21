@@ -19,18 +19,19 @@ class Config(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: SecretStr
     POSTGRES_HOST: str
-    POSTGRES_PORT: int
+    POSTGRES_PORT: int = 5432
 
     # fluentd configuration
     FLUENTD_HOST: str
-    FLUENTD_PORT: int
+    FLUENTD_PORT: int = 24224
 
     # redis is used by celery for workers
     REDIS_HOST: str
-    REDIS_PORT: int
+    REDIS_PORT: int = 6379
 
     # S3 related configuration
     S3_ENDPOINT: str
+    S3_BUCKET_NAME: str
     S3_PORT: int = 443 # Overriden for development
     S3_ACCESS_KEY: SecretStr
     S3_SECRET_KEY: SecretStr
@@ -43,7 +44,7 @@ class Config(BaseSettings):
 
     # SMTP and SMS related configuration
     SMTP_HOST: str
-    SMTP_PORT: int
+    SMTP_PORT: int = 587
     SMTP_USER: str
     SMTP_PASSWORD: SecretStr
     

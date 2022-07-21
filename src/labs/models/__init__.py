@@ -6,3 +6,4 @@
 """
 
 from .user import User
+from .s3 import S3FileMetadata

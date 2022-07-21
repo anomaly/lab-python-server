@@ -11,7 +11,7 @@ minio_client = Minio(
     access_key=config.S3_ACCESS_KEY.get_secret_value(),
     secret_key=config.S3_SECRET_KEY.get_secret_value(),
     secure=config.S3_USE_SSL,
-    region="any",
+    region=config.S3_REGION,
 )
 
 def create_celery_app(include=None):
