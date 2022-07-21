@@ -44,9 +44,6 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
     otp_secret = Column(String,
         nullable=True)
 
-    async def set_password(self, plain_text_pass):
-        pass
-
     async def check_password(self, plain_text_pass):
         pass
 
@@ -79,7 +76,9 @@ def receive_init(target, args, kwargs):
     """
     target.otp_secret = pyotp.random_base32()
 
-@event.listens_for(User.password, 'set')
-def receive_set(target, value, initiator):
+@event.listens_for(User.password, 'set', propagate=True)
+def receive_password_set(target, value, old, initiator):
     """ Setting the password will has the value """
-    target.password = hash_password(value)
+    print("=== START ===")
+    # print(target, value, initiator, )
+    print("=== END ===")

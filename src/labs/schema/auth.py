@@ -7,7 +7,6 @@ class PasswordLoginRequest(BaseModel):
 class SignupRequest(BaseModel):
     password: str
     email: str
-
 class OTPTriggerEmailRequest(BaseModel):
     email: str
 
