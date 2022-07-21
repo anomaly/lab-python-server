@@ -39,6 +39,8 @@ async def init_models():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
+# TODO: Revise implementation in async context
+# Donot use until we have a better understanding of how to use async context
 @asynccontextmanager
 async def session_context():
     """Provide a transactional scope around a series of operations.
