@@ -3,11 +3,11 @@ from .utils import IdentityMixin, DateTimeMixin
 class UserRequest(IdentityMixin, DateTimeMixin):
     """ User profile 
     """
-    email: str
-    mobile_phone: str
+    email: Optional[str]
+    mobile_number: Optional[str]
     verified: bool
-    first_name: str
-    last_name: str
+    first_name: Optional[str]
+    last_name: Optional[str]
 
     class Config:
         """ Enable compatibility with SQLAlchemy

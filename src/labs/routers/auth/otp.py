@@ -31,7 +31,9 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
   # If not found make a user account with the mobile
 
   # Initiate the OTP process
-  initiate_otp_via_email.apply_async(args=["test"])
+  initiate_otp_via_email.apply_async(args=[user.id])
+
+  return OTPTriggerResponse(success=True)
 
 
 @router.post("/initiate/sms")
@@ -42,12 +44,19 @@ async def initiate_otp_request(request: OTPTriggerSMSRequest,
   
   """
   # Get the user account
-  user = await User.get_by_email(session, request.username)
+  user = await User.get_by_phone(session, request.phone_number)
+
+  import logging
+  logging.error(request.dict())
 
   # If not found make a user account with the mobile
+  if user is None:
+    user = User.create(session, request.dict())
 
   # Initiate the OTP process
-  initiate_otp_via_sms.apply_async(args=["test"])
+  initiate_otp_via_sms.apply_async(args=[user.id])
+
+  return OTPTriggerResponse(success=True)
 
 @router.post("/verify")
 async def verify_otp(request: OTPVerifyRequest, 

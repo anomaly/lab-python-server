@@ -8,7 +8,7 @@ class OTPTriggerEmailRequest(BaseModel):
     email: str
 
 class OTPTriggerSMSRequest(BaseModel):
-    phone_number: str
+    mobile_number: str
 
 class OTPVerifyRequest(BaseModel):
     otp: str
