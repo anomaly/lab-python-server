@@ -1,6 +1,6 @@
 from .utils import IdentityMixin, DateTimeMixin
 
-class User(IdentityMixin, DateTimeMixin):
+class UserRequest(IdentityMixin, DateTimeMixin):
     """ User profile 
     """
     email: str

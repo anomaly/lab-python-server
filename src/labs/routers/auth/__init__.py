@@ -14,7 +14,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import session_context, get_async_session
 from ...models import User
-from ...schema import User as UserSchema, LoginRequest, OTPVerifyRequest, AuthResponse
+from ...schema import UserRequest,\
+  PasswordLoginRequest, AuthResponse
 
 from .create import router as router_account_create
 from .otp import router as router_otp
@@ -26,7 +27,7 @@ router.include_router(router_account_create)
 router.include_router(router_otp, prefix="/otp")
 
 @router.post("/login", response_model=AuthResponse)
-async def login_user(request: LoginRequest, 
+async def login_user(request: PasswordLoginRequest, 
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
@@ -64,7 +65,7 @@ async def refresh_jwt_token(request: Request,
 async def logout_user(session: AsyncSession = Depends(session_context)):
   return {}
 
-@router.get("/me", response_model=UserSchema)
+@router.get("/me", response_model=UserRequest)
 async def get_me(request: Request,
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(session_context)):
@@ -74,7 +75,7 @@ async def get_me(request: Request,
   and exception if the user is not logged in.
   """
   Authorize.jwt_required()
-  model = UserSchema(
+  model = UserRequest(
     id = UUID('{12345678-1234-5678-1234-567812345678}'),
     first_name="Dev",
     last_name="Mukherjee",

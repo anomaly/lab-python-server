@@ -51,9 +51,20 @@ class S3FileMetadata(DateTimeMixin, IdentifierMixin, ModelCRUDMixin):
                 self.s3_key,
                 expires=timedelta(hours=1),
                 response_headers={
-                    "response-content-disposition": f'attachment; filename="{self.file_name}"'
+                    "response-content-disposition": 
+                    f'attachment; filename="{self.file_name}"'
                 },
             )
         except Exception as e:
             return None
 
+    def get_upload_url(self) -> Union[str, None]:
+        try:
+            url = minio_client.presigned_put_object(
+                config.S3_BUCKET_NAME,
+                self.s3_key,
+                expires=timedelta(minutes=20)
+            )
+            return url
+        except Exception:
+            return None

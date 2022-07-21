@@ -1,11 +1,12 @@
 from pydantic import BaseModel
 
-class LoginRequest(BaseModel):
+class PasswordLoginRequest(BaseModel):
     username: str
     password: str
 
 class OTPTriggerEmailRequest(BaseModel):
     email: str
+
 class OTPTriggerSMSRequest(BaseModel):
     phone_number: str
 

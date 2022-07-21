@@ -75,8 +75,10 @@ class ModelCRUDMixin:
     """
     @classmethod
     async def create(cls, **kwargs):
-        async_db_session.add(cls(**kwargs))
+        new_instance = cls(**kwargs)
+        async_db_session.add(new_instance)
         await async_db_session.commit()
+        return new_instance
 
     @classmethod
     async def update(cls, id, **kwargs):
@@ -98,19 +100,19 @@ class ModelCRUDMixin:
         return result
 
     @classmethod
-    async def get_all(cls):
+    async def get_all(cls, async_db_session):
         query = select(cls)
-        users = await db.execute(query)
+        users = await async_db_session.execute(query)
         users = users.scalars().all()
         return users
 
     @classmethod
-    async def delete(cls, id):
+    async def delete(cls, async_db_session, id):
         query = sqlalchemy_delete(cls).where(cls.id == id)
-        await db.execute(query)
+        await async_db_session.execute(query)
         try:
-            await db.commit()
+            await async_db_session.commit()
         except Exception:
-            await db.rollback()
+            await async_db_session.rollback()
             raise
         return True

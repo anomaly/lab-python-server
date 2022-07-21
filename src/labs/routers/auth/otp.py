@@ -26,8 +26,7 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
   user = await User.get_by_email(session, request.username)
 
   if user is None:
-    raise HTTPException(status_code=401, detail="Failed to authenticate user")
-
+    use = User.create(session, request.dict())
 
   # If not found make a user account with the mobile
 
@@ -43,6 +42,7 @@ async def initiate_otp_request(request: OTPTriggerSMSRequest,
   
   """
   # Get the user account
+  user = await User.get_by_email(session, request.username)
 
   # If not found make a user account with the mobile
 

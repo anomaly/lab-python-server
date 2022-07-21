@@ -17,27 +17,27 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
 
     email = Column(String,
         unique=True,
-        nullable=False)
+        nullable=True)
 
     hashed_password = Column(String,
-        nullable=False)
+        nullable=True)
 
     verified = Column(Boolean,
         server_default=expression.false(), 
         nullable=False)
 
+    mobile_number = Column(String,
+        nullable=True)
+
     first_name = Column(String,
-        nullable=False)
+        nullable=True)
 
     last_name = Column(String,
-        nullable=False)
+        nullable=True)
 
     is_admin = Column(Boolean, 
         server_default=expression.false(), 
         nullable=False)
-
-    mobile_number = Column(String,
-        nullable=True)
 
     otp_secret = Column(String,
         nullable=True)
