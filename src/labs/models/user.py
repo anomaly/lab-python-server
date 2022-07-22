@@ -6,11 +6,13 @@ from sqlalchemy.sql import expression
 from sqlalchemy.future import select
 from sqlalchemy.exc import NoResultFound
 
-import pyotp
+# OTP helpers from pyotp
+from pyotp import TOTP, random_base32
 
 from ..db import Base
 from .utils import DateTimeMixin, IdentifierMixin,\
     ModelCRUDMixin, hash_password
+
 class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
     """
     """
@@ -21,7 +23,19 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
         unique=True,
         nullable=True)
 
-    password = Column(String,
+    """ Note that we define the password slightly differently
+
+        The Column knows to provision the field as password
+        however we will override the getter and more importantly
+        the setter. The setter will hash the password whenever
+        the user wishes to update this. 
+
+        This will make the code on the API side cleaner and will
+        ensure that the password is never stored in plain text.
+
+    """
+    _password = Column("password",
+        String,
         nullable=True)
 
     verified = Column(Boolean,
@@ -44,8 +58,24 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
     otp_secret = Column(String,
         nullable=True)
 
+    # Password wrapper for hashing when we set 
+    @property
+    def password(self):
+        return self._password
+
+    @password.setter
+    def password(self, password):
+        """ Overrides the default setter behaviour to hash the password
+
+            It would be cool to override the comparison method
+            if it's simple then we use the equality operator
+
+        """
+        self._password = hash_password(password)
+
+    # Methods to assist to deal with passwords
     async def check_password(self, plain_text_pass):
-        pass
+        return self.password == hash_password(plain_text_pass)
 
     async def get_otp(self):
         pass
@@ -74,11 +104,5 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
 def receive_init(target, args, kwargs):
     """ When the user is created, generate a secret for the OTP
     """
-    target.otp_secret = pyotp.random_base32()
+    target.otp_secret = random_base32()
 
-@event.listens_for(User.password, 'set', propagate=True)
-def receive_password_set(target, value, old, initiator):
-    """ Setting the password will has the value """
-    print("=== START ===")
-    # print(target, value, initiator, )
-    print("=== END ===")
