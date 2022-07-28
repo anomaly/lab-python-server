@@ -11,7 +11,7 @@ from pyotp import TOTP, random_base32
 
 from ..db import Base
 from .utils import DateTimeMixin, IdentifierMixin,\
-    ModelCRUDMixin, hash_password
+    ModelCRUDMixin, hash_password, verify_password
 
 class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
     """
@@ -74,11 +74,18 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
         self._password = hash_password(password)
 
     # Methods to assist to deal with passwords
-    async def check_password(self, plain_text_pass):
-        return self.password == hash_password(plain_text_pass)
+    def check_password(self, plain_text_pass):
+        return verify_password(plain_text_pass, self.password)
 
-    async def get_otp(self):
-        pass
+    def get_otp(self, digits: int, timeout: int):
+        """
+        """
+        otp = TOTP(self.secret, digits=digits, interval=timeout)
+        return otp.now()
+    
+    def verify_otp(self, timeout: int, window: int, token: str):
+        otp = TOTP(self.secret, interval=timeout)
+        return otp.verify(token, valid_window=window)
 
     @classmethod
     async def get_by_email(cls, session, email):

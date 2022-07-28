@@ -14,6 +14,9 @@ from sqlalchemy import update as sqlalchemy_update,\
 
 from passlib.context import CryptContext
 
+# Password hashing and validation helpers
+
+# The following should not be called directly
 _pwd_context = CryptContext(
     schemes=["bcrypt"],
     deprecated="auto"
@@ -70,15 +73,14 @@ class CreatedByMixin(object):
     @declared_attr
     def created_by_user_id(cls):
         return Column(UUID(as_uuid=True),
-            ForeignKey("core.user.id"),
+            ForeignKey("user.user.id"),
             nullable=False)
 
     @declared_attr
     def last_updated_by_user_id(cls):
         return Column(UUID(as_uuid=True),
-            ForeignKey("core.user.id"),
+            ForeignKey("user.user.id"),
             nullable=False)
-
 
 class ModelCRUDMixin:
     """
@@ -94,6 +96,7 @@ class ModelCRUDMixin:
         new_instance = cls(**kwargs)
         async_db_session.add(new_instance)
         await async_db_session.commit()
+        async_db_session.refresh(new_instance) # Ensure we get the id
         return new_instance
 
     @classmethod

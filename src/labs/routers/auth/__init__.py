@@ -26,7 +26,11 @@ router = APIRouter(tags=["auth"])
 router.include_router(router_account_create)
 router.include_router(router_otp, prefix="/otp")
 
-@router.post("/login", response_model=AuthResponse)
+@router.post("/login",
+  summary=""" Provides an endpoint for login via email and password
+  """,
+  response_model=AuthResponse
+)
 async def login_user(request: PasswordLoginRequest, 
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
