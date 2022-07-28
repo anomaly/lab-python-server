@@ -1,26 +1,18 @@
 """ OTP related tasks 
 
 """
-import asyncio
-
-loop = asyncio.new_event_loop()
-asyncio.set_event_loop(loop)
-
 # App related imports
+
 from ...celery import app
 from ..utils import send_sms_message, email_sender
 from ...db import get_async_session
 from ...models import User
 
-async def get_user_info(user_id):
+@app.task()
+async def initiate_otp_via_sms(user_id):
+
     session = get_async_session()
     user = await User.get(session, user_id)
-    return user
-
-@app.task()
-def initiate_otp_via_sms(user_id):
-
-    user = loop.run_until_complete(get_user_info(user_id))
 
     import logging
     logging.error(user)
@@ -30,7 +22,7 @@ def initiate_otp_via_sms(user_id):
 
 
 @app.task()
-def initiate_otp_via_email(user_id):
+async def initiate_otp_via_email(user_id):
     email_sender.send(
         subject='email subject',
         sender="",

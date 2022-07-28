@@ -6,6 +6,7 @@
 
 """
 
+
 from ...celery import app
 
 @app.on_after_configure.connect
@@ -17,6 +18,6 @@ def setup_periodic_tasks(sender, **kwargs):
         name='add every minute')
 
 @app.task
-def check_every_so_often(arg):
+async def check_every_so_often(arg):
     import logging
     logging.error(arg)

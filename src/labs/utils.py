@@ -23,7 +23,13 @@ def create_celery_app(include=None):
     Otherwise we return a connection to the broker to delay
     or schedule tasks.
     """
+    import asyncio
     from celery import Celery
+
+    # Monkey patching Celer to use asyncio
+    # https://pypi.org/project/celery-pool-asyncio/
+    import celery_pool_asyncio
+    celery_pool_asyncio.__package__
 
     from . import __title__
     from .config import config
