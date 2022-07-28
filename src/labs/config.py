@@ -51,6 +51,17 @@ class Config(BaseSettings):
     SMS_API_KEY: str
     SMS_API_SECRET: SecretStr
 
+    # The following are recommended values for the app to use for
+    # security tokens, and other cryptography related features.
+    # 
+    # While these can be overridden in the container environment,
+    # it's recommend that you use the values below.
+
+    APP_VERIFICATION_TOKEN_EXPIRY: int = 600 # In seconds
+    APP_TOTP_NUM_DIGITS: int = 6 # Login code length
+    APP_TOTP_INTERVAL: int = 30 # How long is a token valid
+    APP_TOTP_WINDOW: int = 30 # How far off can you drift
+
 
     @property
     def postgres_async_dsn(self) -> PostgresDsn:
