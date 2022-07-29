@@ -96,7 +96,7 @@ class ModelCRUDMixin:
         new_instance = cls(**kwargs)
         async_db_session.add(new_instance)
         await async_db_session.commit()
-        async_db_session.refresh(new_instance) # Ensure we get the id
+        await async_db_session.refresh(new_instance) # Ensure we get the id
         return new_instance
 
     @classmethod
