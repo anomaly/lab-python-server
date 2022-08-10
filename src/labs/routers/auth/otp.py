@@ -15,7 +15,10 @@ from ...tasks.otp import initiate_otp_via_email, \
 
 router = APIRouter(tags=["otp"])
 
-@router.post("/initiate/email", response_model=OTPTriggerResponse)
+@router.post("/initiate/email",
+  response_model=OTPTriggerResponse,
+  operation_id="initiate_otp_via_email",
+)
 async def initiate_otp_request(request: OTPTriggerEmailRequest, 
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
@@ -39,7 +42,10 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
   return OTPTriggerResponse(success=True)
 
 
-@router.post("/initiate/sms")
+@router.post("/initiate/sms",
+  response_model=OTPTriggerResponse,
+  operation_id="initiate_otp_via_sms"
+)
 async def initiate_otp_request(request: OTPTriggerSMSRequest, 
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):

@@ -29,7 +29,8 @@ router.include_router(router_otp, prefix="/otp")
 @router.post("/login",
   summary=""" Provides an endpoint for login via email and password
   """,
-  response_model=AuthResponse
+  response_model=AuthResponse,
+  operation_id="login_user",
 )
 async def login_user(request: PasswordLoginRequest, 
   Authorize: AuthJWT = Depends(),
@@ -50,7 +51,11 @@ async def login_user(request: PasswordLoginRequest,
                       token_type="Bearer",
                       expires_in=100)
 
-@router.post("/refresh")
+@router.post("/refresh",
+  summary=""" Provides an endpoint for refreshing the JWT token""",
+  response_model=AuthResponse,
+  operation_id="refresh_token",
+)
 async def refresh_jwt_token(request: Request,
   Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(session_context)):
@@ -65,7 +70,10 @@ async def refresh_jwt_token(request: Request,
   return {}
 
 
-@router.post("/logout")
+@router.post("/logout",
+  summary=""" Provides an endpoint for logging out the user""",
+  operation_id="logout_user"
+)
 async def logout_user(session: AsyncSession = Depends(session_context)):
   return {}
 

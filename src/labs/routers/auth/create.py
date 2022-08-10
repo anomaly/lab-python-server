@@ -15,7 +15,9 @@ from ...config import config
 
 router = APIRouter()
 
-@router.post("/signup")
+@router.post("/signup",
+  operation_id="signup_user",
+)
 async def signup_user(request: SignupRequest, 
   session: AsyncSession = Depends(get_async_session)):
   # Try and get a user by email
@@ -28,7 +30,10 @@ async def signup_user(request: SignupRequest,
   return {}
 
 
-@router.get("/verify")
+@router.get(
+  "/verify",
+  operation_id="verify_user",
+)
 async def verify_user_account(request: Request):
     """Verify an account
     """
