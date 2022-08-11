@@ -29,6 +29,6 @@ RUN poetry config virtualenvs.create false
 RUN poetry install --no-root
 
 WORKDIR /opt/
-ENTRYPOINT ["watchmedo", "auto-restart", "--directory=./", "--pattern=*.py", "--recursive", "--", "celery", "--app=labs.celery:app", "worker", "--pool=celery_pool_asyncio:TaskPool", "--scheduler=celery_pool_asyncio:PersistentScheduler", "--loglevel=INFO"]
+ENTRYPOINT ["watchmedo", "auto-restart", "--directory=./", "--pattern=*.py", "--recursive", "--", "celery", "--app=labs.celery.app", "worker", "--pool=gevent", "--loglevel=INFO"]
 
 CMD ["--queues=celery"]

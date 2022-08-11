@@ -170,18 +170,6 @@ zookeeper = ["kazoo (>=1.3.1)"]
 zstd = ["zstandard"]
 
 [[package]]
-name = "celery-pool-asyncio"
-version = "0.2.0"
-description = "Celery pool to run coroutine tasks"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-asgiref = "*"
-celery = "*"
-
-[[package]]
 name = "certifi"
 version = "2022.6.15"
 description = "Python package for providing Mozilla's CA Bundle."
@@ -925,7 +913,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "079d286974db26fbb81b112101a60f427cdde3b2e3c857a56e9de9bd8bf1c198"
+content-hash = "e02b844e57a2ef9bad6c535a3af517fa4b2c52fcf28a86c85449c76772f8888d"
 
 [metadata.files]
 alembic = [
@@ -1003,10 +991,6 @@ billiard = [
 celery = [
     {file = "celery-5.2.7-py3-none-any.whl", hash = "sha256:138420c020cd58d6707e6257b6beda91fd39af7afde5d36c6334d175302c0e14"},
     {file = "celery-5.2.7.tar.gz", hash = "sha256:fafbd82934d30f8a004f81e8f7a062e31413a23d444be8ee3326553915958c6d"},
-]
-celery-pool-asyncio = [
-    {file = "celery-pool-asyncio-0.2.0.tar.gz", hash = "sha256:330e0ff31a7f6e3ea9cb004843f2f967601602b52cee05a2faea7ed65b76a5b8"},
-    {file = "celery_pool_asyncio-0.2.0-py2.py3-none-any.whl", hash = "sha256:72cdec065060bc99af57771cba7f0444d8a901842ee3c859d0d167c547764a21"},
 ]
 certifi = []
 cffi = [

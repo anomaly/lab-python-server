@@ -26,11 +26,6 @@ def create_celery_app(include=None):
     import asyncio
     from celery import Celery
 
-    # Monkey patching Celer to use asyncio
-    # https://pypi.org/project/celery-pool-asyncio/
-    import celery_pool_asyncio
-    celery_pool_asyncio.__package__
-
     from . import __title__
     from .config import config
 

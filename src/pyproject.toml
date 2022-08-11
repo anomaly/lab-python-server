@@ -27,7 +27,6 @@ clicksend-client = "^5.0.72"
 minio = "^7.1.10"
 passlib = "^1.7.4"
 bcrypt = "^3.2.2"
-celery-pool-asyncio = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
