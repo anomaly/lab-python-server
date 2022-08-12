@@ -256,8 +256,8 @@ INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 
 [Task](https://taskfile.dev) is a task runner / build tool that aims to be simpler and easier to use than, for example, GNU Make. Wile it's useful to know the actual commands it's easy to use a tool like task to make things easier on a daily basis:
 
-- `task db-revision -- "commit message"` - creates a new revision in the database and uses the parameter as the commit message
-- `task db-migrate` - migrates the schema to the latest version
+- `task db:revision -- "commit message"` - creates a new revision in the database and uses the parameter as the commit message
+- `task db:migrate` - migrates the schema to the latest version
 
 ## Docker in Development
 
