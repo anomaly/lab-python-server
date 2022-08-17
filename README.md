@@ -9,7 +9,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [ ] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring (fluentd)
 - [X] CSRF protection
-- [ ] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
+- [X] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
 
 Additionally, we provide:
 - [ ] Examples of working with Stripe for payments including handling webhooks
@@ -112,6 +112,11 @@ app.include_router(router_ext, prefix="/ext")
 ```
 
 > FastAPI camel cases the method name as the short description and uses the docstring as documentation for each endpoint. Markdown is allowed in the docstring.
+
+### Standards based Design
+
+- camel casing via snake casing of variables
+- readability 
 
 ## Celery based workers
 
