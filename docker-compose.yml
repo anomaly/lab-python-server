@@ -74,6 +74,22 @@ services:
     restart: unless-stopped
     volumes:
       - ./src/labs:/opt/labs
+    depends_on:
+      - redis
+
+  beat:
+    container_name: ${PROJ_NAME}-beat
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    command: ["celery", "--app=labs.celery.app", "beat", "--loglevel=INFO"]
+    env_file:
+      - .env.development
+    restart: unless-stopped
+    volumes:
+      - ./src/alabs:/opt/labs
+    depends_on:
+      - redis
 
   # MinIO server used during development, replaced by object store in prod
   minio:
