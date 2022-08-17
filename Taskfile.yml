@@ -5,6 +5,14 @@ tasks:
     desc: builds a publishable docker image
     cmds:
       - docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER} -f Dockerfile.api .
+  dev:pyshell:
+    desc: get a python session on the api container
+    cmds:
+      - docker compose exec api sh -c "python"
+  dev:psql:
+    desc: postgres shell on the db container
+    cmds:
+      - docker compose exec db sh -c "psql -U postgres"
   db:rev:
     desc: create a database migration, pass a string as commit string
     cmds:
