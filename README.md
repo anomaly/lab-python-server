@@ -263,6 +263,8 @@ INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 
 - `task db:revision -- "commit message"` - creates a new revision in the database and uses the parameter as the commit message
 - `task db:migrate` - migrates the schema to the latest version
+- `tas dev:psql` - 	postgres shell in the database container
+- `tas dev:pyshell` - 	get a `python` session on the api container which should have access to the entire application
 
 ## Docker in Development
 
