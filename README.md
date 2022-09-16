@@ -86,7 +86,7 @@ Directory structure for our application:
 
 ```
 
-## API
+## Building your API
 
 FastAPI is a Python framework for building HTTP APIs. It is a simple, flexible, and powerful framework for building APIs and builds upon the popular `pydantic` and `typing` libraries. Our general design for API end points is to break them into packages.
 
@@ -113,12 +113,52 @@ app.include_router(router_ext, prefix="/ext")
 
 > FastAPI camel cases the method name as the short description and uses the docstring as documentation for each endpoint. Markdown is allowed in the docstring.
 
+When running behind a Reverse Proxy (which would almost always be the case for our applications), FastAPI can accept the root path in numerous ways. This tells FastAPI where to mount the application i.e how the requests are going to be forwarded to the top router so it can stripe away the prefix before routing the requests. So for example the `root` FastAPI application might be mounted on `/api` and the FastAPI will need to strip away the `/api` before handling the request.
+
+FastAPI's [Behind a Proxy](https://fastapi.tiangolo.com/advanced/behind-a-proxy/) document describes how to set this up. Where possible the recommend way is to pass this in via the `uvicorn` invocation, see `Dockerfile` for the `api` container:
+
+```Dockerfile
+ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
+```
+
+> Failing everything you can pass the argument in the FastAPI constructor.
+
 ### Standards based Design
 
-- camel casing via snake casing of variables
-- readability 
+Anomaly puts great emphasis on code readability and standards. These circle around the following design principles proposed by the languages and the others around protocols (e.g RESTful responses, JSON, etc). We recommend strictly following:
+
+- [**PEP8**](https://www.python.org/dev/peps/pep-0008/) - Python style guide
+- [**PEP257**](https://www.python.org/dev/peps/pep-0257/) - Python docstring conventions
+
+Our [web-client](https://github.com/anomaly/lab-web-client) defines the standards for the front end. It's important to note the differences that both environments have and the measure to translate between them. For example:
+
+Python snake case is translated to camel case in JavaScript. So `my_var` becomes `myVar` in JavaScript. This is done by the `pydantic` library when it serialises the data to JSON. 
+
+```python
+from pydantic import BaseModel
+from humps import camelize
+
+
+def to_camel(string):
+    return camelize(string)
+
+
+class User(BaseModel):
+    first_name: str
+    last_name: str = None
+    age: float
+
+    class Config:
+        alias_generator = to_camel
+```
+
+> Source: [CamelCase Models with FastAPI and Pydantic](https://medium.com/analytics-vidhya/camel-case-models-with-fast-api-and-pydantic-5a8acb6c0eee) by Ahmed Nafies
+
+It is important to pay attention to such detail, and doing what is right for the environment and language.
 
 ## Celery based workers
+
+> *WARNING:* Celery currently *DOES NOT* have support for `asyncio` which comes in the way of our stack, please follow [Issue 21](https://github.com/anomaly/lab-python-server/issues/21) for information on current work arounds and recommendations. We are also actively working with the Celery team to get this resolved.
 
 The projects use `Celery` to manage a queue backed by `redis` to schedule and process background tasks. The celery app is run a separate container. In development we use [watchdog](https://github.com/gorakhargosh/watchdog) to watch for changes to the Python files, this is obviously uncessary in production.
 
@@ -288,15 +328,6 @@ https://docs.docker.com/develop/develop-images/multistage-build/
 gunicorn vs uvicorn
 https://www.uvicorn.org/deployment/
 
-When running behind a Reverse Proxy (which would almost always be the case for our applications), FastAPI can accept the root path in numerous ways. This tells FastAPI where to mount the application i.e how the requests are going to be forwarded to the top router so it can stripe away the prefix before routing the requests. So for example the `root` FastAPI application might be mounted on `/api` and the FastAPI will need to strip away the `/api` before handling the request.
-
-FastAPI's [Behind a Proxy](https://fastapi.tiangolo.com/advanced/behind-a-proxy/) document describes how to set this up. Where possible the recommend way is to pass this in via the `uvicorn` invocation, see `Dockerfile` for the `api` container:
-
-```Dockerfile
-ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
-```
-
-> Failing everything you can pass the argument in the FastAPI constructor.
 
 ## Distribution
 
