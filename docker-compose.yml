@@ -1,8 +1,11 @@
 # The aim of this docker compose file is to provide a good known
 # way to build your docker-compose file for Anomaly projects
 # 
+# Before you use this template have a look at the README, note that
+# you will require PROJ_NAME and PROJ_FQDN setup in your environment
+# for these template to work
+# 
 # This file provides you a template for your development environment
-
 # https://docs.docker.com/compose/compose-file/compose-versioning/
 version: "3.8"
 
@@ -53,7 +56,8 @@ services:
     container_name: ${PROJ_NAME}-api
     build:
       context: .
-      dockerfile: Dockerfile.api
+      dockerfile: Dockerfile
+    command: ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
     env_file:
       - .env.development
     restart: unless-stopped
@@ -61,35 +65,38 @@ services:
       - "8000:80"
     volumes:
       - ./src/labs:/opt/labs
+    depends_on:
+      - db
+      - redis
 
 
   # Worker: is a celery based worker process that runs in the background
-  worker:
-    container_name: ${PROJ_NAME}-worker
-    build:
-      context: .
-      dockerfile: Dockerfile.worker
-    env_file:
-      - .env.development
-    restart: unless-stopped
-    volumes:
-      - ./src/labs:/opt/labs
-    depends_on:
-      - redis
+  # worker:
+  #   container_name: ${PROJ_NAME}-worker
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.worker
+  #   env_file:
+  #     - .env.development
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./src/labs:/opt/labs
+  #   depends_on:
+  #     - redis
 
-  beat:
-    container_name: ${PROJ_NAME}-beat
-    build:
-      context: .
-      dockerfile: Dockerfile.api
-    command: ["celery", "--app=labs.celery.app", "beat", "--loglevel=INFO"]
-    env_file:
-      - .env.development
-    restart: unless-stopped
-    volumes:
-      - ./src/alabs:/opt/labs
-    depends_on:
-      - redis
+  # beat:
+  #   container_name: ${PROJ_NAME}-beat
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.api
+  #   command: ["celery", "--app=labs.celery.app", "beat", "--loglevel=INFO"]
+  #   env_file:
+  #     - .env.development
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./src/alabs:/opt/labs
+  #   depends_on:
+  #     - redis
 
   # MinIO server used during development, replaced by object store in prod
   minio:

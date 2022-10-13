@@ -6,8 +6,6 @@ ARG PYTHON_VERSION=3.10-slim-buster
 # This image is particularly for a web server using uvicorn
 FROM python:${PYTHON_VERSION}
 
-ENV APP=labs
-
 # Expose ports which is proxied via traefik
 EXPOSE 80
 
@@ -35,7 +33,4 @@ RUN poetry install --no-root
 # The app package will be located in /opt/appname so run
 # uvicorn at this level so it sees the package
 WORKDIR /opt/
-ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
 
-# There can only be one CMD argument
-CMD []
