@@ -123,6 +123,8 @@ ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-pa
 
 > Failing everything you can pass the argument in the FastAPI constructor.
 
+There are times that you don't want the endpoint to be included in the documentation, which in turns makes client code generators to ignore the endpoint. FastAPI has `include_in_schema` parameter in the `decorator`, which is set to `True` by default. This can be set to `False` to exclude the endpoint from the documentation.
+
 ### Standards based Design
 
 Anomaly puts great emphasis on code readability and standards. These circle around the following design principles proposed by the languages and the others around protocols (e.g RESTful responses, JSON, etc). We recommend strictly following:
@@ -204,6 +206,17 @@ verification_email.apply_async(args=[user_id])
 which would be recieved by the task as `user_id` as a positional argument.
 
 > We recommend reading design documentation for the `Celery` project [here](https://docs.celeryproject.org/en/latest/userguide/tasks.html), the general principle is send meta data that the task can use to complete the task not complete, heavy objects. i.e send an ID with some context as opposed to a fully formed object.
+
+## SQLAlchemy wisdom
+
+SQLAlchemy is making a move towards their `2.0` syntax, this is available as of `v1.4` which is what we currently target as part of our template. This also brings the use of `asyncpg` which allows us to use `asyncio` with `SQLAlchemy`. 
+
+First and foremost we use the `asyncpg` driver to connect to PostgreSQL. Refer to the property `postgres_async_dsn` in `config.py`.
+
+
+
+```python
+
 ## Schema migrations
 
 To initialise `alembic` activate the virtualenv created by `poetry`:
