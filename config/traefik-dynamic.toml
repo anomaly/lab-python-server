@@ -1,0 +1,22 @@
+# Commentary on letsencrypt and how the object store maps
+
+[http]
+    [http.middlewares]
+        [http.middlewares.host.headers]
+            [http.middlewares.host.headers.customRequestHeaders]
+                Host = "http://eservices.temora.nsw.gov.au.website-ap-south-1.linodeobjects.com"
+
+    [http.routers]
+        [http.routers.website]
+            entryPoints = ["https"]
+            service = "bucket"
+            middlewares = "host"
+            rule = "Host(`eservices.temora.nsw.gov.au`)"
+            priority=1
+            [http.routers.website.tls]
+                certResolver = "letsencrypt"
+
+    [http.services]
+        [http.services.bucket.loadBalancer]
+            [[http.services.bucket.loadBalancer.servers]]
+                url = "http://eservices.temora.nsw.gov.au.website-ap-south-1.linodeobjects.com"
