@@ -38,6 +38,9 @@ services:
   # - In development we read secrets from .env
   #   refer to the production config to see how to use secrets
   #   via Kubernetes
+  #
+  # Note that the volume is mounted so that the data is
+  # preserved when the containers are brought down
   db:
     image: postgres:14-bullseye
     container_name: ${PROJ_NAME}-postgres
@@ -103,7 +106,7 @@ services:
   worker:
     container_name: ${PROJ_NAME}-worker
     image: anomalyhq/anomaly-lab-server:${VERSION}
-    command: "celery --app=anomaly-lab.celery.app worker --pool=gevent --loglevel=INFO --queues=celery"
+    command: ["celery", "--app=${PROJ_NAME}.celery.app", "worker", "--pool=gevent", "--loglevel=INFO", "--queues=celery"]
     cap_drop:
       - "all"
     env_file:
@@ -115,7 +118,7 @@ services:
   beat:
     container_name: ${PROJ_NAME}-beat
     image: anomalyhq/anomaly-lab-server:${VERSION}
-    command: ["celery", "--app=anomaly-lab.celery.app", "beat", "--loglevel=INFO"]
+    command: ["celery", "--app=${PROJ_NAME}.celery.app", "beat", "--loglevel=INFO"]
     cap_drop:
       - "all"
     env_file:
@@ -126,4 +129,4 @@ services:
 
 networks:
   default:
-    name: anomaly-lab-network
+    name: ${PROJ_NAME}-network
