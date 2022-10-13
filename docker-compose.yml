@@ -57,46 +57,51 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
+    command: ["uvicorn", "${PROJ_NAME}.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
     env_file:
       - .env.development
     restart: unless-stopped
     ports:
       - "8000:80"
     volumes:
-      - ./src/labs:/opt/labs
+      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
     depends_on:
       - db
       - redis
 
 
   # Worker: is a celery based worker process that runs in the background
-  # worker:
-  #   container_name: ${PROJ_NAME}-worker
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.worker
-  #   env_file:
-  #     - .env.development
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./src/labs:/opt/labs
-  #   depends_on:
-  #     - redis
+  worker:
+    container_name: ${PROJ_NAME}-worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery --app=${PROJ_NAME}.celery.app worker --pool=gevent --loglevel=INFO --queues=celery"
+    env_file:
+      - .env.development
+    restart: unless-stopped
+    volumes:
+      - ./src/labs:/opt/labs
+    depends_on:
+      - db
+      - redis
 
-  # beat:
-  #   container_name: ${PROJ_NAME}-beat
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.api
-  #   command: ["celery", "--app=labs.celery.app", "beat", "--loglevel=INFO"]
-  #   env_file:
-  #     - .env.development
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./src/alabs:/opt/labs
-  #   depends_on:
-  #     - redis
+  # Beta is Celery's cron like feature which keepts taps on
+  # repeating tasks defined by the application
+  beat:
+    container_name: ${PROJ_NAME}-beat
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["celery", "--app=labs.celery.app", "beat", "--loglevel=INFO"]
+    env_file:
+      - .env.development
+    restart: unless-stopped
+    volumes:
+      - ./src/labs:/opt/labs
+    depends_on:
+      - db
+      - redis
 
   # MinIO server used during development, replaced by object store in prod
   minio:

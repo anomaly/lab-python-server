@@ -19,7 +19,7 @@ RUN apt-get update \
 
 # Copy the files in the src directory which is the app package
 # and the dependency matrix dedescribed by pyproject.toml
-WORKDIR /opt/labs
+WORKDIR /opt/${PROJ_NAME}
 COPY ./src/. .
 
 # Ask poetry to install all packages including the app
