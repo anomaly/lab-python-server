@@ -1,0 +1,129 @@
+# The aim of this docker compose file is to provide a good known
+# way to build your docker-compose file for Anomaly projects
+# 
+# This file provides you a template for your development environment
+
+# ENTRYPOINT ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "wattle.mm.api:app"]
+
+# https://docs.docker.com/compose/compose-file/compose-versioning/
+version: "3.8"
+
+services:
+
+  reverse-proxy:
+    image: traefik:v2.8
+    command:
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file"
+      - "--providers.file.filename=/opt/traefik/traefik-dynamic.toml"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.http.http.redirections.entryPoint.to=:443"
+      - "--entrypoints.http.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.http.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.https.address=:443"
+      - "--certificatesResolvers.letsencrypt.acme.email=${SOA_EMAIL}"
+      - "--certificatesResolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entrypoint=http"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /opt/anomaly-lab/data/letsencrypt:/letsencrypt
+      - /opt/anomaly-lab/traefik-dynamic.toml:/opt/traefik/traefik-dynamic.toml
+    restart: unless-stopped
+
+  # Postgres:
+  # - In development we read secrets from .env
+  #   refer to the production config to see how to use secrets
+  #   via Kubernetes
+  db:
+    image: postgres:14-bullseye
+    container_name: ${PROJ_NAME}-postgres
+    # Expose for development purposes
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - /opt/data/postgres:/var/lib/postgresql/data/
+
+  # Redis:
+  # - In development we read secrets from .env
+  #   used by Clerey to broker tasks between the api endpoints
+  #   and worker tasks
+  redis:
+    image: redis:7-bullseye
+    container_name: ${PROJ_NAME}-redis
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - /opt/data/redis:/data
+
+  # fluent-bit:
+  #   image: fluent/fluent-bit:1.5
+  #   container_name: ${PROJ_NAME}-fluentbit
+  #   restart: unless-stopped
+
+  # Applicaiton API:
+  # - In development we read secrets from .env
+  # - Provides a FastAPI based API that runs using uvicorn in development
+  api:
+    container_name: ${PROJ_NAME}-api
+    image: anomalyhq/anomaly-lab-server:${VERSION}
+    command: ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "--root-path=/api", "anomaly-lab.api:app"]
+    cap_drop:
+      - "all"
+    env_file:
+      - .env
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api/"
+      - "traefik.http.routers.api-no-auth.entrypoints=https"
+      - "traefik.http.routers.api-no-auth.tls"
+      - "traefik.http.routers.api-no-auth.tls.certResolver=letsencrypt"
+      - "traefik.http.routers.api-no-auth.rule=Host(`${PROJ_FQDN}`) && Path(`/api/{routes:(/?|/(webhooks/stripe|docs|openapi.json))}`)"
+      - "traefik.http.routers.api-no-auth.middlewares=strip-api"
+      - "traefik.http.routers.api-auth.entrypoints=https"
+      - "traefik.http.routers.api-auth.tls"
+      - "traefik.http.routers.api-auth.tls.certResolver=letsencrypt"
+      - "traefik.http.routers.api-auth.rule=Host(`${PROJ_FQDN}`) && PathPrefix(`/api/`)"
+      - "traefik.http.routers.api-auth.middlewares=strip-api"
+    depends_on:
+      - redis
+      - db
+
+  # Worker: is a celery based worker process that runs in the background
+  worker:
+    container_name: ${PROJ_NAME}-worker
+    image: anomalyhq/anomaly-lab-server:${VERSION}
+    command: "celery --app=anomaly-lab.celery.app worker --pool=gevent --loglevel=INFO --queues=celery"
+    cap_drop:
+      - "all"
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+  beat:
+    container_name: ${PROJ_NAME}-beat
+    image: anomalyhq/anomaly-lab-server:${VERSION}
+    command: ["celery", "--app=anomaly-lab.celery.app", "beat", "--loglevel=INFO"]
+    cap_drop:
+      - "all"
+    env_file:
+      - .env
+    restart: unless-stopped
+    depends_on:
+      - redis
+
+networks:
+  default:
+    name: anomaly-lab-network
