@@ -100,9 +100,3 @@ class Config(BaseSettings):
 # A singleton instance of the configuration
 config = Config()
 
-class JWTAuthConfig(BaseModel):
-  """A model required by the JWT auth plugin
-
-  The FastAPI initialiser registers a decorated instance.
-  """
-  authjwt_secret_key:str = config.JWT_SECRET.get_secret_value()

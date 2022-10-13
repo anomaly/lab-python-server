@@ -8,7 +8,6 @@
 from datetime import datetime
 from uuid import UUID
 from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -33,7 +32,6 @@ router.include_router(router_otp, prefix="/otp")
   operation_id="login_user",
 )
 async def login_user(request: PasswordLoginRequest, 
-  Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
   
@@ -57,16 +55,9 @@ async def login_user(request: PasswordLoginRequest,
   operation_id="refresh_token",
 )
 async def refresh_jwt_token(request: Request,
-  Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(session_context)):
   """ Provides a refresh token for the JWT session.
   """
-  Authorize.jwt_refresh_token_required()
-
-  current_user = Authorize.get_jwt_subject()
-  new_access_token = Authorize\
-    .create_access_token(subject=current_user,
-    fresh=False)
   return {}
 
 
@@ -79,14 +70,12 @@ async def logout_user(session: AsyncSession = Depends(session_context)):
 
 @router.get("/me", response_model=UserRequest)
 async def get_me(request: Request,
-  Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(session_context)):
   """Get the currently logged in user or myself
 
   This endpoint will return the currently logged in user or raise
   and exception if the user is not logged in.
   """
-  Authorize.jwt_required()
   model = UserRequest(
     id = UUID('{12345678-1234-5678-1234-567812345678}'),
     first_name="Dev",

@@ -3,7 +3,6 @@
 """
 
 from fastapi import APIRouter, Request, Depends, HTTPException
-from fastapi_jwt_auth import AuthJWT
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
@@ -20,7 +19,6 @@ router = APIRouter(tags=["otp"])
   operation_id="initiate_otp_via_email",
 )
 async def initiate_otp_request(request: OTPTriggerEmailRequest, 
-  Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
 
@@ -47,7 +45,6 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
   operation_id="initiate_otp_via_sms"
 )
 async def initiate_otp_request(request: OTPTriggerSMSRequest, 
-  Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
 
@@ -69,7 +66,6 @@ async def initiate_otp_request(request: OTPTriggerSMSRequest,
 
 @router.post("/verify")
 async def verify_otp(request: OTPVerifyRequest, 
-  Authorize: AuthJWT = Depends(),
   session: AsyncSession = Depends(get_async_session)):
   """ Attempt to authenticate a user and issue JWT token
   
