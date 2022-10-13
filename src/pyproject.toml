@@ -22,11 +22,11 @@ email-validator = "^1.2.1"
 pyotp = "^2.6.0"
 redmail = "^0.4.0"
 stripe = "^4.1.0"
-fastapi-jwt-auth = "^0.5.0"
 clicksend-client = "^5.0.72"
 minio = "^7.1.11"
 passlib = "^1.7.4"
 bcrypt = "^4.0.0"
+PyJWT = "^2.5.0"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"
