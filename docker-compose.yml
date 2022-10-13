@@ -69,19 +69,18 @@ services:
       - db
       - redis
 
-
   # Worker: is a celery based worker process that runs in the background
   worker:
     container_name: ${PROJ_NAME}-worker
     build:
       context: .
       dockerfile: Dockerfile
-    command: "watchmedo auto-restart --directory=./ --pattern=*.py --recursive -- celery --app=${PROJ_NAME}.celery.app worker --pool=gevent --loglevel=INFO --queues=celery"
+    command: ["watchmedo", "auto-restart", "--directory=./", "--pattern=*.py", "--recursive", "--", "celery", "--app=${PROJ_NAME}.celery.app", "worker", "--pool=gevent", "--loglevel=INFO", "--queues=celery"]
     env_file:
       - .env.development
     restart: unless-stopped
     volumes:
-      - ./src/labs:/opt/labs
+      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
     depends_on:
       - db
       - redis
@@ -93,12 +92,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["celery", "--app=labs.celery.app", "beat", "--loglevel=INFO"]
+    command: ["celery", "--app=${PROJ_NAME}.celery.app", "beat", "--loglevel=INFO"]
     env_file:
       - .env.development
     restart: unless-stopped
     volumes:
-      - ./src/labs:/opt/labs
+      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
     depends_on:
       - db
       - redis
