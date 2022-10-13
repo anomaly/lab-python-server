@@ -1,9 +1,10 @@
 # While optional this tells the Docker builder of the version
 # syntax=docker/dockerfile:1
+ARG PYTHON_VERSION=3.10-slim-buster
 
 # Base image for Python applications
 # This image is particularly for a web server using uvicorn
-FROM python:3.10-slim-buster
+FROM python:${PYTHON_VERSION}
 
 ENV APP=labs
 
