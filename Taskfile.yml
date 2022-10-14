@@ -19,6 +19,14 @@ tasks:
     desc: postgres shell on the db container
     cmds:
       - docker compose exec db sh -c "psql -U postgres"
+  dev:sh:
+    desc: get a bash session on the api container
+    cmds:
+      - docker compose exec api sh -c "bash"
+  db:init:
+    desc: initialise the database schema
+    cmds:
+      - docker compose exec api sh -c "poetry run init_db"
   db:rev:
     desc: create a database migration, pass a string as commit string
     cmds:
