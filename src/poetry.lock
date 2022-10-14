@@ -378,14 +378,6 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
-name = "humps"
-version = "0.2.2"
-description = "camelCase converter"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "idna"
 version = "3.4"
 description = "Internationalized Domain Names in Applications (IDNA)"
@@ -577,6 +569,14 @@ typing-extensions = ">=4.1.0"
 [package.extras]
 dotenv = ["python-dotenv (>=0.10.4)"]
 email = ["email-validator (>=1.0.3)"]
+
+[[package]]
+name = "pyhumps"
+version = "3.7.3"
+description = "🐫  Convert strings (and dictionary keys) between snake case, camel case and pascal case in Python. Inspired by Humps for Node"
+category = "main"
+optional = false
+python-versions = "*"
 
 [[package]]
 name = "PyJWT"
@@ -911,7 +911,7 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.10"
-content-hash = "ce965d15bc6ede2e72990a96e804f09f2e61b9111cadf5255a04f71038f5347c"
+content-hash = "b26fd4c3eb32c908c0d6e59936514424f311d04ffe46995d286a52b2da924df1"
 
 [metadata.files]
 alembic = [
@@ -1224,10 +1224,6 @@ h11 = [
     {file = "h11-0.14.0-py3-none-any.whl", hash = "sha256:e3fe4ac4b851c468cc8363d500db52c2ead036020723024a109d37346efaa761"},
     {file = "h11-0.14.0.tar.gz", hash = "sha256:8f19fbbe99e72420ff35c00b27a34cb9937e902a8b810e2c88300c6f0a3b699d"},
 ]
-humps = [
-    {file = "humps-0.2.2-py2.py3-none-any.whl", hash = "sha256:401de60fd73673b697086ba7c865966751c57b11cce57a37c9eabb3e75938417"},
-    {file = "humps-0.2.2.tar.gz", hash = "sha256:777f7a17f6b20aa9cc078d63b56ebd66532c6b2c88b370f1d596d5205410f67c"},
-]
 idna = [
     {file = "idna-3.4-py3-none-any.whl", hash = "sha256:90b77e79eaa3eba6de819a0c442c0b4ceefc341a7a2ab77d7562bf49f425c5c2"},
     {file = "idna-3.4.tar.gz", hash = "sha256:814f528e8dead7d329833b91c5faa87d60bf71824cd12a7530b5526063d02cb4"},
@@ -1432,6 +1428,10 @@ pydantic = [
     {file = "pydantic-1.10.2-cp39-cp39-win_amd64.whl", hash = "sha256:c1ba1afb396148bbc70e9eaa8c06c1716fdddabaf86e7027c5988bae2a829ab6"},
     {file = "pydantic-1.10.2-py3-none-any.whl", hash = "sha256:1b6ee725bd6e83ec78b1aa32c5b1fa67a3a65badddde3976bca5fe4568f27709"},
     {file = "pydantic-1.10.2.tar.gz", hash = "sha256:91b8e218852ef6007c2b98cd861601c6a09f1aa32bbbb74fab5b1c33d4a1e410"},
+]
+pyhumps = [
+    {file = "pyhumps-3.7.3-py3-none-any.whl", hash = "sha256:8cf9503f71be250a1ec2c0af997309e6360ad4daa343acd7faafde54cce36469"},
+    {file = "pyhumps-3.7.3.tar.gz", hash = "sha256:6eec3741cf917009adb16f6b6b883429edb1c6286531bd9f3977ba41938b0a09"},
 ]
 PyJWT = [
     {file = "PyJWT-2.5.0-py3-none-any.whl", hash = "sha256:8d82e7087868e94dd8d7d418e5088ce64f7daab4b36db654cbaedb46f9d1ca80"},
