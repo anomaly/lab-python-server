@@ -11,7 +11,7 @@ from fastapi import APIRouter, Request, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
-from ...db import session_context, get_async_session
+from ...db import get_async_session
 from ...models import User
 from ...schema import UserRequest,\
   PasswordLoginRequest, AuthResponse
@@ -56,7 +56,7 @@ async def login_user(request: PasswordLoginRequest,
   operation_id="refresh_token",
 )
 async def refresh_jwt_token(request: Request,
-  session: AsyncSession = Depends(session_context)):
+  session: AsyncSession = Depends(get_async_session)):
   """ Provides a refresh token for the JWT session.
   """
   return {}
@@ -66,7 +66,7 @@ async def refresh_jwt_token(request: Request,
   summary=""" Provides an endpoint for logging out the user""",
   operation_id="logout_user"
 )
-async def logout_user(session: AsyncSession = Depends(session_context)):
+async def logout_user(session: AsyncSession = Depends(get_async_session)):
   """ Ends a users session
   
   """
@@ -74,7 +74,7 @@ async def logout_user(session: AsyncSession = Depends(session_context)):
 
 @router.get("/me", response_model=UserRequest)
 async def get_me(request: Request,
-  session: AsyncSession = Depends(session_context)
+  session: AsyncSession = Depends(get_async_session)
 ):
   """Get the currently logged in user or myself
 

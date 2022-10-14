@@ -43,15 +43,15 @@ async def init_models():
 
 # TODO: Revise implementation in async context
 # Donot use until we have a better understanding of how to use async context
-@asynccontextmanager
-async def session_context():
-    """Provide a transactional scope around a series of operations.
-    """
-    try:
-        yield async_session
-        await async_session.commit()
-    except:  # noqa: E722
-        await async_session.rollback()
-        raise
-    finally:
-        await async_session.close()
+# @asynccontextmanager
+# async def session_context():
+#     """Provide a transactional scope around a series of operations.
+#     """
+#     try:
+#         yield async_session
+#         await async_session.commit()
+#     except:  # noqa: E722
+#         await async_session.rollback()
+#         raise
+#     finally:
+#         await async_session.close()

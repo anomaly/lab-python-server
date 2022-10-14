@@ -4,7 +4,7 @@
 from fastapi import APIRouter, Request, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...db import session_context, session_context
+from ...db import get_async_session
 from ...config import config
 
 router = APIRouter(tags=["ext"])
@@ -25,13 +25,12 @@ async def get_health(request: Request):
     Purpose of this endpoint is to check the health of the server.
     We check for connection to the database, queue and logger
     """
-    async with session_context() as session:
-        return {"message": "ok"}
+    return {"message": "ok"}
 
 
 @router.get("/log")
 async def test_logger(request: Request,
-    session: AsyncSession = Depends(session_context)
+    session: AsyncSession = Depends(get_async_session)
 ):
     """Log a message.
 
