@@ -7,6 +7,10 @@ tasks:
     desc: builds a publishable docker image
     cmds:
       - docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER} -f Dockerfile.api .
+  dev:test:
+    desc: runs tests inside the server container
+    cmds:
+      - docker compose exec api sh -c "pytest"
   dev:pyshell:
     desc: get a python session on the api container
     cmds:
