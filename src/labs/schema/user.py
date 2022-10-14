@@ -1,8 +1,11 @@
 from typing import Optional
 
-from .utils import IdentityMixin, DateTimeMixin
+from .utils import AppBaseModel,\
+    IdentityMixin, DateTimeMixin
 
-class UserRequest(IdentityMixin, DateTimeMixin):
+class UserRequest(AppBaseModel,\
+    IdentityMixin, DateTimeMixin
+):
     """ User profile 
     """
     email: Optional[str]

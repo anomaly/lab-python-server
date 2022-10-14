@@ -1,34 +1,33 @@
-from pydantic import BaseModel
-
-class PasswordLoginRequest(BaseModel):
+from .utils import AppBaseModel
+class PasswordLoginRequest(AppBaseModel):
     """ Requires parameters to login via password
     """
     username: str
     password: str
 
-class SignupRequest(BaseModel):
+class SignupRequest(AppBaseModel):
     password: str
     email: str
 
-class SignupResponse(BaseModel):
+class SignupResponse(AppBaseModel):
     success: bool
     email: str
 
-class OTPTriggerEmailRequest(BaseModel):
+class OTPTriggerEmailRequest(AppBaseModel):
     email: str
 
-class OTPTriggerSMSRequest(BaseModel):
+class OTPTriggerSMSRequest(AppBaseModel):
     mobile_number: str
 
-class OTPVerifyRequest(BaseModel):
+class OTPVerifyRequest(AppBaseModel):
     """ OTP sent to the server to verify if it's valid """
     otp: str
 
-class OTPTriggerResponse(BaseModel):
+class OTPTriggerResponse(AppBaseModel):
     """ OTP Verification result """
     success: bool
 
-class AuthResponse(BaseModel):
+class AuthResponse(AppBaseModel):
     """Response from the authentication endpoint
     """
     access_token: str

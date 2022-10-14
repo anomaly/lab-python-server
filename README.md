@@ -140,10 +140,8 @@ Python snake case is translated to camel case in JavaScript. So `my_var` becomes
 from pydantic import BaseModel
 from humps import camelize
 
-
 def to_camel(string):
     return camelize(string)
-
 
 class User(BaseModel):
     first_name: str
@@ -157,6 +155,22 @@ class User(BaseModel):
 > Source: [CamelCase Models with FastAPI and Pydantic](https://medium.com/analytics-vidhya/camel-case-models-with-fast-api-and-pydantic-5a8acb6c0eee) by Ahmed Nafies
 
 It is important to pay attention to such detail, and doing what is right for the environment and language.
+
+To assist with this `src/labs/schema/utils.py` provides the class `AppBaseModel` which inherits from `pydantic`'s `BaseModel` and configures it to use `humps`'s `camelize` function to convert snake case to camel case. To use it simply inherit from `AppBaseModel`:
+
+```python
+from .utils import AppBaseModel
+
+class MyModel(AppBaseModel):
+    first_name: str
+    last_name: str = None
+    age: float
+```
+
+> Warning `humps` is published as `pyhumps` on `pypi`
+
+As per [this issue](https://github.com/anomaly/lab-python-server/issues/27) we have wrapped this
+
 
 FastAPI will try and generate an `operation_id` based on the path of the router endpoint, which usually ends up being a convoluted string. This was originally reported in [labs-web-client](https://github.com/anomaly/lab-web-client/issues/6). You can provide an `operation_id` in the `decorator` e.g:
 
