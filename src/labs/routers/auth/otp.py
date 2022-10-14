@@ -16,10 +16,10 @@ router = APIRouter(tags=["otp"])
 
 @router.post("/initiate/email",
   response_model=OTPTriggerResponse,
-  operation_id="initiate_otp_via_email",
 )
-async def initiate_otp_request(request: OTPTriggerEmailRequest, 
-  session: AsyncSession = Depends(get_async_session)):
+async def initiate_otp_email(request: OTPTriggerEmailRequest, 
+  session: AsyncSession = Depends(get_async_session)
+):
   """ Attempt to authenticate a user and issue JWT token
 
     The user has provided us their email address and we will
@@ -42,10 +42,10 @@ async def initiate_otp_request(request: OTPTriggerEmailRequest,
 
 @router.post("/initiate/sms",
   response_model=OTPTriggerResponse,
-  operation_id="initiate_otp_via_sms"
 )
-async def initiate_otp_request(request: OTPTriggerSMSRequest, 
-  session: AsyncSession = Depends(get_async_session)):
+async def initiate_otp_sms(request: OTPTriggerSMSRequest, 
+  session: AsyncSession = Depends(get_async_session)
+):
   """ Attempt to authenticate a user and issue JWT token
 
     The user has provided a mobile number and we will text them
@@ -66,7 +66,8 @@ async def initiate_otp_request(request: OTPTriggerSMSRequest,
 
 @router.post("/verify")
 async def verify_otp(request: OTPVerifyRequest, 
-  session: AsyncSession = Depends(get_async_session)):
+  session: AsyncSession = Depends(get_async_session)
+):
   """ Attempt to authenticate a user and issue JWT token
   
   """

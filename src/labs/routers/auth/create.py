@@ -19,7 +19,8 @@ router = APIRouter()
   operation_id="signup_user",
 )
 async def signup_user(request: SignupRequest, 
-  session: AsyncSession = Depends(get_async_session)):
+  session: AsyncSession = Depends(get_async_session)
+):
   # Try and get a user by email
   user = await User.get_by_email(session, request.email)
   if user:
@@ -34,7 +35,7 @@ async def signup_user(request: SignupRequest,
   "/verify",
   operation_id="verify_user",
 )
-async def verify_user_account(request: Request):
+async def verify_user(request: Request):
     """Verify an account
     """
     verification_email.delay()

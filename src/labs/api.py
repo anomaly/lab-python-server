@@ -12,8 +12,9 @@
 """
 from . import __title__, __version__
 
-from fastapi import FastAPI, Request, Depends, status, WebSocket
+from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
 
 from .routers import router_auth, router_ext
 
@@ -31,31 +32,32 @@ aim of the project is:
 """A FastAPI application that serves handlers
 """
 app = FastAPI(
-    title=__title__,
-    version=__version__,
-    description=api_description,
-    docs_url="/docs",
-    terms_of_service="https://github.com/anomaly/labs",
-    contact={
-      "name": "Anomaly Software",
-      "url": "https://github.com/anomaly/labs",
-      "email": "oss@anomaly.ltd"
-    },
-    license_info={
-      "name": "Apache 2.0",
-      "url": "https://www.apache.org/licenses/LICENSE-2.0"
-    },
-    openapi_tags=[
-      {
-        "name": "auth",
-        "description": "Authentication related endpoints"
-      }
-    ]
-    )
+  title=__title__,
+  version=__version__,
+  description=api_description,
+  docs_url="/docs",
+  terms_of_service="https://github.com/anomaly/labs",
+  contact={
+    "name": "Anomaly Software",
+    "url": "https://github.com/anomaly/labs",
+    "email": "oss@anomaly.ltd"
+  },
+  license_info={
+    "name": "Apache 2.0",
+    "url": "https://www.apache.org/licenses/LICENSE-2.0"
+  },
+  openapi_tags=[
+    {
+      "name": "auth",
+      "description": "Authentication related endpoints"
+    }
+  ]
+)
 
 # Additional routers of the application described in the routers package
 app.include_router(router_auth, prefix="/auth")
 app.include_router(router_ext, prefix="/ext")
+
 
 
 @app.get("/")
@@ -79,3 +81,23 @@ async def websocket_endpoint(websocket: WebSocket):
 
 # Hook up any events worth responding to
 # https://fastapi.tiangolo.com/advanced/events/
+
+# With a little help from FastAPI docs
+# https://bit.ly/3rXeAvH
+#
+# Globally use the path name as the operation id thus
+# making things a lot more readable, note that this requires
+# you name your functions really well.
+def use_route_names_as_operation_ids(app: FastAPI) -> None:
+  """
+  Simplify operation IDs so that generated API clients have simpler function
+  names.
+
+  Should be called only after all routes have been added.
+  """
+  for route in app.routes:
+    if isinstance(route, APIRoute):
+      route.operation_id = route.name
+
+
+use_route_names_as_operation_ids(app)

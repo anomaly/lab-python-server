@@ -49,6 +49,7 @@ async def login_user(request: PasswordLoginRequest,
                       token_type="Bearer",
                       expires_in=100)
 
+
 @router.post("/refresh",
   summary=""" Provides an endpoint for refreshing the JWT token""",
   response_model=AuthResponse,
@@ -66,11 +67,15 @@ async def refresh_jwt_token(request: Request,
   operation_id="logout_user"
 )
 async def logout_user(session: AsyncSession = Depends(session_context)):
+  """ Ends a users session
+  
+  """
   return {}
 
 @router.get("/me", response_model=UserRequest)
 async def get_me(request: Request,
-  session: AsyncSession = Depends(session_context)):
+  session: AsyncSession = Depends(session_context)
+):
   """Get the currently logged in user or myself
 
   This endpoint will return the currently logged in user or raise

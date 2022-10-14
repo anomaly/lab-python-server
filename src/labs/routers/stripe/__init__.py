@@ -33,7 +33,7 @@ router = APIRouter(tags=["stripe"])
 # Note that include_in_schema=False and this will not appear
 # in the OpenAPI documentation
 @router.post("/webhook", include_in_schema=False)
-async def process_webhook(
+async def stripe_webhook(
   request: Request,
   background_tasks: BackgroundTasks,
   STRIPE_SIGNATURE: str = Header(default=None),
