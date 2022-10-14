@@ -34,12 +34,19 @@ class AppBaseModel(BaseModel):
         orm_mode = True
 
 class IdentityMixin(BaseModel):
-    """ Identifier
+    """ Identifier 
+
+    This mixin is used to define the identifier field for all
+    models that use UUID as identifiers, which is out preference
+    for PostgreSQL.
     """
     id: UUID
 
 class DateTimeMixin(BaseModel):
     """ Adds timestamps to relevant models
+
+    Many of out models will have a created and updated timestamp
+    this mixin will add those fields to the schemas
     """
     created_at: datetime
     updated_at: datetime

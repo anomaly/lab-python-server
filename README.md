@@ -174,7 +174,7 @@ As per [this issue](https://github.com/anomaly/lab-python-server/issues/27) we h
 
 FastAPI will try and generate an `operation_id` based on the path of the router endpoint, which usually ends up being a convoluted string. This was originally reported in [labs-web-client](https://github.com/anomaly/lab-web-client/issues/6). You can provide an `operation_id` in the `decorator` e.g:
 
-```
+```python
 @app.get("/items/", operation_id="some_specific_id_you_define")
 ```
 
@@ -348,8 +348,6 @@ INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 
 ## Docker in Development
 
-There are two `Dockerfiles` that are used in Development.  We've decided to name the `Dockerfile` suffixed by their purpose e.g `Dockerfile.api` and `Dockerfile.worker`.
-
 It's important that we put files that should not be copied across into the containers in the `.dockerignore` file. Please try and to keep this up to date as your projects grow. The best security is the absence of files that are not required.
 
 Our current standard image is `python:3.10-slim-buster` this should be updated as the infrastructure changes.
@@ -361,6 +359,8 @@ The `Dockerfile` for the API simply copies the contents of the `src` directory a
 > The `virtualenvs.create` is set to `false` for containers as `virtualenv` are not required
 
 We run the application using `uvicorn` and pass in `--root-path=/api` for FastAPI to work properly when behind a reverse proxy. FastAPI [recommends](https://fastapi.tiangolo.com/advanced/behind-a-proxy/) setting this at the server level, setting the flag in FastAPI is the last resort. 
+
+`Dockerfile` is the configuration referenced by `docker-compose.yml` for development and `Dockerfile.prod` is the configuration referenced by `docker-compose.prod.yml` for production. For Kubernetes based deployment please reference `Dockerfile.prod`.
 
 ## Docker in Production
 

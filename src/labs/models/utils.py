@@ -113,6 +113,9 @@ class ModelCRUDMixin:
 
     @classmethod
     async def get(cls, async_db_session, id):
+        """
+        
+        """
         query = select(cls).where(cls.id == id)
         results = await async_db_session.execute(query)
         (result,) = results.one()
