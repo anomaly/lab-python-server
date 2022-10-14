@@ -158,6 +158,16 @@ class User(BaseModel):
 
 It is important to pay attention to such detail, and doing what is right for the environment and language.
 
+FastAPI will try and generate an `operation_id` based on the path of the router endpoint, which usually ends up being a convoluted string. This was originally reported in [labs-web-client](https://github.com/anomaly/lab-web-client/issues/6). You can provide an `operation_id` in the `decorator` e.g:
+
+```
+@app.get("/items/", operation_id="some_specific_id_you_define")
+```
+
+which would result in the client generating a function like `someSpecificIdYouDefine()`.
+
+For consistenty FastAPI docs shows a wrapper function that [globally re-writes](https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/?h=operation_id#using-the-path-operation-function-name-as-the-operationid) the `operation_id` to the function name. This does put the onus on the developer to name the function correctly.
+
 ## Celery based workers
 
 > *WARNING:* Celery currently *DOES NOT* have support for `asyncio` which comes in the way of our stack, please follow [Issue 21](https://github.com/anomaly/lab-python-server/issues/21) for information on current work arounds and recommendations. We are also actively working with the Celery team to get this resolved.
@@ -213,9 +223,12 @@ SQLAlchemy is making a move towards their `2.0` syntax, this is available as of 
 
 First and foremost we use the `asyncpg` driver to connect to PostgreSQL. Refer to the property `postgres_async_dsn` in `config.py`.
 
-
+`asyncio` and the new query mechanism affects the way you write queries to load objects referenced by `relationships`. Consider the following tables:
 
 ```python
+
+
+```
 
 ## Schema migrations
 
