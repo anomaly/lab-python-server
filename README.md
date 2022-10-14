@@ -167,7 +167,7 @@ class MyModel(AppBaseModel):
     age: float
 ```
 
-> Warning `humps` is published as `pyhumps` on `pypi`
+> **WARNING:** `humps` is published as `pyhumps` on `pypi`
 
 As per [this issue](https://github.com/anomaly/lab-python-server/issues/27) we have wrapped this
 
@@ -237,11 +237,82 @@ SQLAlchemy is making a move towards their `2.0` syntax, this is available as of 
 
 First and foremost we use the `asyncpg` driver to connect to PostgreSQL. Refer to the property `postgres_async_dsn` in `config.py`.
 
-`asyncio` and the new query mechanism affects the way you write queries to load objects referenced by `relationships`. Consider the following tables:
+`asyncio` and the new query mechanism affects the way you write queries to load objects referenced by `relationships`. Consider the following models and relationships:
 
 ```python
+class Catalogue(Base):
+    __tablename__ = "catalogue"
+
+    name = Column(String,
+        nullable=False)
+
+    description = Column(String,
+        nullable=True)
+
+    # Catalogues are made of one or more products
+    products = relationship("Product",
+        back_populates="catalogue",
+        lazy="joined"
+    )
+
+class Product(Base):
+    __tablename__ = "product"
+
+    name = Column(String,
+        nullable=False)
+
+    description = Column(String,
+        nullable=True)
+
+    # Products have one or more prices
+    prices = relationship("Price",
+        primaryjoin="and_(Product.id==Price.product_id, Price.active==True)",
+        back_populates="product"
+    )
+
+class Price(Base):
+    __tablename__ = "price"
+
+    name = Column(String, nullable=True)
+
+    description = Column(String, nullable=True)
+
+    amount = Column(Integer,
+        nullable=False)
+```
+
+For you to be able to access the `Products` and then related `Prices` you would have to use the `selectinload` option to ensure that SQLAlchemy is able to load the related objects. This is because the `asyncio` driver does not support `joinedload` which is the default for `SQLAlchemy`.
 
 
+```python
+from sqlalchemy.orm import selectinload
+
+query = select(cls).options(selectinload(cls.products).\
+    selectinload(Product.prices)).\
+        where(cls.id == id)
+results = await async_db_session.execute(query)
+```
+> **Note:** how the `selectinload` is chained to the `products` relationship and then the `prices` relationship.
+
+Our base project provides serveral `Mixin`, a handy one being the `ModelCRUDMixin` (in `src/labs/models/utils.py`). It's very likely that you will want to write multiple `getters` for your models. To facilitate this we encourage each Model you have overrides `_base_get_query` and returns a `query` with the `selectinload` options applied. 
+
+```python
+@classmethod
+async def _base_get_query(cls):
+    query = select(cls).options(selectinload(cls.products).\
+        selectinload(Product.prices))
+    return query
+```
+
+This is then used by the `get` method in the `ModelCRUDMixin` to load the related objects and apply any further conditions, or orders:
+    
+```python
+@classmethod
+async def get(cls, async_db_session, id):
+    query = await cls._base_get_query()
+    results = await async_db_session.execute(query)
+    (result,) = results.one()
+    return result
 ```
 
 ## Schema migrations
@@ -313,7 +384,7 @@ and change it to:
 target_metadata = Base.metadata
 ```
 
-> Note that the `Base` comes from the above imports and we import everything from our models package so alembic tracks all the models in the application.
+> **Note:** that the `Base` comes from the above imports and we import everything from our models package so alembic tracks all the models in the application.
 
 And finally you should be able to run your initial migration:
 

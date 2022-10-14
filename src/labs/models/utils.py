@@ -5,12 +5,13 @@
 
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, text
-from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy.future import select
-from sqlalchemy import update as sqlalchemy_update,\
+from sqlalchemy import Column, DateTime, ForeignKey, text,\
+    update as sqlalchemy_update,\
     delete as sqlalchemy_delete
+from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.future import select
+from sqlalchemy.orm import selectinload
+from sqlalchemy.dialects.postgresql import UUID
 
 from passlib.context import CryptContext
 
@@ -23,12 +24,19 @@ _pwd_context = CryptContext(
 )
 
 def verify_password(plain_password, hashed_password) -> bool:
+    """ Use the crypt context to verify the password
+    """
     return _pwd_context.verify(
         plain_password,
         hashed_password
     )
 
 def hash_password(password) -> str:
+    """ Use the crypt context to hash the password
+
+    This is used by the setter in the User model to hash
+    the password when the handlers set the property.
+    """
     return _pwd_context.hash(password)
 
 class IdentifierMixin(object):
@@ -112,23 +120,6 @@ class ModelCRUDMixin:
         await async_db_session.commit()
 
     @classmethod
-    async def get(cls, async_db_session, id):
-        """
-        
-        """
-        query = select(cls).where(cls.id == id)
-        results = await async_db_session.execute(query)
-        (result,) = results.one()
-        return result
-
-    @classmethod
-    async def get_all(cls, async_db_session):
-        query = select(cls)
-        users = await async_db_session.execute(query)
-        users = users.scalars().all()
-        return users
-
-    @classmethod
     async def delete(cls, async_db_session, id):
         query = sqlalchemy_delete(cls).where(cls.id == id)
         await async_db_session.execute(query)
@@ -139,4 +130,45 @@ class ModelCRUDMixin:
             raise
         return True
 
+    # Helper patterns to make loaders easier to work with
+    # when using asyncpg
 
+    @classmethod
+    async def _base_get_query(cls):
+        """
+        asyncpg does not support joineload, so we have to selectinload
+        any relationships we want to load.
+
+        An example would be loading products and prices of a catalogue
+        query = select(cls).options(selectinload(cls.products).\
+            selectinload(Product.prices)).\
+            where(cls.id == id)
+
+        The default query does not load any relationships, this should
+        be overridden by each class to load the relationships they need.
+
+        All getters then inturn call this method to get the base query
+        and apply any clauses, orders etc.
+
+        This also means that we can maintain the selectinload pattern
+        in one spot.
+        """
+        query = select(cls).options()
+        return query
+
+    @classmethod
+    async def get(cls, async_db_session, id):
+        """
+        
+        """
+        query = await cls._base_get_query()
+        results = await async_db_session.execute(query)
+        (result,) = results.one()
+        return result
+
+    @classmethod
+    async def get_all(cls, async_db_session):
+        query = await cls._base_get_query()
+        users = await async_db_session.execute(query)
+        users = users.scalars().all()
+        return users
