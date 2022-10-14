@@ -27,6 +27,7 @@ minio = "^7.1.11"
 passlib = "^1.7.4"
 bcrypt = "^4.0.0"
 PyJWT = "^2.5.0"
+humps = "^0.2.2"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"
