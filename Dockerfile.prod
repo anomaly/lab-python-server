@@ -1,12 +1,17 @@
 # While optional this tells the Docker builder of the version
 # syntax=docker/dockerfile:1
+#
+ARG PYTHON_VERSION=3.10-slim-buster
 
 # This Dockerfile uses a multi stage build to slim down the image
 # https://docs.docker.com/develop/develop-images/multistage-build/
-
+#
+# Portion of this is adapted from
+# https://bit.ly/3Vw9B2m
+#
 # Base image for Python applications
 # This image is particularly for a web server using uvicorn
-FROM python:3.10-slim-buster as build-image
+FROM python:${PYTHON_VERSION} as requirements-stage
 
 # Update the based image to latest versions of packages
 # python 3.10 seems to want python3-tk installed
@@ -16,10 +21,12 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Work in the temporary directory for the build phase
+WORKDIR /tmp
+
 # Copy the files in the src directory which is the app package
 # and the dependency matrix dedescribed by pyproject.toml
-WORKDIR /opt/labs
-COPY ./src/. .
+COPY src/pyproject.toml src/poetry.lock* /tmp/
 
 # Ask poetry to install all packages including the app
 # not in virtual machine as we are in a container
@@ -28,15 +35,17 @@ RUN pip3 install poetry
 RUN poetry config virtualenvs.create false
 RUN poetry install --no-dev --no-root
 
-# Build the wheels and then remove files to make the 
-# image smaller
-RUN poetry build -f wheel -n && \
-    pip install --no-deps dist/*.whl && \
-    rm -rf dist *.egg-info
+# Generate the requirements.txt file.
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
 
 ### Stage 2
 
-FROM python:3.10-slim-buster as run-image
+FROM python:${PYTHON_VERSION}
+
+ARG USER={PROJ_NAME}
+ARG GROUP={PROJ_NAME}
+ARG UID=1000
+ARG GID=1000
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONFAULTHANDLER=1
@@ -51,17 +60,18 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-ARG USER=bilum
-ARG GROUP=bilum
-ARG UID=1000
-ARG GID=1000
+COPY --from=requirements-stage /tmp/requirements.txt /opt/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /opt/requirements.txt
+
 RUN groupadd --gid "${GID}" "${GROUP}"
 RUN useradd --uid "${UID}" --gid "${GID}" --create-home "${USER}"
 USER "${USER}"
 
+WORKDIR /opt/${PROJ_NAME}
+COPY ./src/. .
+
 # Expose ports which is proxied via traefik
 EXPOSE 80
 
-
-ENTRYPOINT ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "labs.api:app"]
-CMD []
+# ENTRYPOINT ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "labs.api:app"]
+# CMD []
