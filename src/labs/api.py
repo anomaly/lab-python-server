@@ -36,6 +36,7 @@ app = FastAPI(
   version=__version__,
   description=api_description,
   docs_url="/docs",
+  root_path="/api",
   terms_of_service="https://github.com/anomaly/labs",
   contact={
     "name": "Anomaly Software",
@@ -98,6 +99,5 @@ def use_route_names_as_operation_ids(app: FastAPI) -> None:
   for route in app.routes:
     if isinstance(route, APIRoute):
       route.operation_id = route.name
-
 
 use_route_names_as_operation_ids(app)
