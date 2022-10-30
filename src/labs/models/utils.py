@@ -101,6 +101,8 @@ class ModelCRUDMixin:
     """
     @classmethod
     async def create(cls, async_db_session, **kwargs):
+        """
+        """
         new_instance = cls(**kwargs)
         async_db_session.add(new_instance)
         await async_db_session.commit()
@@ -109,6 +111,8 @@ class ModelCRUDMixin:
 
     @classmethod
     async def update(cls, async_db_session, id, **kwargs):
+        """
+        """
         query = (
             sqlalchemy_update(cls)
             .where(cls.id == id)
