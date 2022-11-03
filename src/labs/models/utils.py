@@ -23,7 +23,10 @@ _pwd_context = CryptContext(
     deprecated="auto"
 )
 
-def verify_password(plain_password, hashed_password) -> bool:
+def verify_password(
+    plain_password,
+    hashed_password
+) -> bool:
     """ Use the crypt context to verify the password
     """
     return _pwd_context.verify(
@@ -67,6 +70,7 @@ class DateTimeMixin(object):
         server_default=text("now()"),
         nullable=False
     )
+
     updated_at = Column(DateTime(timezone=True),
         doc="The date and time the object was updated",
         server_default=text("now()"),
@@ -98,10 +102,24 @@ class ModelCRUDMixin:
     Adapted from the work of Ahmed Nafies:
     - https://bit.ly/3coTT7j
     - https://bit.ly/3OmhtPw
+
+    The aim is to assist in CRUD operations for all models, including
+    generic filter, sort and pagination (also includes infinite scroll).
+
+    Pay special attention to the `get` methods, this is the method that
+    which use a base builder to construct v2.0 style queries for 
+    SQLAlchemy.
     """
     @classmethod
-    async def create(cls, async_db_session, **kwargs):
-        """
+    async def create(
+        cls,
+        async_db_session,
+        **kwargs
+    ):
+        """ Create a new record and save it the database.
+
+        This is a generic call that takes an async session and
+        keyvalue pairs to create a new record in the database.
         """
         new_instance = cls(**kwargs)
         async_db_session.add(new_instance)
@@ -110,8 +128,16 @@ class ModelCRUDMixin:
         return new_instance
 
     @classmethod
-    async def update(cls, async_db_session, id, **kwargs):
-        """
+    async def update(
+        cls,
+        async_db_session,
+        id,
+        **kwargs
+    ):
+        """ Update a record and save it the database.
+
+        This is a generic call that takes an async session and
+        keyvalue pairs to update a record in the database.
         """
         query = (
             sqlalchemy_update(cls)
@@ -124,7 +150,13 @@ class ModelCRUDMixin:
         await async_db_session.commit()
 
     @classmethod
-    async def delete(cls, async_db_session, id):
+    async def delete(
+        cls,
+        async_db_session,
+        id
+    ):
+        """ Delete a record from the database by ID
+        """
         query = sqlalchemy_delete(cls).where(cls.id == id)
         await async_db_session.execute(query)
         try:
@@ -138,15 +170,17 @@ class ModelCRUDMixin:
     # when using asyncpg
 
     @classmethod
-    async def _base_get_query(cls):
+    def _base_get_query(cls):
         """
         asyncpg does not support joineload, so we have to selectinload
         any relationships we want to load.
 
         An example would be loading products and prices of a catalogue
-        query = select(cls).options(selectinload(cls.products).\
-            selectinload(Product.prices)).\
-            where(cls.id == id)
+        query = select(cls).options(
+            selectinload(cls.products).\
+            selectinload(Product.prices)\
+        ).\
+        where(cls.id == id)
 
         The default query does not load any relationships, this should
         be overridden by each class to load the relationships they need.
@@ -156,23 +190,67 @@ class ModelCRUDMixin:
 
         This also means that we can maintain the selectinload pattern
         in one spot.
+
+        All sqlalchemy query methods are factories, so you can chain
+        call one on top of the other, e.g:
+
+        query = cls._base_get_query()
+        query = query.offset(offset).limit(limit)
+
+        Note: this is not an async call as it does nothing async.
         """
         query = select(cls).options()
         return query
 
     @classmethod
-    async def get(cls, async_db_session, id):
+    async def get(
+        cls,
+        async_db_session,
+        id
+    ):
+        """ Get a single record from the database by ID
+
+        uses _base_get_query to construct a select statement
+        and filters by id        
         """
-        
-        """
-        query = await cls._base_get_query()
+        query = cls._base_get_query()
         results = await async_db_session.execute(query)
         (result,) = results.one()
         return result
 
     @classmethod
-    async def get_all(cls, async_db_session):
-        query = await cls._base_get_query()
+    async def get_all_in_range(
+        cls,
+        async_db_session,
+        offset: int = 0,
+        limit: int = 100,
+    ):
+        """ Get records with limit and offset
+
+        This is a more useful version of getting blocks of records
+        that are in a range.
+        """
+        query = cls._base_get_query()
+        query = query.offset(offset).limit(limit)
+        users = await async_db_session.execute(query)
+        users = users.scalars().all()
+        return users
+
+
+    @classmethod
+    async def get_all(
+        cls,
+        async_db_session
+    ):
+        """ Get all records for a table
+
+        There should be very few use cases where this applicable,
+        for most use cases this would be a very expensive call.
+
+        Please consider the design of your application if you
+        require to use this too often.
+        """
+        query = cls._base_get_query()
         users = await async_db_session.execute(query)
         users = users.scalars().all()
         return users
