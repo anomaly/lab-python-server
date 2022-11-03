@@ -3,8 +3,8 @@ from typing import Optional
 from .utils import AppBaseModel,\
     IdentityMixin, DateTimeMixin
 
-class UserRequest(AppBaseModel,\
-    IdentityMixin, DateTimeMixin
+class UserRequest(
+    AppBaseModel
 ):
     """ User profile 
     """
@@ -14,15 +14,17 @@ class UserRequest(AppBaseModel,\
     first_name: Optional[str]
     last_name: Optional[str]
 
-    class Config:
-        """ Enable compatibility with SQLAlchemy
-
-        ORM mode will allow pydantic to translate SQLAlchemy results
-        into serializable models.
-
-        For a full set of options, see:
-        https://pydantic-docs.helpmanual.io/usage/model_config/
-        """
-        orm_mode = True
-
     
+class UserResponse(
+    AppBaseModel,
+    IdentityMixin,
+    DateTimeMixin
+):
+    """ User profile 
+    """
+    email: str
+    mobile_number: Optional[str]
+    verified: bool
+    first_name: Optional[str]
+    last_name: Optional[str]
+

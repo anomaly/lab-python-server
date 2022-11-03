@@ -8,3 +8,4 @@
 
 from .auth import router as router_auth
 from .ext import router as router_ext
+from .users import router as router_users

@@ -14,7 +14,10 @@ from .utils import DateTimeMixin, IdentifierMixin,\
     ModelCRUDMixin, hash_password, verify_password
 
 class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
-    """
+    """ A user defines a person that will use various software systems
+
+    Users have authentication built into the system with support
+    for password based auth and one time passwords.
     """
     
     __tablename__ = "user"
