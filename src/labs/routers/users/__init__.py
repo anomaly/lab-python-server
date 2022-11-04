@@ -7,10 +7,9 @@ was built to test out the initial CRUD features.
 from datetime import datetime
 from uuid import UUID
 from typing import List
-from http import HTTPStatus
 
 from fastapi import APIRouter, Depends,\
-    HTTPException, Query
+    HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
@@ -23,7 +22,7 @@ router = APIRouter(tags=["user"])
     "", 
     summary="Query users between limits",
     response_model=List[UserResponse],
-    status_code=HTTPStatus.OK
+    status_code=status.HTTP_200_OK
 )
 async def get_users_with_limits(
     offset: int = Query(0, ge=0),
@@ -41,7 +40,7 @@ async def get_users_with_limits(
     "/infinite", 
     summary="Get all users",
     response_model=List[UserResponse],
-    status_code=HTTPStatus.OK
+    status_code=status.HTTP_200_OK
 )
 async def get_users(
     next_id: UUID = None,
@@ -55,7 +54,7 @@ async def get_users(
     "/{id}", 
     summary="Get a particular user",
     response_model=UserResponse,
-    status_code=HTTPStatus.OK
+    status_code=status.HTTP_200_OK
 )
 async def get_user_by_id(
     id: UUID,
@@ -74,12 +73,11 @@ async def get_user_by_id(
 @router.delete(
     "/{id}", 
     summary="Delete a particular user",
-    status_code=HTTPStatus.NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT
 )
 async def delete_user(
     id: UUID,
     session: AsyncSession = Depends(get_async_session),
-    status_code=HTTPStatus.NO_CONTENT
 ):
     """ Delete a user from the database
 
@@ -105,7 +103,7 @@ async def delete_user(
     "/{id}", 
     summary="Update a particular user",
     response_model=UserResponse,
-    status_code=HTTPStatus.ACCEPTED
+    status_code=status.HTTP_202_ACCEPTED
 )
 async def update_user(
     id: UUID,
@@ -129,7 +127,7 @@ async def update_user(
     "", 
     summary="Create a new user",
     response_model=UserResponse,
-    status_code=HTTPStatus.CREATED
+    status_code=status.HTTP_201_CREATED
 )
 async def create_user(
     user_request: UserRequest,
