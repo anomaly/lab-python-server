@@ -1,3 +1,5 @@
+import pytest
+
 from labs import __version__
 
 
