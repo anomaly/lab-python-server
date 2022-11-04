@@ -54,7 +54,6 @@ The following Python packages make the standard set of tools for our projects:
 
 - [**SQLAlchemy**](https://www.sqlalchemy.org) - A Python object relational mapper (ORM)
 - [**alembic**](https://alembic.sqlalchemy.org/en/latest/) - A database migration tool
-- [**fastapi-csrf-protect**](https://github.com/aekasitt/fastapi-csrf-protect) - A fastapi middleware that protects against cross-site request forgery
 - [**FastAPI**](http://fastapi.tiangolo.com) - A fast, simple, and flexible framework for building HTTP APIs
 - [**Celery**](https://docs.celeryq.dev/en/stable/getting-started/introduction.html) - A task queue
 - **fluent-logger** - A Python logging library that supports fluentd
@@ -124,6 +123,12 @@ ENTRYPOINT ["uvicorn", "labs.api:app", "--host=0.0.0.0", "--port=80", "--root-pa
 > Failing everything you can pass the argument in the FastAPI constructor.
 
 There are times that you don't want the endpoint to be included in the documentation, which in turns makes client code generators to ignore the endpoint. FastAPI has `include_in_schema` parameter in the `decorator`, which is set to `True` by default. This can be set to `False` to exclude the endpoint from the documentation.
+
+### Routers and Endpoints
+
+[HTTPCode](https://docs.python.org/3/library/http.html)
+
+
 
 ### Standards based Design
 
@@ -298,7 +303,7 @@ Our base project provides serveral `Mixin`, a handy one being the `ModelCRUDMixi
 
 ```python
 @classmethod
-async def _base_get_query(cls):
+def _base_get_query(cls):
     query = select(cls).options(selectinload(cls.products).\
         selectinload(Product.prices))
     return query
@@ -309,7 +314,7 @@ This is then used by the `get` method in the `ModelCRUDMixin` to load the relate
 ```python
 @classmethod
 async def get(cls, async_db_session, id):
-    query = await cls._base_get_query()
+    query = cls._base_get_query()
     results = await async_db_session.execute(query)
     (result,) = results.one()
     return result

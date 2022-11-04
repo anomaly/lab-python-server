@@ -7,36 +7,41 @@ was built to test out the initial CRUD features.
 from datetime import datetime
 from uuid import UUID
 from typing import List
+from http import HTTPStatus
 
-from fastapi import APIRouter, Request, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends,\
+    HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models import User
-from ...schema import UserResponse
+from ...schema import UserResponse, UserRequest
 
 router = APIRouter(tags=["user"])
 
 @router.get(
     "", 
     summary="Query users between limits",
-    response_model=List[UserResponse]
+    response_model=List[UserResponse],
+    status_code=HTTPStatus.OK
 )
 async def get_users_with_limits(
-    offset: int = Query(1, ge=1),
+    offset: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
     session: AsyncSession = Depends(get_async_session)
 ):
     users = await User.get_all_in_range(
         session,
-        offset=skip,
+        offset=offset,
         limit=limit
     )
     return users
 
 @router.get(
     "/infinite", 
-    summary="Get all users"
+    summary="Get all users",
+    response_model=List[UserResponse],
+    status_code=HTTPStatus.OK
 )
 async def get_users(
     next_id: UUID = None,
@@ -46,43 +51,90 @@ async def get_users(
     pass
 
 
-
 @router.get(
     "/{id}", 
-    summary="Get a particular user"
+    summary="Get a particular user",
+    response_model=UserResponse,
+    status_code=HTTPStatus.OK
 )
 async def get_user_by_id(
     id: UUID,
     session: AsyncSession = Depends(get_async_session)
 ):
-    pass
+    """ Get a user by their id 
+    
+    
+    """
+    user = await User.get(session, id)
+    if not user:
+        raise HTTPException(404, "User not found")
+
+    return user
 
 @router.delete(
     "/{id}", 
-    summary="Delete a particular user"
+    summary="Delete a particular user",
+    status_code=HTTPStatus.NO_CONTENT
 )
 async def delete_user(
     id: UUID,
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    status_code=HTTPStatus.NO_CONTENT
 ):
-    pass
+    """ Delete a user from the database
+
+    The endpoint will look to see if the user exists, and if so
+    will attempt to delete the user from the database and
+    return a 204 response. If the user does not exist, a 404
+    """
+    user = await User.get(session, id)
+    if not user:
+        raise HTTPException(
+            HTTPStatus.NOT_FOUND,
+            "User not found"
+        )
+
+    result = await User.delete(session, id)
+    if not result:
+        raise HTTPException(
+            HTTPStatus.INTERNAL_SERVER_ERROR,
+            "Unable to delete user"
+        )    
 
 @router.patch(
     "/{id}", 
-    summary="Update a particular user"
+    summary="Update a particular user",
+    response_model=UserResponse,
+    status_code=HTTPStatus.ACCEPTED
 )
 async def update_user(
     id: UUID,
+    user: UserRequest,
     session: AsyncSession = Depends(get_async_session)
 ):
-    pass
+    user = await User.get(session, id)
+    if not user:
+        raise HTTPException(
+            HTTPStatus.NOT_FOUND,
+            "User not found"
+        )
 
+    user = await User.update(
+        session,
+        id,
+        **user.dict()
+    )
 
 @router.post(
     "", 
-    summary="Create a new user"
+    summary="Create a new user",
+    response_model=UserResponse,
+    status_code=HTTPStatus.CREATED
 )
 async def create_user(
-    session: AsyncSession = Depends(get_async_session)
+    user: UserRequest,
+    session: AsyncSession = Depends(get_async_session),
 ):
-    pass
+    """ Creates a new user based on
+    
+    """

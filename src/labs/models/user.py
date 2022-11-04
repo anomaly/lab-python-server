@@ -92,7 +92,7 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
 
     @classmethod
     async def get_by_email(cls, session, email):
-        query = select(cls).where(cls.email == email)
+        query = cls._base_get_query().where(cls.email == email)
         try:
             results = await session.execute(query)
             (result,) = results.one()
@@ -102,13 +102,27 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
 
     @classmethod
     async def get_by_phone(cls, session, phone):
-        query = select(cls).where(cls.mobile_number == phone)
+        query = cls._base_get_query().where(
+            cls.mobile_number == phone
+        )
         try:
             results = await session.execute(query)
             (result,) = results.one()
             return result
         except NoResultFound: # noqa: E722
             return None
+
+    @classmethod
+    async def get_by_email_or_mobile(cls, session, email, phone):
+        query = cls._base_get_query().where(cls.email == email or\
+            cls.mobile_number == phone)
+        try:
+            results = await session.execute(query)
+            (result,) = results.one()
+            return result
+        except NoResultFound: # noqa: E722
+            return None
+
 
 @event.listens_for(User, 'init')
 def receive_init(target, args, kwargs):
