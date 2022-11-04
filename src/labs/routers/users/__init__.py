@@ -109,7 +109,7 @@ async def delete_user(
 )
 async def update_user(
     id: UUID,
-    user: UserRequest,
+    user_request: UserRequest,
     session: AsyncSession = Depends(get_async_session)
 ):
     user = await User.get(session, id)
@@ -122,7 +122,7 @@ async def update_user(
     user = await User.update(
         session,
         id,
-        **user.dict()
+        **user_request.dict()
     )
 
 @router.post(
@@ -132,9 +132,26 @@ async def update_user(
     status_code=HTTPStatus.CREATED
 )
 async def create_user(
-    user: UserRequest,
+    user_request: UserRequest,
     session: AsyncSession = Depends(get_async_session),
 ):
     """ Creates a new user based on
     
     """
+    user = await User.get_by_email_or_mobile(
+        session,
+        user_request.email,
+        user_request.mobile
+    )
+    if user:
+        raise HTTPException(
+            HTTPStatus.CONFLICT,
+            "User already exists"
+        )
+
+    user = await User.create(
+        session,
+        **user_request.dict()
+    )
+
+    return user
