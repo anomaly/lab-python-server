@@ -213,10 +213,13 @@ class ModelCRUDMixin:
         uses _base_get_query to construct a select statement
         and filters by id        
         """
-        query = cls._base_get_query()
-        results = await async_db_session.execute(query)
-        (result,) = results.one()
-        return result
+        query = cls._base_get_query().where(cls.id == id)
+        try:
+            results = await async_db_session.execute(query)
+            (result,) = results.one()
+            return result
+        except Exception:
+            return None
 
     @classmethod
     async def get_all_in_range(
@@ -231,7 +234,7 @@ class ModelCRUDMixin:
         that are in a range.
         """
         query = cls._base_get_query()
-        query = query.offset(offset).limit(limit)
+        query = query.limit(limit).offset(offset)
         users = await async_db_session.execute(query)
         users = users.scalars().all()
         return users
