@@ -126,9 +126,42 @@ There are times that you don't want the endpoint to be included in the documenta
 
 ### Routers and Endpoints
 
-[HTTPCode](https://docs.python.org/3/library/http.html)
+FastAPI provides a really nice, clean way to build out endpoints. We recommend that each endpoint must:
 
+- Explicitly define the `status_code` it will return for positive responses
+- Throw `HTTPException` on errors with the proper HTTP Error Code and a descriptive message (see `status` package provided by FastAPI)
+- Provide a `pydantic` schema for the request and response body (where appropriate)
+- Provide a summary of the operation (no matter how trivial) which will make for better documentation
 
+```python
+from fastapi import APIRouter, Depends,\
+    HTTPException, Query, status
+
+@router.get(
+    "/{id}", 
+    summary="Get a particular user",
+    response_model=UserResponse,
+    status_code=status.HTTP_200_OK
+)
+async def get_user_by_id(
+    id: UUID,
+    session: AsyncSession = Depends(get_async_session)
+):
+    """ Get a user by their id 
+    
+    
+    """
+    user = await User.get(session, id)
+    if not user:
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            "User not found"
+        )
+
+    return user
+```
+
+> Ensure that handlers never have unreferenced or variables
 
 ### Standards based Design
 
