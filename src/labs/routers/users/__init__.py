@@ -141,7 +141,7 @@ async def create_user(
     user = await User.get_by_email_or_mobile(
         session,
         user_request.email,
-        user_request.mobile
+        user_request.mobile_number
     )
     if user:
         raise HTTPException(
