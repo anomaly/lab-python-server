@@ -10,7 +10,6 @@ class UserRequest(
     """
     email: Optional[str]
     mobile_number: Optional[str]
-    verified: bool
     first_name: Optional[str]
     last_name: Optional[str]
 
