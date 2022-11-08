@@ -8,10 +8,10 @@ class UserRequest(
 ):
     """ User profile 
     """
-    email: Optional[str]
-    mobile_number: Optional[str]
-    first_name: Optional[str]
-    last_name: Optional[str]
+    email: str
+    mobile_number: str
+    first_name: str
+    last_name: str
 
     
 class UserResponse(
