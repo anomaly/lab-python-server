@@ -66,7 +66,10 @@ async def get_user_by_id(
     """
     user = await User.get(session, id)
     if not user:
-        raise HTTPException(404, "User not found")
+        raise HTTPException(
+            status.HTTP_404_NOT_FOUND,
+            "User not found"
+        )
 
     return user
 
@@ -88,21 +91,20 @@ async def delete_user(
     user = await User.get(session, id)
     if not user:
         raise HTTPException(
-            HTTPStatus.NOT_FOUND,
+            status.HTTP_404_NOT_FOUND,
             "User not found"
         )
 
     result = await User.delete(session, id)
     if not result:
         raise HTTPException(
-            HTTPStatus.INTERNAL_SERVER_ERROR,
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
             "Unable to delete user"
         )    
 
 @router.patch(
     "/{id}", 
     summary="Update a particular user",
-    response_model=UserResponse,
     status_code=status.HTTP_202_ACCEPTED
 )
 async def update_user(
@@ -113,7 +115,7 @@ async def update_user(
     user = await User.get(session, id)
     if not user:
         raise HTTPException(
-            HTTPStatus.NOT_FOUND,
+            status.HTTP_404_NOT_FOUND,
             "User not found"
         )
 
@@ -143,7 +145,7 @@ async def create_user(
     )
     if user:
         raise HTTPException(
-            HTTPStatus.CONFLICT,
+            status.HTTP_404_NOT_FOUND,
             "User already exists"
         )
 
