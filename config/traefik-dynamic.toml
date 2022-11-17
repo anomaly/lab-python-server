@@ -4,7 +4,7 @@
     [http.middlewares]
         [http.middlewares.host.headers]
             [http.middlewares.host.headers.customRequestHeaders]
-                Host = "http://eservices.temora.nsw.gov.au.website-ap-south-1.linodeobjects.com"
+                Host = "eservices.temora.nsw.gov.au.website-ap-south-1.linodeobjects.com"
 
     [http.routers]
         [http.routers.website]
