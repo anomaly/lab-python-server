@@ -42,11 +42,17 @@ brew install python-tk@3.10
 
 Handy commands and tools, which we use to help with the infrastructure: 
 
-Use `openssl` to generate a random `base64` string where the `20` is th length:
+Use `openssl` to generate a random `hex` string where the `20` is th length:
 ```
-openssl rand -base64 20
+openssl rand -hex 20
 ```
 > This can be used to generate secrets which the application uses, folllow more notes on how to cycle secrets in this guide.
+
+The above is wrapped up as a `Task` endpoints, you need to supply the length of the hash as a parameter:
+
+```sh
+task crypt:hash -- 32
+```
 
 ## Python packages
 

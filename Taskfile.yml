@@ -23,6 +23,10 @@ tasks:
     desc: get a bash session on the api container
     cmds:
       - docker compose exec api sh -c "bash"
+  crypt:hash:
+    desc: generate a random cryptographic hash
+    cmds:
+      - openssl rand -hex {{.CLI_ARGS}}
   db:init:
     desc: initialise the database schema
     cmds:
