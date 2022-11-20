@@ -4,7 +4,7 @@
 
 from minio import Minio
 
-from .config import config
+from ..config import config
 
 minio_client = Minio(
     f"{config.S3_ENDPOINT}:{config.S3_PORT}",
@@ -26,8 +26,8 @@ def create_celery_app(include=None):
     import asyncio
     from celery import Celery
 
-    from . import __title__
-    from .config import config
+    from .. import __title__
+    from ..config import config
 
     app = Celery(__title__, broker=config.redis_dsn)
     app.autodiscover_tasks()
@@ -43,7 +43,7 @@ def create_fluentbit_logger():
     in the Docker-compose or K8s constructed environment.
     """
     from fluent import sender
-    from . import __title__
+    from .. import __title__
 
     logger = sender.FluentSender(__title__, 
         host=config.FLUENTD_HOST, 
