@@ -56,7 +56,7 @@ app = FastAPI(
 )
 
 # Additional routers of the application described in the routers package
-app.include_router(router_auth, prefix="/auth")
+app.include_router(router_auth)
 app.include_router(router_ext, prefix="/ext")
 app.include_router(router_users, prefix="/users")
 
