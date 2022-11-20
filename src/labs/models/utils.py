@@ -13,35 +13,6 @@ from sqlalchemy.future import select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.dialects.postgresql import UUID
 
-from passlib.context import CryptContext
-
-# Password hashing and validation helpers
-
-# The following should not be called directly
-_pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
-
-def verify_password(
-    plain_password,
-    hashed_password
-) -> bool:
-    """ Use the crypt context to verify the password
-    """
-    return _pwd_context.verify(
-        plain_password,
-        hashed_password
-    )
-
-def hash_password(password) -> str:
-    """ Use the crypt context to hash the password
-
-    This is used by the setter in the User model to hash
-    the password when the handlers set the property.
-    """
-    return _pwd_context.hash(password)
-
 class IdentifierMixin(object):
     """An ID for a given object
 

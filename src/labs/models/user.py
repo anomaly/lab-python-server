@@ -11,7 +11,9 @@ from pyotp import TOTP, random_base32
 
 from ..db import Base
 from .utils import DateTimeMixin, IdentifierMixin,\
-    ModelCRUDMixin, hash_password, verify_password
+    ModelCRUDMixin
+
+from ..utils.auth import hash_password, verify_password
 
 class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
     """ A user defines a person that will use various software systems
