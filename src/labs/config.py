@@ -40,7 +40,8 @@ class Config(BaseSettings):
 
     # Secrets that the application requires for session
     # and cross domain checking
-    JWT_SECRET: SecretStr
+    JWT_SECRET_KEY: SecretStr
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # SMTP and SMS related configuration
     SMTP_HOST: str
