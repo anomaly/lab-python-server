@@ -12,7 +12,12 @@ https://fastapi.tiangolo.com/tutorial/security/
 
 """
 
+from datetime import datetime, timedelta
+
 from passlib.context import CryptContext
+import jwt
+
+from ..config import config
 
 # Password hashing and validation helpers
 
@@ -41,3 +46,37 @@ def hash_password(password) -> str:
     """
     return _pwd_context.hash(password)
 
+
+def create_access_token(
+    subject: str,
+    fresh: bool = False
+) -> str:
+    """ Creates a JWT token for the user
+
+    This is used by the authentication handler to create
+    a JWT token for the user to use for subsequent requests.
+
+    Args:
+        subject (str): The subject of the token, usually the email
+        expires_delta (int, optional): The number of seconds the token
+            should be valid for. Defaults to None.
+        fresh (bool, optional): Whether the token is fresh or not.
+            Defaults to False.
+
+    Returns:
+        str: The encoded JWT token
+    """
+    delta = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode = {
+        "sub": subject,
+        "fresh": fresh,
+        "exp": datetime.utcnow() + delta
+    }
+
+    encoded_jwt = jwt.encode(
+        to_encode,
+        config.JWT_SECRET_KEY.get_secret_value(),
+        algorithm=config.JWT_ALGORITHM
+    )
+    
+    return encoded_jwt

@@ -1,11 +1,27 @@
+from pydantic import BaseModel
 from .utils import AppBaseModel
-class PasswordLoginRequest(AppBaseModel):
-    """ Requires parameters to login via password
+
+class Token(BaseModel):
+    """ A model that represents a JWT token
+
+
     """
-    username: str
-    password: str
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    """ A model that represents the data in a JWT token
+
+    Literally used to validate if what we have unpacked
+    is a valid token.
+
+    """
+    username: str = None
+
 
 class SignupRequest(AppBaseModel):
+    """ A simple request to sign up a user with an email and password    
+    """
     password: str
     email: str
 
@@ -27,10 +43,3 @@ class OTPTriggerResponse(AppBaseModel):
     """ OTP Verification result """
     success: bool
 
-class AuthResponse(AppBaseModel):
-    """Response from the authentication endpoint
-    """
-    access_token: str
-    refresh_token: str
-    token_type: str
-    expires_in: int
