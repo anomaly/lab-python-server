@@ -76,8 +76,8 @@ services:
   # - Provides a FastAPI based API that runs using uvicorn in development
   api:
     container_name: ${PROJ_NAME}-api
-    image: anomalyhq/anomaly-lab-server:${VERSION}
-    command: ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "--root-path=/api", "anomaly-lab.api:app"]
+    image: anomalyhq/${PROJ_NAME}:${VERSION}
+    command: ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "--root-path=/api", "${PROJ_NAME}.api:app"]
     cap_drop:
       - "all"
     env_file:
