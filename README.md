@@ -8,7 +8,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [X] Worker processes that will process tasks in the background (using Celery)
 - [ ] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring (fluentd)
-- [X] CSRF protection
+- [X] ~~CSRF protection~~ see [#52](https://github.com/anomaly/lab-python-server/issues/52)
 - [X] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
 
 Additionally, we provide:
