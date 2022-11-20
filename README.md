@@ -516,5 +516,10 @@ SQLAlchemy speciific resources:
 - [FastAPI with Async SQLAlchemy, SQLModel, and Alembic](https://testdriven.io/blog/fastapi-sqlmodel/) by [Michael Herman](https://testdriven.io/authors/herman/)
 - [SQLAlchemy Async ORM is Finally Here!](https://ahmed-nafies.medium.com/sqlalchemy-async-orm-is-finally-here-d560dfaa335d) by [Ahmed Nafies](https://ahmed-nafies.medium.com/)
 
+
+## Developer Tools
+
+- [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) - Jinja syntax highlighting for [VS Code](https://github.com/samuelcolvin/jinjahtml-vscode) by @SamuelColvin (accepted as part of PAP [#47](https://github.com/anomaly/lab-python-server/issues/47)
+
 ## License
 Contents of this repository are licensed under the Apache 2.0 license.
