@@ -16,7 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models import User
-from ...schema import UserRequest, UserResponse, Token
+from ...schema import UserResponse, Token
 from ...utils.auth import create_access_token
 from ..utils import get_current_user
 
