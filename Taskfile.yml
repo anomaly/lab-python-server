@@ -6,7 +6,7 @@ tasks:
   build:image:
     desc: builds a publishable docker image
     cmds:
-      - docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER} -f Dockerfile.api .
+      - docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER}} -f Dockerfile.api .
   dev:test:
     desc: runs tests inside the server container
     cmds:
@@ -23,6 +23,10 @@ tasks:
     desc: get a bash session on the api container
     cmds:
       - docker compose exec api sh -c "bash"
+  dev:qwatch:
+    desc: get a list of celery events
+    cmds:
+      - docker compose exec api sh -c "celery -A {{.PROJ_NAME}}.celery:app events"
   crypt:hash:
     desc: generate a random cryptographic hash
     cmds:

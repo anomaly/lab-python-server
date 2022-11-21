@@ -275,6 +275,16 @@ which would be recieved by the task as `user_id` as a positional argument.
 
 > We recommend reading design documentation for the `Celery` project [here](https://docs.celeryproject.org/en/latest/userguide/tasks.html), the general principle is send meta data that the task can use to complete the task not complete, heavy objects. i.e send an ID with some context as opposed to a fully formed object.
 
+### Monitoring the queue
+
+Celery can be monitored using the `flower` package, it provides a web based interfaces. There's also a text based interface available via the command line interface:
+
+```sh
+celery -A labs.celery:app events
+```
+
+you can alternatively use the wrapped Task command `task dev:qwatch`, this is portable across projects if you copy the template.
+
 ## SQLAlchemy wisdom
 
 SQLAlchemy is making a move towards their `2.0` syntax, this is available as of `v1.4` which is what we currently target as part of our template. This also brings the use of `asyncpg` which allows us to use `asyncio` with `SQLAlchemy`. 
