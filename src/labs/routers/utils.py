@@ -56,7 +56,7 @@ async def get_current_user(
   return user
 
 
-async def get_current_active_user(
+async def get_admin_user(
   current_user: User = Depends(get_current_user)
 ):
   """ Demonstrates wrapping the base Dependency to a more specific one
@@ -67,7 +67,7 @@ async def get_current_active_user(
   Note: see the use of OAuth2 scopes for this purpose. 
 
   """
-  if current_user.verified:
+  if not current_user.is_admin:
     raise HTTPException(
       status_code=status.HTTP_400_BAD_REQUEST,
       detail="Inactive user"

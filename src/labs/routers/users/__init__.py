@@ -15,6 +15,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...db import get_async_session
 from ...models import User
 from ...schema import UserResponse, UserRequest
+from ..utils import get_admin_user
 
 router = APIRouter(tags=["user"])
 
@@ -27,7 +28,8 @@ router = APIRouter(tags=["user"])
 async def get_users_with_limits(
     offset: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_admin_user),
 ):
     users = await User.get_all_in_range(
         session,
@@ -45,7 +47,8 @@ async def get_users_with_limits(
 async def get_users(
     next_id: UUID = None,
     limit: int = 10,
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_admin_user),
 ):
     pass
 
@@ -58,7 +61,8 @@ async def get_users(
 )
 async def get_user_by_id(
     id: UUID,
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_admin_user),
 ):
     """ Get a user by their id 
     
@@ -76,11 +80,12 @@ async def get_user_by_id(
 @router.delete(
     "/{id}", 
     summary="Delete a particular user",
-    status_code=status.HTTP_204_NO_CONTENT
+    status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_user(
     id: UUID,
     session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_admin_user),
 ):
     """ Delete a user from the database
 
@@ -110,7 +115,8 @@ async def delete_user(
 async def update_user(
     id: UUID,
     user_request: UserRequest,
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_admin_user),
 ):
     user = await User.get(session, id)
     if not user:
@@ -129,11 +135,12 @@ async def update_user(
     "", 
     summary="Create a new user",
     response_model=UserResponse,
-    status_code=status.HTTP_201_CREATED
+    status_code=status.HTTP_201_CREATED,
 )
 async def create_user(
     user_request: UserRequest,
     session: AsyncSession = Depends(get_async_session),
+    current_user: User = Depends(get_admin_user),
 ):
     """ Creates a new user based on
     
