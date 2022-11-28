@@ -56,13 +56,13 @@ class CreatedByMixin(object):
     @declared_attr
     def created_by_user_id(cls):
         return Column(UUID(as_uuid=True),
-            ForeignKey("user.user.id"),
+            ForeignKey("user.id"),
             nullable=False)
 
     @declared_attr
     def last_updated_by_user_id(cls):
         return Column(UUID(as_uuid=True),
-            ForeignKey("user.user.id"),
+            ForeignKey("user.id"),
             nullable=False)
 
 class ModelCRUDMixin:
