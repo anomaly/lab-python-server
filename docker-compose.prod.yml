@@ -44,9 +44,6 @@ services:
   db:
     image: postgres:14-bullseye
     container_name: ${PROJ_NAME}-postgres
-    # Expose for development purposes
-    ports:
-      - "5432:5432"
     restart: unless-stopped
     env_file:
       - .env
@@ -76,15 +73,13 @@ services:
   # - Provides a FastAPI based API that runs using uvicorn in development
   api:
     container_name: ${PROJ_NAME}-api
-    image: anomalyhq/${PROJ_NAME}:${VERSION}
+    image: anomalyhq/${PROJ_NAME}-server:${VERSION}
     command: ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "--root-path=/api", "${PROJ_NAME}.api:app"]
     cap_drop:
       - "all"
     env_file:
       - .env
     restart: unless-stopped
-    ports:
-      - "8000:80"
     labels:
       - "traefik.enable=true"
       - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api/"
@@ -105,7 +100,7 @@ services:
   # Worker: is a celery based worker process that runs in the background
   worker:
     container_name: ${PROJ_NAME}-worker
-    image: anomalyhq/anomaly-lab-server:${VERSION}
+    image: anomalyhq/${PROJ_NAME}-server:${VERSION}
     command: ["celery", "--app=${PROJ_NAME}.celery.app", "worker", "--pool=gevent", "--loglevel=INFO", "--queues=celery"]
     cap_drop:
       - "all"
@@ -117,7 +112,7 @@ services:
 
   beat:
     container_name: ${PROJ_NAME}-beat
-    image: anomalyhq/anomaly-lab-server:${VERSION}
+    image: anomalyhq/${PROJ_NAME}}-server:${VERSION}
     command: ["celery", "--app=${PROJ_NAME}.celery.app", "beat", "--loglevel=INFO"]
     cap_drop:
       - "all"
