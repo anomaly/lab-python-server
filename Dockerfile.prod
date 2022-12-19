@@ -1,7 +1,7 @@
 # While optional this tells the Docker builder of the version
 # syntax=docker/dockerfile:1
 #
-ARG PYTHON_VERSION=3.10-slim-buster
+ARG PYTHON_VERSION=3.11.1-slim-bullseye
 
 # This Dockerfile uses a multi stage build to slim down the image
 # https://docs.docker.com/develop/develop-images/multistage-build/
@@ -11,7 +11,7 @@ ARG PYTHON_VERSION=3.10-slim-buster
 #
 # Base image for Python applications
 # This image is particularly for a web server using uvicorn
-FROM python:${PYTHON_VERSION} as requirements-stage
+FROM --platform=linux/amd64 python:${PYTHON_VERSION} as requirements-stage
 
 # Update the based image to latest versions of packages
 # python 3.10 seems to want python3-tk installed
