@@ -52,6 +52,7 @@ class Config(BaseSettings):
     
     SMS_API_KEY: str
     SMS_API_SECRET: SecretStr
+    SMS_FROM: str
 
     # The following are recommended values for the app to use for
     # security tokens, and other cryptography related features.
