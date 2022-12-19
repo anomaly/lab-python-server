@@ -35,7 +35,7 @@ def send_sms_message(phone_number: str, message: str):
         .SMSApi(clicksend_client.ApiClient(_cs_config))
 
     sms_message = clicksend_client.SmsMessage(
-        _from="ANOMALY",
+        _from=config.SMTP_USER,
         body=message,
         to=phone_number,
     )
