@@ -68,6 +68,27 @@ The following Python packages make the standard set of tools for our projects:
 
 Packages are managed using `poetry`, docs available [here](https://python-poetry.org/docs/).
 
+### Keeping up to date
+
+Python packages should be moved up manually to ensure that there aren't any breaking changes.
+
+Use `poetry` to list a set of outdated packages:
+
+```sh
+cd src/
+poetry show -o
+```
+
+this will produce a list of outdated packages. Some of these will be dependencies of our dependencies, so start by upgrading the top level project dependencies (e.g FastAPI or SQLAlchemy):
+
+```sh
+poetry add SQLAlchemy@latest
+```
+
+If you haven't installed a particular package e.g. `starlette` then be wary of forcefully upgrading it as it might break it's parent dependency e.g. `FastAPI`.
+
+> Note: It's a very good habit not to have packages that you don't use. Please review the package list for every project. This also applies to any handlers e.g `stripe`, if your application does not use payments then please disable these.
+
 ## App directory structure
 
 Directory structure for our application:
