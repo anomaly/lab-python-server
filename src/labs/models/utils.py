@@ -50,7 +50,7 @@ class DateTimeMixin(object):
     )
 
 class CreatedByMixin(object):
-    """ Adds references to created_by and updated_by users
+    """ Adds references to created_by and updated_by results
 
     """
     @declared_attr
@@ -206,9 +206,9 @@ class ModelCRUDMixin:
         """
         query = cls._base_get_query()
         query = query.limit(limit).offset(offset)
-        users = await async_db_session.execute(query)
-        users = users.scalars().all()
-        return users
+        results = await async_db_session.execute(query)
+        records = results.scalars().all()
+        return records
 
 
     @classmethod
@@ -225,6 +225,6 @@ class ModelCRUDMixin:
         require to use this too often.
         """
         query = cls._base_get_query()
-        users = await async_db_session.execute(query)
-        users = users.scalars().all()
-        return users
+        results = await async_db_session.execute(query)
+        records = results.scalars().all()
+        return records
