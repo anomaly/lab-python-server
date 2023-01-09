@@ -6,11 +6,11 @@
 
 """
 
-import asyncio
-from contextlib import asynccontextmanager
+from sqlalchemy.ext.asyncio import create_async_engine,\
+    AsyncSession
+from sqlalchemy.orm import DeclarativeBase,\
+    configure_mappers, sessionmaker
 
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import declarative_base, configure_mappers, sessionmaker
 
 from .config import config
 
@@ -27,7 +27,13 @@ async def get_async_session() -> AsyncSession:
         yield session
 
 # Used by the ORM layer to describe models
-Base = declarative_base()
+class Base(DeclarativeBase):
+    """
+    SQLAlchemy 2.0 style declarative base class
+    https://bit.ly/3WE3Srg
+    """
+    pass
+
 
 async def init_models():
     """Initialises the models in the database

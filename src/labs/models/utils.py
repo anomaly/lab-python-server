@@ -5,13 +5,82 @@
 
 """
 
-from sqlalchemy import Column, DateTime, ForeignKey, text,\
+from datetime import datetime
+from typing_extensions import Annotated
+
+from uuid import UUID
+
+from sqlalchemy import DateTime, ForeignKey, func,\
     update as sqlalchemy_update,\
     delete as sqlalchemy_delete
-from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.future import select
-from sqlalchemy.orm import selectinload
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.dialects.postgresql import UUID as PGUUID
+
+from passlib.context import CryptContext
+
+# Password hashing and validation helpers
+# The following should not be called directly
+_pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto"
+)
+
+def verify_password(
+    plain_password,
+    hashed_password
+) -> bool:
+    """ Use the crypt context to verify the password
+    """
+    return _pwd_context.verify(
+        plain_password,
+        hashed_password
+    )
+
+def hash_password(password) -> str:
+    """ Use the crypt context to hash the password
+
+    This is used by the setter in the User model to hash
+    the password when the handlers set the property.
+    """
+    return _pwd_context.hash(password)
+
+
+pk_uuid = Annotated[
+    UUID,
+    mapped_column(
+        PGUUID(as_uuid=True),
+        primary_key=True,
+        server_default=func.gen_random_uuid()
+    )
+]
+
+fk_user_uuid = Annotated[
+    UUID,
+    mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("user.id"),
+        nullable=True,
+    )
+]
+
+fk_user_uuid_req = Annotated[
+    UUID,
+    mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey("user.id"),
+        nullable=False,
+    )
+]
+
+timestamp = Annotated[
+    datetime,
+    mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.CURRENT_TIMESTAMP()
+    ),
+]
 
 class IdentifierMixin(object):
     """An ID for a given object
@@ -20,12 +89,8 @@ class IdentifierMixin(object):
     field as identifiers, this sits closer to modern software engineering
     techniques.
     """
-    id = Column(UUID(as_uuid=True),
-        doc="The ID of the object",
-        primary_key=True,
-        server_default=text("gen_random_uuid()"),
-        nullable=False,
-    )
+    id: Mapped[pk_uuid]
+    
 class DateTimeMixin(object):
     """Stores creation and update timestamps
 
@@ -36,34 +101,17 @@ class DateTimeMixin(object):
     and when the object is update, you will not be required to set these
     values manually.
     """
-    created_at = Column(DateTime(timezone=True),
-        doc="The date and time the object was created",
-        server_default=text("now()"),
-        nullable=False
-    )
+    created_at: Mapped[timestamp]
+    updated_at: Mapped[timestamp]
+    deleted_at: Mapped[timestamp]
 
-    updated_at = Column(DateTime(timezone=True),
-        doc="The date and time the object was updated",
-        server_default=text("now()"),
-        onupdate=text("now()"),
-        nullable=False,
-    )
-
-class CreatedByMixin(object):
-    """ Adds references to created_by and updated_by results
+class CUDByMixin(object):
+    """ Adds references to created_by and updated_by users
 
     """
-    @declared_attr
-    def created_by_user_id(cls):
-        return Column(UUID(as_uuid=True),
-            ForeignKey("user.id"),
-            nullable=False)
-
-    @declared_attr
-    def last_updated_by_user_id(cls):
-        return Column(UUID(as_uuid=True),
-            ForeignKey("user.id"),
-            nullable=False)
+    created_by_user_id: Mapped[fk_user_uuid_req]
+    last_updated_by_user_id: Mapped[fk_user_uuid_req]
+    deleted_by_user_id: Mapped[fk_user_uuid]
 
 class ModelCRUDMixin:
     """
@@ -206,9 +254,9 @@ class ModelCRUDMixin:
         """
         query = cls._base_get_query()
         query = query.limit(limit).offset(offset)
-        results = await async_db_session.execute(query)
-        records = results.scalars().all()
-        return records
+        users = await async_db_session.execute(query)
+        users = users.scalars().all()
+        return users
 
 
     @classmethod
@@ -225,6 +273,6 @@ class ModelCRUDMixin:
         require to use this too often.
         """
         query = cls._base_get_query()
-        results = await async_db_session.execute(query)
-        records = results.scalars().all()
-        return records
+        users = await async_db_session.execute(query)
+        users = users.scalars().all()
+        return users

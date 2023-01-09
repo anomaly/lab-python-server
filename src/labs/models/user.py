@@ -1,21 +1,25 @@
 """An application user
 """
 
-from sqlalchemy import Boolean, Column, String, event
-from sqlalchemy.sql import expression
-from sqlalchemy.future import select
+from typing import Optional
+
+from sqlalchemy import event, func
 from sqlalchemy.exc import NoResultFound
+from sqlalchemy.orm import Mapped, mapped_column
 
 # OTP helpers from pyotp
 from pyotp import TOTP, random_base32
 
 from ..db import Base
 from .utils import DateTimeMixin, IdentifierMixin,\
+    ModelCRUDMixin, hash_password, verify_password
+
+class User(
+    Base,
+    IdentifierMixin,
+    DateTimeMixin,
     ModelCRUDMixin
-
-from ..utils.auth import hash_password, verify_password
-
-class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
+):
     """ A user defines a person that will use various software systems
 
     Users have authentication built into the system with support
@@ -24,10 +28,8 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
     
     __tablename__ = "user"
 
-    email = Column(String,
-        unique=True,
-        nullable=True)
-
+    email: Mapped[str] = mapped_column(unique=True)
+    
     """ Note that we define the password slightly differently
 
         The Column knows to provision the field as password
@@ -39,44 +41,20 @@ class User(Base, IdentifierMixin, DateTimeMixin, ModelCRUDMixin):
         ensure that the password is never stored in plain text.
 
     """
-    _password = Column("password",
-        String,
-        nullable=True)
+    password: Mapped[str]
 
-    verified = Column(Boolean,
-        server_default=expression.false(), 
-        nullable=False)
+    verified: Mapped[bool]
 
-    mobile_number = Column(String,
-        nullable=True)
+    mobile_number: Mapped[Optional[str]]
 
-    first_name = Column(String,
-        nullable=True)
+    # password: Mapped[Optional[str]]
 
-    last_name = Column(String,
-        nullable=True)
+    first_name: Mapped[Optional[str]]
+    last_name: Mapped[Optional[str]]
 
-    is_admin = Column(Boolean, 
-        server_default=expression.false(), 
-        nullable=False)
+    is_admin: Mapped[bool]
 
-    otp_secret = Column(String,
-        nullable=True)
-
-    # Password wrapper for hashing when we set 
-    @property
-    def password(self):
-        return self._password
-
-    @password.setter
-    def password(self, password):
-        """ Overrides the default setter behaviour to hash the password
-
-            It would be cool to override the comparison method
-            if it's simple then we use the equality operator
-
-        """
-        self._password = hash_password(password)
+    otp_secret: Mapped[str]
 
     # Methods to assist to deal with passwords
     def check_password(self, plain_text_pass):
@@ -132,3 +110,7 @@ def receive_init(target, args, kwargs):
     """
     target.otp_secret = random_base32()
 
+def encrypt_password(target, value, oldvalue, initiator):
+    return hash_password(value)
+
+event.listen(User.password, 'set', encrypt_password, retval=True)
