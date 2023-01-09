@@ -12,8 +12,8 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.10"
 pendulum = "^2.1.2"
-SQLAlchemy = "^1.4.45"
-fastapi = "^0.88.0"
+SQLAlchemy = {version = "^2.0.0rc1", allow-prereleases = true}
+fastapi = "^0.89.0"
 alembic = "^1.9.0"
 celery = "^5.2.7"
 uvicorn = "^0.20.0"
@@ -36,6 +36,7 @@ pyhumps = "^3.8.0"
 python-multipart = "^0.0.5"
 pytest = "^7.2.0"
 pytz = "^2022.7"
+httpx = "^0.23.3"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"
