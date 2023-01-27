@@ -7,7 +7,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
 - [X] Worker processes that will process tasks in the background (using Celery)
 - [ ] Provide `Dockerfile` for development and production
-- [ ] Log aggregation and monitoring (fluentd)
+- [ ] Log aggregation and monitoring ([parseable](https://github.com/parseablehq/parseable))
 - [X] ~~CSRF protection~~ see [#52](https://github.com/anomaly/lab-python-server/issues/52), also see [official guide](https://fastapi.tiangolo.com/tutorial/cors/)
 - [X] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
 
