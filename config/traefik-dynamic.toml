@@ -4,14 +4,14 @@
     [http.middlewares]
         [http.middlewares.host.headers]
             [http.middlewares.host.headers.customRequestHeaders]
-                Host = "eservices.temora.nsw.gov.au.website-ap-south-1.linodeobjects.com"
+                Host = "bucket-name.website-ap-south-1.linodeobjects.com"
 
     [http.routers]
         [http.routers.website]
             entryPoints = ["https"]
             service = "bucket"
             middlewares = "host"
-            rule = "Host(`eservices.temora.nsw.gov.au`)"
+            rule = "Host(`productiondomain.com`)"
             priority=1
             [http.routers.website.tls]
                 certResolver = "letsencrypt"
@@ -19,4 +19,12 @@
     [http.services]
         [http.services.bucket.loadBalancer]
             [[http.services.bucket.loadBalancer.servers]]
-                url = "http://eservices.temora.nsw.gov.au.website-ap-south-1.linodeobjects.com"
+                url = "http://bucker-name.website-ap-south-1.linodeobjects.com"
+
+
+[tls.options]
+  [tls.options.default]
+    maxVersion = "VersionTLS13"
+
+  [tls.options.maxtls12]
+    maxVersion = "VersionTLS12"
