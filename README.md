@@ -315,14 +315,24 @@ First and foremost we use the `asyncpg` driver to connect to PostgreSQL. Refer t
 `asyncio` and the new query mechanism affects the way you write queries to load objects referenced by `relationships`. Consider the following models and relationships:
 
 ```python
+from typing import Optional
+
+from sqlalchemy.orm import Mapped, mapped_column,\
+    DeclarativeBase
+
+# Used by the ORM layer to describe models
+class Base(DeclarativeBase):
+    """
+    SQLAlchemy 2.0 style declarative base class
+    https://bit.ly/3WE3Srg
+    """
+    pass
+
 class Catalogue(Base):
     __tablename__ = "catalogue"
 
-    name = Column(String,
-        nullable=False)
-
-    description = Column(String,
-        nullable=True)
+    name: Mapped[str]
+    description: Mapped[Optional[str]]
 
     # Catalogues are made of one or more products
     products = relationship("Product",
@@ -333,11 +343,8 @@ class Catalogue(Base):
 class Product(Base):
     __tablename__ = "product"
 
-    name = Column(String,
-        nullable=False)
-
-    description = Column(String,
-        nullable=True)
+    name: Mapped[str]
+    description: Mapped[Optional[str]]
 
     # Products have one or more prices
     prices = relationship("Price",
@@ -348,12 +355,9 @@ class Product(Base):
 class Price(Base):
     __tablename__ = "price"
 
-    name = Column(String, nullable=True)
-
-    description = Column(String, nullable=True)
-
-    amount = Column(Integer,
-        nullable=False)
+    name: Mapped[str]
+    description: Mapped[Optional[str]]
+    amount: Mapped[float]
 ```
 
 For you to be able to access the `Products` and then related `Prices` you would have to use the `selectinload` option to ensure that SQLAlchemy is able to load the related objects. This is because the `asyncio` driver does not support `joinedload` which is the default for `SQLAlchemy`.
