@@ -14,18 +14,10 @@ https://fastapi.tiangolo.com/tutorial/security/
 
 from datetime import datetime, timedelta
 
-from passlib.context import CryptContext
+import bcrypt
 import jwt
 
 from ..config import config
-
-# Password hashing and validation helpers
-
-# The following should not be called directly
-_pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto"
-)
 
 def verify_password(
     plain_password,
@@ -33,9 +25,9 @@ def verify_password(
 ) -> bool:
     """ Use the crypt context to verify the password
     """
-    return _pwd_context.verify(
-        plain_password,
-        hashed_password
+    return bcrypt.checkpw(
+        str.encode(plain_password),
+        str.encode(hashed_password)
     )
 
 def hash_password(password) -> str:
@@ -43,8 +35,15 @@ def hash_password(password) -> str:
 
     This is used by the setter in the User model to hash
     the password when the handlers set the property.
+
+    the input string has to be 
     """
-    return _pwd_context.hash(password)
+    encoded_password = bcrypt.hashpw(
+        str.encode(password),
+        bcrypt.gensalt()
+    )
+    # Return a string representation so that it can be stored
+    return encoded_password.decode()
 
 
 def create_access_token(

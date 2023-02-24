@@ -3,7 +3,7 @@
 
 from typing import Optional
 
-from sqlalchemy import event, func
+from sqlalchemy import event
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -12,7 +12,9 @@ from pyotp import TOTP, random_base32
 
 from ..db import Base
 from .utils import DateTimeMixin, IdentifierMixin,\
-    ModelCRUDMixin, hash_password, verify_password
+    ModelCRUDMixin
+    
+from ..utils.auth import hash_password, verify_password
 
 class User(
     Base,

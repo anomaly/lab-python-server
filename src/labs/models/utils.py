@@ -9,7 +9,6 @@ from datetime import datetime
 from typing_extensions import Annotated
 
 from uuid import UUID
-import bcrypt
 
 from sqlalchemy import DateTime, ForeignKey, func,\
     update as sqlalchemy_update,\
@@ -17,30 +16,6 @@ from sqlalchemy import DateTime, ForeignKey, func,\
 from sqlalchemy.future import select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
-
-def verify_password(
-    plain_password,
-    hashed_password
-) -> bool:
-    """ Use the crypt context to verify the password
-    """
-    return bcrypt.checkpw(
-        str.encode(plain_password),
-        str.encode(hashed_password)
-    )
-
-def hash_password(password) -> str:
-    """ Use the crypt context to hash the password
-
-    This is used by the setter in the User model to hash
-    the password when the handlers set the property.
-
-    the input string has to be 
-    """
-    bcrypt.hashpw(
-        str.encode(password),
-        bcrypt.gensalt()
-    )
 
 pk_uuid = Annotated[
     UUID,
