@@ -13,21 +13,53 @@ services:
   reverse-proxy:
     image: traefik:v2.8
     command:
+      # Remove this for production, this exposes the web UI
       - "--providers.docker"
+      - "--log.level=DEBUG"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.file"
-      - "--providers.file.filename=/opt/traefik/traefik-dynamic.toml"
-      - "--entrypoints.http.address=:80"
-      - "--entrypoints.http.http.redirections.entryPoint.to=:443"
-      - "--entrypoints.http.http.redirections.entryPoint.scheme=https"
-      - "--entrypoints.http.http.redirections.entrypoint.permanent=true"
-      - "--entrypoints.https.address=:443"
+      # Listen to port 80 solely to redirect it
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      # Listen to https for all other
+      - "--entrypoints.websecure.address=:443"
+      # This allows us to use the staging server for development
+      # We could potentially move this to a variable name
+      #- "--certificatesresolvers.letsencrypt.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesResolvers.letsencrypt.acme.email=${SOA_EMAIL}"
       - "--certificatesResolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-      - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entrypoint=http"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entrypoint=web"
     ports:
       - "80:80"
       - "443:443"
+    labels:
+      - "traefik.enable"
+      # We start off the TLS configuration
+      # Ensure that the SSL version is set to a minimum of 1.2
+      - "traefik.tls.options.default.minVersion=VersionTLS12"
+      # Send X-Frame-Options to DENY
+      - "traefik.http.middlewares.header-security.headers.frameDeny=true"
+      # HSTS security headers
+      # the time has been set to one non-leap year
+      - "traefik.http.middlewares.header-security.headers.stsSeconds=315360000"
+      - "traefik.http.middlewares.header-security.headers.stsIncludeSubdomains=true"
+      - "traefik.http.middlewares.header-security.headers.stsPreload=true"
+      # set the hsts header even in http - see if this required
+      - "traefik.http.middlewares.header-security.headers.forceSTSHeader=true"
+      # Proxy the bucket or another container for the web client
+      - "traefik.http.middlewares.header-bucket.headers.customrequestheaders.host=${BUCKET_FQDN}"
+      # Declare a service to reverer proxy
+      - "traefik.http.services.service-bucket.loadbalancer.servers.url=${BUCKET_FQDN}"
+      - "traefik.http.services.service-bucket.loadbalancer.passhostheaders=false"
+      - "traefik.http.routers.${PROJ_NAME}-root.entrypoints=websecure"
+      - "traefik.http.routers.${PROJ_NAME}-root.rule=Host(`${PROJ_FQDN}`)"
+      - "traefik.http.routers.${PROJ_NAME}-root.tls"
+      - "traefik.http.routers.${PROJ_NAME}-root.tls.certResolver=letsencrypt"
+      - "traefik.http.routers.${PROJ_NAME}-root.priority=1"
+      - "traefik.http.routers.${PROJ_NAME}-root.services=service-bucket"
+      - "traefik.http.routers.${PROJ_NAME}-root.middlewares=header-bucket"
+      - "traefik.http.routers.${PROJ_NAME}-root.middlewares=header-security"    
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - /opt/anomaly-lab/data/letsencrypt:/letsencrypt
@@ -81,18 +113,19 @@ services:
       - .env
     restart: unless-stopped
     labels:
+      # Explicitly tell Traefik to expose this container
       - "traefik.enable=true"
-      - "traefik.http.middlewares.strip-api.stripprefix.prefixes=/api/"
-      - "traefik.http.routers.api-no-auth.entrypoints=https"
-      - "traefik.http.routers.api-no-auth.tls"
-      - "traefik.http.routers.api-no-auth.tls.certResolver=letsencrypt"
-      - "traefik.http.routers.api-no-auth.rule=Host(`${PROJ_FQDN}`) && Path(`/api/{routes:(/?|/(webhooks/stripe|docs|openapi.json))}`)"
-      - "traefik.http.routers.api-no-auth.middlewares=strip-api"
-      - "traefik.http.routers.api-auth.entrypoints=https"
-      - "traefik.http.routers.api-auth.tls"
-      - "traefik.http.routers.api-auth.tls.certResolver=letsencrypt"
-      - "traefik.http.routers.api-auth.rule=Host(`${PROJ_FQDN}`) && PathPrefix(`/api/`)"
-      - "traefik.http.routers.api-auth.middlewares=strip-api"
+      # Declare a middleware that strips the api prefix, this 
+      # is required for FastaPI to mount on the root and for us
+      # to proxy the urls on the /api endpoint
+      - "traefik.http.middlewares.strip-api-prefix.stripprefix.prefixes=/api/"
+      # The router for this container is going to respond to the host
+      # of the project and root level url
+      - "traefik.http.routers.${PROJ_NAME}-api.entrypoints=websecure"
+      - "traefik.http.routers.${PROJ_NAME}-api.rule=Host(`${PROJ_FQDN}`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.${PROJ_NAME}-api.middlewares=strip-api-prefix"
+      - "traefik.http.routers.${PROJ_NAME}-api.tls"
+      - "traefik.http.routers.${PROJ_NAME}-api.tls.certResolver=letsencrypt"
     depends_on:
       - redis
       - db
