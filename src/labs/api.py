@@ -16,7 +16,7 @@ from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
-from .routers import router_auth, router_ext, router_users
+from .routers import router_root
 
 api_description = """
 This project provides a reference Python API built using FastAPI, the 
@@ -56,10 +56,7 @@ app = FastAPI(
 )
 
 # Additional routers of the application described in the routers package
-app.include_router(router_auth)
-app.include_router(router_ext, prefix="/ext")
-app.include_router(router_users, prefix="/users")
-
+app.include_router(router_root)
 
 @app.get("/")
 async def root(request: Request):
