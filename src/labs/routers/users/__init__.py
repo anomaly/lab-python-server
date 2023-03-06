@@ -4,9 +4,7 @@ This should only be accessible to admin users, and are endpoints
 used to manage user accounts. For the template application this
 was built to test out the initial CRUD features.
 """
-from datetime import datetime
 from uuid import UUID
-from typing import List
 
 from fastapi import APIRouter, Depends,\
     HTTPException, Query, status
@@ -22,7 +20,6 @@ router = APIRouter(tags=["user"])
 @router.get(
     "", 
     summary="Query users between limits",
-    response_model=List[UserResponse],
     status_code=status.HTTP_200_OK
 )
 async def get_users_with_limits(
@@ -30,7 +27,7 @@ async def get_users_with_limits(
     limit: int = Query(100, ge=1, le=100),
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(get_admin_user),
-):
+) -> list[UserResponse]:
     users = await User.get_all_in_range(
         session,
         offset=offset,
@@ -41,7 +38,6 @@ async def get_users_with_limits(
 @router.get(
     "/infinite", 
     summary="Get all users",
-    response_model=List[UserResponse],
     status_code=status.HTTP_200_OK
 )
 async def get_users(
@@ -49,21 +45,20 @@ async def get_users(
     limit: int = 10,
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(get_admin_user),
-):
+) -> list[UserResponse]:
     pass
 
 
 @router.get(
     "/{id}", 
     summary="Get a particular user",
-    response_model=UserResponse,
     status_code=status.HTTP_200_OK
 )
 async def get_user_by_id(
     id: UUID,
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(get_admin_user),
-):
+) -> UserResponse:
     """ Get a user by their id 
     
     
@@ -134,14 +129,13 @@ async def update_user(
 @router.post(
     "", 
     summary="Create a new user",
-    response_model=UserResponse,
     status_code=status.HTTP_201_CREATED,
 )
 async def create_user(
     user_request: UserRequest,
     session: AsyncSession = Depends(get_async_session),
     current_user: User = Depends(get_admin_user),
-):
+) -> UserResponse:
     """ Creates a new user based on
     
     """

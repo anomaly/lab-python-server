@@ -6,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...schema import HealthCheckResponse
-from ...config import config
 
 router = APIRouter(tags=["ext"])
 
@@ -21,11 +20,10 @@ async def echo():
 
 @router.get(
     "/healthcheck",
-    response_model=HealthCheckResponse
 )
 async def get_health(
     session: AsyncSession = Depends(get_async_session)
-):
+) -> HealthCheckResponse:
     """Check the health of the server.
 
     Purpose of this endpoint is to check the health of the server.

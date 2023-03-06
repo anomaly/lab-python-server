@@ -32,12 +32,11 @@ router.include_router(router_otp, prefix="/otp")
 @router.post(
   "/token",
   summary="Provides an endpoint for login via email and password",
-  response_model=Token,
 )
 async def login_for_auth_token(
   form_data: OAuth2PasswordRequestForm = Depends(),
   session: AsyncSession = Depends(get_async_session)
-):
+) -> Token:
   """ Attempt to authenticate a user and issue JWT token
   
   """
@@ -63,10 +62,10 @@ async def login_for_auth_token(
 @router.post(
   "/refresh",
   summary=""" Provides an endpoint for refreshing the JWT token""",
-  response_model=Token,
 )
 async def refresh_jwt_token(request: Request,
-  session: AsyncSession = Depends(get_async_session)):
+  session: AsyncSession = Depends(get_async_session)
+) -> Token:
   """ Provides a refresh token for the JWT session.
   """
   return {}
@@ -76,7 +75,9 @@ async def refresh_jwt_token(request: Request,
   "/logout",
   summary=""" Provides an endpoint for logging out the user""",
 )
-async def logout_user(session: AsyncSession = Depends(get_async_session)):
+async def logout_user(
+  session: AsyncSession = Depends(get_async_session)
+):
   """ Ends a users session
   
   """
@@ -84,11 +85,10 @@ async def logout_user(session: AsyncSession = Depends(get_async_session)):
 
 @router.get(
   "/me",
-  response_model=UserResponse,
 )
 async def get_me(
   current_user: User = Depends(get_current_user)
-):
+) -> UserResponse:
   """Get the currently logged in user or myself
 
   This endpoint will return the currently logged in user or raise
