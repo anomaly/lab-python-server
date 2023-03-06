@@ -41,7 +41,7 @@ httpx = "^0.23.3"
 watchdog = "^2.1.8"
 
 [tool.poetry.scripts]
-init-db = "labs.db:main"
+initdb = "labs.db:initalise"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.1.3"

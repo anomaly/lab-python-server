@@ -36,7 +36,7 @@ tasks:
   db:init:
     desc: initialise the database schema
     cmds:
-      - docker compose exec api sh -c "poetry run init_db"
+      - docker compose exec api sh -c "poetry run initdb"
   db:rev:
     desc: create a database migration, pass a string as commit string
     cmds:
