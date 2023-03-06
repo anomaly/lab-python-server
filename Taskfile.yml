@@ -55,8 +55,10 @@ tasks:
       Finally it will remove references to all alembic migrations 
 
       Ejecting the template should only ever be done once! 
-    cmds: 
-      - rm src/labs/alembic/versions/*.py
-      - FROM="labs"; TO=$PROJ_NAME; for FROM_DIR in `find . -name $FROM`; do if [ -d $FROM_DIR ]; then TARGET_DIR=`echo $FROM_DIR | sed "s/$FROM/$TO/g"`; echo $FROM_DIR ">" $TARGET_DIR; mv $FROM_DIR $TARGET_DIR; fi ; done; for SRC_FILE in `ls **/*.py **/Makefile **/*.yml **/Dockerfile **/*.dockerfile **/alembic.ini **/.env* **/README.md `; do sed -i '' "s/$FROM/$TO/g" $SRC_FILE; done
+    cmds:
+      - ls 
+      #- rm src/labs/alembic/versions/*.py
+      #- FROM="labs"; TO=$PROJ_NAME; for FROM_DIR in `find . -name $FROM`; do if [ -d $FROM_DIR ]; then TARGET_DIR=`echo $FROM_DIR | sed "s/$FROM/$TO/g"`; echo $FROM_DIR ">" $TARGET_DIR; mv $FROM_DIR $TARGET_DIR; fi ; done; for SRC_FILE in `ls **/*.py **/Makefile **/*.yml **/Dockerfile **/*.dockerfile **/alembic.ini **/.env* **/README.md `; do sed -i '' "s/$FROM/$TO/g" $SRC_FILE; done
     status:
+      # The project is not labs
       - test $PROJ_NAME != "labs"
