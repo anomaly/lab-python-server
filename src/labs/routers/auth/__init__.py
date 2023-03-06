@@ -40,7 +40,10 @@ async def login_for_auth_token(
   """ Attempt to authenticate a user and issue JWT token
   
   """
-  user = await User.get_by_email(session, form_data.username)
+  user = await User.get_by_email(
+    session,
+    form_data.username
+  )
 
   if user is None or not user.check_password(form_data.password):
     raise HTTPException(
@@ -50,7 +53,7 @@ async def login_for_auth_token(
     )
 
   access_token = create_access_token(
-    subject=user.email,
+    subject=user.id,
     fresh=True
   )
   
