@@ -11,9 +11,9 @@ from typing_extensions import Annotated
 from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, func,\
+    select,\
     update as sqlalchemy_update,\
     delete as sqlalchemy_delete
-from sqlalchemy.future import select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 
