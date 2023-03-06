@@ -29,7 +29,8 @@ Ultimately the output of this lab will be consumed as the `app` and `worker` for
 All `docker-compose` files depend on the following environment variables, which can be set by either exporting them before you run the commands or by declaring them in your `.env` file.
 
 - `PROJ_NAME` is a prefix that is used to label resources, object stores
-- `PROJ_DOMAIN` is the domain name of the application, this can be set
+- `PROJ_FQDN` is the domain name of the application, this can be set
+- `ORG_NAME` is the organisation for your Docker registry; Anomaly defaults to using Github
 
 ## General notes
 
