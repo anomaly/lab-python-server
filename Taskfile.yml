@@ -9,6 +9,8 @@ tasks:
       - docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER}} -f Dockerfile.api .
   dev:test:
     desc: runs tests inside the server container
+    summary: |
+      Uses pytest to run a set of extensive test suites for the project 
     cmds:
       - docker compose exec api sh -c "pytest"
   dev:pyshell:
@@ -43,3 +45,18 @@ tasks:
     desc: migrates models to HEAD
     cmds:
       - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini upgrade head"
+  eject:
+    desc: eject the project from a template
+    summary: |
+      This process will remove any references to the Anomaly labs template, 
+      it specifically will set the package name to your project name, fix
+      any references in configuration files to the labs project.
+
+      Finally it will remove references to all alembic migrations 
+
+      Ejecting the template should only ever be done once! 
+    cmds: 
+      - rm src/labs/alembic/versions/*.py
+      - FROM="labs"; TO=$PROJ_NAME; for FROM_DIR in `find . -name $FROM`; do if [ -d $FROM_DIR ]; then TARGET_DIR=`echo $FROM_DIR | sed "s/$FROM/$TO/g"`; echo $FROM_DIR ">" $TARGET_DIR; mv $FROM_DIR $TARGET_DIR; fi ; done; for SRC_FILE in `ls **/*.py **/Makefile **/*.yml **/Dockerfile **/*.dockerfile **/alembic.ini **/.env* **/README.md `; do sed -i '' "s/$FROM/$TO/g" $SRC_FILE; done
+    status:
+      - test $PROJ_NAME != "labs"
