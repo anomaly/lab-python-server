@@ -1123,7 +1123,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.
 name = "pytest-order"
 version = "1.0.1"
 description = "pytest plugin to run your tests in a specific order"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -1696,4 +1696,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "d71c2601cac640ff71512e90f059af47ec9a97d405f0ae83d2167fbc012d695d"
+content-hash = "9252cb216e263a8193b5e8ed24c263762eadbbae34e3a37dc6ed5003395c4173"
