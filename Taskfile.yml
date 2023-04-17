@@ -43,3 +43,11 @@ tasks:
     desc: migrates models to HEAD
     cmds:
       - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini upgrade head"
+  db:heads:
+    desc: shows the HEAD SHA
+    cmds:
+      - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini heads"
+  db:alembic:
+    desc: arbitrary alembic command
+    cmds:
+      - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini {{.CLI_ARGS}}"
