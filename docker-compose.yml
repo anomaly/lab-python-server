@@ -11,7 +11,6 @@ version: "3.8"
 
 volumes:
   postgres-data:
-  postgres-log:
   redis-data:
   fluentd-data:
   minio-data:
@@ -33,7 +32,6 @@ services:
       - .env.development
     volumes:
       - postgres-data:/var/lib/postgresql/data/
-      - postgres-log:/var/log/postgresql/
 
   # Redis:
   # - In development we read secrets from .env.development
@@ -133,15 +131,3 @@ services:
       /usr/bin/mc mb -p devel/devel;
       exit 0;
       "
-
-# Logging agent to collect logs from all containers in the setup
-# and send the logs to a centralised logging server
-
-  vector:
-    image: timberio/vector:0.28.1-debian
-    container_name: ${PROJ_NAME}-vector
-    volumes: 
-      - $PWD/vector.toml:/etc/vector/vector.toml:ro
-      - postgres-log:/var/log/postgresql/
-    restart: unless-stopped
-      
