@@ -2,18 +2,21 @@
 
 
 """
+from uuid import uuid4
 from datetime import timedelta
 from typing import TYPE_CHECKING, Union
 
-from sqlalchemy import Boolean, Column, ForeignKey, String, Integer
-from sqlalchemy.sql import expression
+from sqlalchemy import event
 from sqlalchemy.orm import relationship, mapped_column, Mapped
 
 from .utils import DateTimeMixin, IdentifierMixin, ModelCRUDMixin, fk_user_uuid
+
+from ..db import Base
 from ..utils import minio_client
 from ..config import config
 
 class S3FileMetadata(
+    Base,
     DateTimeMixin,
     IdentifierMixin,
     ModelCRUDMixin
@@ -42,6 +45,10 @@ class S3FileMetadata(
         default=False
     )
 
+    legal_hold: Mapped[bool] = mapped_column(
+        default=False
+    )
+
     user_id: Mapped[fk_user_uuid]
 
     user = relationship(
@@ -58,7 +65,7 @@ class S3FileMetadata(
             return minio_client.presigned_get_object(
                 config.S3_BUCKET_NAME,
                 self.s3_key,
-                expires=timedelta(hours=1),
+                expires=timedelta(minutes=config.S3_DOWNLOAD_EXPIRY),
                 response_headers={
                     "response-content-disposition": 
                     f'attachment; filename="{self.file_name}"'
@@ -72,7 +79,7 @@ class S3FileMetadata(
             url = minio_client.presigned_put_object(
                 config.S3_BUCKET_NAME,
                 self.s3_key,
-                expires=timedelta(minutes=20)
+                expires=timedelta(minutes=config.S3_UPLOAD_EXPIRY)
             )
             return url
         except Exception:
@@ -99,3 +106,16 @@ class S3FileMetadata(
             return True
         except Exception:
             return False
+        
+
+@event.listens_for(S3FileMetadata, 'init')
+def receive_init(target, args, kwargs):
+    """ Assigns a UUID based on the UUID4 standard as the key for the file upload
+
+    When the application assigns a new S3FileMetadata object, it will be 
+    given a UUID to use as the key in the bucket, and this record will act
+    as the meta table for translating the object in the bucket to a downloadable
+    file.
+    """
+    target.otp_secret = uuid4()
+
