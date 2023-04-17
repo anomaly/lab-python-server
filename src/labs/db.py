@@ -48,7 +48,7 @@ async def init_models():
         await conn.run_sync(Base.metadata.create_all)
 
 
-def initalise():
+def initialise():
     """ Async IO containers to run the init_models function
 
     This is called from the command line via poetry
@@ -70,3 +70,8 @@ def initalise():
 #         raise
 #     finally:
 #         await async_session.close()
+
+
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(init_models())
