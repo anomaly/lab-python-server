@@ -1,7 +1,7 @@
 """Scenes for the ext module
 """
 
-from fastapi import APIRouter, Request, Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
