@@ -51,3 +51,20 @@ def create_fluentbit_logger():
 
     return logger
 
+def redis_client():
+    """ Creates a redis client that can be used to connect to the
+    redis server. 
+
+    While this is not used by the Celery queue processor, it is
+    provided as a utility function for the app.
+    """
+    import redis
+
+    client = redis.Redis(
+        host=config.REDIS_HOST,
+        port=config.REDIS_PORT,
+        db=0,
+        decode_responses=True
+    )
+
+    return client

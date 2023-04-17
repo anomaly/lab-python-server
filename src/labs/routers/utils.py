@@ -38,17 +38,17 @@ async def get_current_user(
       algorithms=[config.JWT_ALGORITHM]
     )
 
-    username: str = payload.get("sub")
+    user_id: str = payload.get("sub")
 
-    if username is None:
+    if user_id is None:
         raise credentials_exception
 
-    token_data = TokenData(username=username)
+    token_data = TokenData(id=user_id)
 
   except:
     raise credentials_exception
 
-  user = await User.get_by_email(session, token_data.username)
+  user = await User.get(session, token_data.id)
 
   if user is None:
       raise credentials_exception

@@ -11,9 +11,9 @@ from typing_extensions import Annotated
 from uuid import UUID
 
 from sqlalchemy import DateTime, ForeignKey, func,\
+    select,\
     update as sqlalchemy_update,\
     delete as sqlalchemy_delete
-from sqlalchemy.future import select
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID as PGUUID
 
@@ -115,6 +115,14 @@ class ModelCRUDMixin:
         async_db_session.add(new_instance)
         await async_db_session.commit()
         await async_db_session.refresh(new_instance) # Ensure we get the id
+
+        # This will trigger using the _base_get_query to load any
+        # relationships we need.
+        updated_instance = await cls.get(
+            async_db_session, 
+            new_instance.id
+        )
+        return updated_instance
         return new_instance
 
     @classmethod

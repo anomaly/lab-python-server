@@ -16,7 +16,7 @@ class TokenData(BaseModel):
     is a valid token.
 
     """
-    username: str = None
+    id: str = None
 
 
 class SignupRequest(AppBaseModel):

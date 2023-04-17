@@ -47,6 +47,15 @@ async def init_models():
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
+
+def initalise():
+    """ Async IO containers to run the init_models function
+
+    This is called from the command line via poetry
+    """
+    import asyncio
+    asyncio.run(init_models())
+
 # TODO: Revise implementation in async context
 # Donot use until we have a better understanding of how to use async context
 # @asynccontextmanager
