@@ -38,6 +38,9 @@ class Config(BaseSettings):
     S3_REGION: str = "ap-south-1" # Set to Linode Singapore
     S3_USE_SSL: bool = True # Should only be relaxed for development
 
+    S3_UPLOAD_EXPIRY: int = 5 # In minutes
+    S3_DOWNLOAD_EXPIRY: int = 5 # In minutes
+
     # Secrets that the application requires for session
     # and cross domain checking
     JWT_SECRET_KEY: SecretStr
