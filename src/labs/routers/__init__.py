@@ -11,6 +11,7 @@ from fastapi import APIRouter
 from .auth import router as router_auth
 from .ext import router as router_ext
 from .users import router as router_users
+from .upload import router as router_upload
 
 # Mount all routers at the top level
 # this is what the FastAPI app will use
@@ -26,4 +27,8 @@ router_root.include_router(
 router_root.include_router(
   router_users,
   prefix="/users",
+)
+router_root.include_router(
+  router_upload,
+  prefix="/upload",
 )
