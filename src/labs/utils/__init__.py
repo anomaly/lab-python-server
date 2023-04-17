@@ -37,20 +37,6 @@ def create_celery_app(include=None):
 
     return app
 
-
-def create_fluentbit_logger():
-    """ Configures a Fluentd sender that should be made available
-    in the Docker-compose or K8s constructed environment.
-    """
-    from fluent import sender
-    from .. import __title__
-
-    logger = sender.FluentSender(__title__, 
-        host=config.FLUENTD_HOST, 
-        port=config.FLUENTD_PORT)
-
-    return logger
-
 def redis_client():
     """ Creates a redis client that can be used to connect to the
     redis server. 
