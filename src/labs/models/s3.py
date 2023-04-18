@@ -80,23 +80,26 @@ class S3FileMetadata(
     )
 
     @property
-    def signed_download_url(self) -> Union[str, None]:
+    def presigned_download_url(self) -> Union[str, None]:
         """
         """
         try:
             return minio_client.presigned_get_object(
                 config.S3_BUCKET_NAME,
                 self.s3_key,
-                expires=timedelta(minutes=config.S3_DOWNLOAD_EXPIRY),
+                expires=timedelta(
+                    minutes=config.S3_DOWNLOAD_EXPIRY
+                ),
                 response_headers={
-                    "response-content-disposition": 
+                    'response-content-disposition': 
                     f'attachment; filename="{self.file_name}"'
                 },
             )
         except Exception as e:
             return None
 
-    def get_upload_url(self) -> Union[str, None]:
+    @property
+    def presigned_upload_url(self) -> Union[str, None]:
         """
         
         """
@@ -104,7 +107,9 @@ class S3FileMetadata(
             url = minio_client.presigned_put_object(
                 config.S3_BUCKET_NAME,
                 self.s3_key,
-                expires=timedelta(minutes=config.S3_UPLOAD_EXPIRY)
+                expires=timedelta(
+                    minutes=config.S3_UPLOAD_EXPIRY
+                )
             )
             return url
         except Exception:
@@ -142,5 +147,5 @@ def receive_init(target, args, kwargs):
     as the meta table for translating the object in the bucket to a downloadable
     file.
     """
-    target.otp_secret = uuid4()
-
+    target.s3_key = uuid4().hex
+    target.prefix = uuid4().hex

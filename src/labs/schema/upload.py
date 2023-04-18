@@ -6,8 +6,8 @@ from .utils import AppBaseModel
 class FileUploadResponse(
     AppBaseModel
 ):
-    url: str
-    expiry_date: datetime
+    presigned_upload_url: str
+    expires: int
 
 
 class FileUploadRequest(
