@@ -36,6 +36,7 @@ pytz = "^2023.3"
 httpx = "^0.24.0"
 taskiq = "^0.4.1"
 markupsafe = "^2.1.2"
+taskiq-fastapi = "^0.1.1"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"

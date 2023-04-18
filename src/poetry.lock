@@ -1280,6 +1280,22 @@ files = [
 ]
 
 [[package]]
+name = "taskiq-fastapi"
+version = "0.1.1"
+description = "FastAPI integration for taskiq"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "taskiq_fastapi-0.1.1-py3-none-any.whl", hash = "sha256:b5f5c743cea06f33b530e3dbc53830417b70cf03044ab1e061a65ffac540cd29"},
+    {file = "taskiq_fastapi-0.1.1.tar.gz", hash = "sha256:ed5af521f18983887763de0342ea09ee3170e96720234b59fdcf824aa4e316f0"},
+]
+
+[package.dependencies]
+fastapi = "*"
+taskiq = ">=0.3.1,<1"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -1549,4 +1565,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "2bd22a7d6843b1f0d336315e9cc98dda62783fc1f22de33425e347faabbd5805"
+content-hash = "23adf3da87dcbdb2e5e7c440451ce3ddac27edd419f9c106f2ff39fb315b894f"
