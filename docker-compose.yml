@@ -12,7 +12,6 @@ version: "3.8"
 volumes:
   postgres-data:
   redis-data:
-  fluentd-data:
   minio-data:
 
 services:
@@ -61,39 +60,6 @@ services:
     volumes:
       - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
       - ./src/tests:/opt/tests # Mount it so we can keep modifying tests
-    depends_on:
-      - db
-      - redis
-
-  # Worker: is a celery based worker process that runs in the background
-  worker:
-    container_name: ${PROJ_NAME}-worker
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["watchmedo", "auto-restart", "--directory=./", "--pattern=*.py", "--recursive", "--", "celery", "--app=${PROJ_NAME}.celery.app", "worker", "--pool=gevent", "--loglevel=INFO", "--queues=celery"]
-    env_file:
-      - .env.development
-    restart: unless-stopped
-    volumes:
-      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
-    depends_on:
-      - db
-      - redis
-
-  # Beta is Celery's cron like feature which keepts taps on
-  # repeating tasks defined by the application
-  beat:
-    container_name: ${PROJ_NAME}-beat
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["celery", "--app=${PROJ_NAME}.celery.app", "beat", "--loglevel=INFO"]
-    env_file:
-      - .env.development
-    restart: unless-stopped
-    volumes:
-      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
     depends_on:
       - db
       - redis

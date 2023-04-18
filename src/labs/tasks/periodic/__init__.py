@@ -7,9 +7,6 @@
 """
 
 
-from ...celery import app
-
-@app.on_after_configure.connect
 def setup_periodic_tasks(sender, **kwargs):
     """ Wireup the tasks that have to be run on a schedule
     """
@@ -17,7 +14,6 @@ def setup_periodic_tasks(sender, **kwargs):
         check_every_so_often.s('a periodic task running'),
         name='add every minute')
 
-@app.task
 async def check_every_so_often(arg):
     import logging
     logging.error(arg)

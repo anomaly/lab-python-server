@@ -130,31 +130,6 @@ services:
       - redis
       - db
 
-  # Worker: is a celery based worker process that runs in the background
-  worker:
-    container_name: ${PROJ_NAME}-worker
-    image: anomalyhq/${PROJ_NAME}-server:${VERSION}
-    command: ["celery", "--app=${PROJ_NAME}.celery.app", "worker", "--pool=gevent", "--loglevel=INFO", "--queues=celery"]
-    cap_drop:
-      - "all"
-    env_file:
-      - .env
-    restart: unless-stopped
-    depends_on:
-      - redis
-
-  beat:
-    container_name: ${PROJ_NAME}-beat
-    image: anomalyhq/${PROJ_NAME}}-server:${VERSION}
-    command: ["celery", "--app=${PROJ_NAME}.celery.app", "beat", "--loglevel=INFO"]
-    cap_drop:
-      - "all"
-    env_file:
-      - .env
-    restart: unless-stopped
-    depends_on:
-      - redis
-
 networks:
   default:
     name: ${PROJ_NAME}-network

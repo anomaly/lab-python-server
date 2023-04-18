@@ -3,12 +3,10 @@
 """
 # App related imports
 
-from ...celery import app
 from ..utils import send_sms_message, email_sender
 from ...db import get_async_session
 from ...models import User
 
-@app.task()
 async def initiate_otp_via_sms(user_id):
 
     session = get_async_session()
@@ -21,7 +19,6 @@ async def initiate_otp_via_sms(user_id):
     #send_sms_message("00000", "Your OTP is 1234")
 
 
-@app.task()
 async def initiate_otp_via_email(user_id):
     email_sender.send(
         subject='email subject',
