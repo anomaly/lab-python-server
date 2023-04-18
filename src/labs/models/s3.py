@@ -2,6 +2,7 @@
 
 
 """
+from typing import Optional
 from uuid import uuid4
 from datetime import timedelta
 from typing import Union
@@ -54,8 +55,12 @@ class S3FileMetadata(
 
     __tablename__ = "s3_file_metadata"
 
+    # This is the unique key for this object store in the associated bucket
+    # which is automatically assigned to the metadata, you do not have to
+    # worry about it simply deal with the wrapped methods provided by this class
     s3_key: Mapped[str]
-    prefix: Mapped[str]
+    # Prefix where you want the object to be stored e.g images, files
+    prefix: Mapped[Optional[str]]
 
     file_name: Mapped[str]
     file_size: Mapped[int]
