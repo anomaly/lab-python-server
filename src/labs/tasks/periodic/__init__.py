@@ -1,9 +1,4 @@
-""" Example of periodic task using Celery
-
-    This is a simple example of a periodic task using Celery.
-    for further documentation please refer to:
-    https://docs.celeryq.dev/en/stable/userguide/periodic-tasks.html
-
+""" 
 """
 
 

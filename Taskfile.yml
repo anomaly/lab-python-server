@@ -25,10 +25,6 @@ tasks:
     desc: get a bash session on the api container
     cmds:
       - docker compose exec api sh -c "bash"
-  dev:qwatch:
-    desc: get a list of celery events
-    cmds:
-      - docker compose exec api sh -c "celery -A {{.PROJ_NAME}}.celery:app events"
   crypt:hash:
     desc: generate a random cryptographic hash
     cmds:

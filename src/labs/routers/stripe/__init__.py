@@ -43,7 +43,6 @@ async def stripe_webhook(
 
     Note that you will require to implement a Task for each handler, 
     these should generally live in the tasks package and you can
-    either use asyncio or celery to process the tasks.
 
     STRIPE_WEBHOOK_SECRET is required to be set in the environment
 

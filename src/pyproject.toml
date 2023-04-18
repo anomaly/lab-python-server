@@ -35,7 +35,6 @@ pytest = "^7.3.1"
 pytz = "^2023.3"
 httpx = "^0.24.0"
 taskiq = "^0.4.1"
-celery = "^5.2.7"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"

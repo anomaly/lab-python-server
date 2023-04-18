@@ -62,7 +62,6 @@ The following Python packages make the standard set of tools for our projects:
 - [**SQLAlchemy**](https://www.sqlalchemy.org) - A Python object relational mapper (ORM)
 - [**alembic**](https://alembic.sqlalchemy.org/en/latest/) - A database migration tool
 - [**FastAPI**](http://fastapi.tiangolo.com) - A fast, simple, and flexible framework for building HTTP APIs
-- [**Celery**](https://docs.celeryq.dev/en/stable/getting-started/introduction.html) - A task queue
 - **fluent-logger** - A Python logging library that supports fluentd
 - [**pendulum**](https://pendulum.eustace.io) - A timezone aware datetime library
 - [**pyotp**](https://pyauth.github.io/pyotp/) - A One-Time Password (OTP) generator
@@ -98,13 +97,12 @@ Directory structure for our application:
  ├─ tests/
  ├─ labs
  |   └─ routers/         -- FastAPI routers
- |   └─ tasks/           -- Celery tasks
+ |   └─ tasks/           -- TaskIQ 
  |   └─ models/          -- SQLAlchemy models
  |   └─ schema/          -- Pydantic schemas
  |   └─ alembic/         -- Alembic migrations
  |   └─ __init__.py
  |   └─ api.py
- |   └─ celery.py
  |   └─ config.py
  |   └─ db.py
  |   └─ utils.py
@@ -248,64 +246,9 @@ which would result in the client generating a function like `someSpecificIdYouDe
 
 For consistenty FastAPI docs shows a wrapper function that [globally re-writes](https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/?h=operation_id#using-the-path-operation-function-name-as-the-operationid) the `operation_id` to the function name. This does put the onus on the developer to name the function correctly.
 
-## Celery based workers
+# TaskIQ based tasks
 
-> *WARNING:* Celery currently *DOES NOT* have support for `asyncio` which comes in the way of our stack, please follow [Issue 21](https://github.com/anomaly/lab-python-server/issues/21) for information on current work arounds and recommendations. We are also actively working with the Celery team to get this resolved.
-
-The projects use `Celery` to manage a queue backed by `redis` to schedule and process background tasks. The celery app is run a separate container. In development we use [watchdog](https://github.com/gorakhargosh/watchdog) to watch for changes to the Python files, this is obviously uncessary in production.
-
-The celery app is configured in `celery.py` which reads from the `redis` configuration in `config.py`.
-
-Each task is defined in the `tasks` package with appropriate subpackages. 
-
-To schedule tasks, the API endpoints need to import the task
-```python
-from ...tasks.email import verification_email
-```
-and call the `apply_async` method on the task:
-```python
-verification_email.apply_async()
-```
-
-A pieced together example of scheduling a task:
-
-```python
-from fastapi import APIRouter, Request, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from ...db import session_context, session_context
-from ...tasks.email import verification_email
-from ...config import config
-
-router = APIRouter()
-
-@router.get("/verify")
-async def log(request: Request):
-    """Verify an account
-    """
-    verification_email.apply_async()
-    return {"message": "hello world"}
-```
-
-You can send position arguments to the task, for example:
-
-```python
-verification_email.apply_async(args=[user_id])
-```
-
-which would be recieved by the task as `user_id` as a positional argument.
-
-> We recommend reading design documentation for the `Celery` project [here](https://docs.celeryproject.org/en/latest/userguide/tasks.html), the general principle is send meta data that the task can use to complete the task not complete, heavy objects. i.e send an ID with some context as opposed to a fully formed object.
-
-### Monitoring the queue
-
-Celery can be monitored using the `flower` package, it provides a web based interfaces. There's also a text based interface available via the command line interface:
-
-```sh
-celery -A labs.celery:app events
-```
-
-you can alternatively use the wrapped Task command `task dev:qwatch`, this is portable across projects if you copy the template.
+To be filled in once we figure out how TaskIQ works.
 
 ## SQLAlchemy wisdom
 
