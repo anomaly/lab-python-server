@@ -29,6 +29,25 @@ class S3FileMetadata(
 
     e.g. user has uploaded identification documents.
 
+    Usage: 
+        s3_file_metadata = await S3FileMetadata.create(
+            session,
+            file_name=upload_request.file_name,
+            file_size=upload_request.file_size,
+            mime_type=upload_request.mime_type,
+        )
+
+    You are required to pass in the file_name, file_size and mime_type of the upload.
+    This is simply a claim that the application is making not the truth, following this
+    use the get_upload_url method to get a signed url to upload the file to the object.
+
+    The application should then queue a validation where the file attributes are checked
+    against the bucket and if they match the is_valid flag is set to True.
+
+    The template assumes you require to be an authenticated user to upload files, if
+    you require to drop this then you will need to make the necessary changes to the
+    tables.
+
     """
 
     __tablename__ = "s3_file_metadata"
@@ -49,11 +68,14 @@ class S3FileMetadata(
         default=False
     )
 
+    is_valid: Mapped[bool] = mapped_column(
+        default=False
+    )
+
     user_id: Mapped[fk_user_uuid]
 
     user = relationship(
         "User",
-        primaryjoin="S3FileMetadata.created_by_user_id==User.id",
         uselist=False,
     )
 
@@ -75,6 +97,9 @@ class S3FileMetadata(
             return None
 
     def get_upload_url(self) -> Union[str, None]:
+        """
+        
+        """
         try:
             url = minio_client.presigned_put_object(
                 config.S3_BUCKET_NAME,

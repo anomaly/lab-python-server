@@ -31,6 +31,7 @@ class User(
     __tablename__ = "user"
 
     email: Mapped[str] = mapped_column(unique=True)
+    mobile_number: Mapped[Optional[str]]
     
     """ Note that we define the password slightly differently
 
@@ -44,19 +45,18 @@ class User(
 
     """
     password: Mapped[str]
-
-    verified: Mapped[bool]
-
-    mobile_number: Mapped[Optional[str]]
-
-    # password: Mapped[Optional[str]]
+    otp_secret: Mapped[str]
 
     first_name: Mapped[Optional[str]]
     last_name: Mapped[Optional[str]]
 
-    is_admin: Mapped[bool]
+    is_admin: Mapped[bool] = mapped_column(
+        default=False,
+    )
 
-    otp_secret: Mapped[str]
+    verified: Mapped[bool] = mapped_column(
+        default=False,
+    )
 
     # Methods to assist to deal with passwords
     def check_password(self, plain_text_pass):
