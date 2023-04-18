@@ -52,7 +52,7 @@ async def login_for_auth_token(
     )
 
   access_token = create_access_token(
-    subject=user.id,
+    subject=str(user.id),
     fresh=True
   )
   
