@@ -42,11 +42,11 @@ tasks:
     cmds:
       - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini upgrade head"
   db:heads:
-    desc: shows the HEAD SHA
+    desc: shows the HEAD SHA for alembic migrations
     cmds:
       - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini heads"
   db:alembic:
-    desc: arbitrary alembic command
+    desc: arbitrary alembic command in the container
     cmds:
       - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini {{.CLI_ARGS}}"
   eject:
