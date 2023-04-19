@@ -15,9 +15,6 @@ from ...schema import OTPTriggerEmailRequest, \
   OTPTriggerSMSRequest, OTPVerifyRequest, OTPTriggerResponse,\
   Token
 
-from ...tasks.otp import initiate_otp_via_email, \
-  initiate_otp_via_sms
-
 router = APIRouter(tags=["otp"])
 
 @router.post(
@@ -42,7 +39,6 @@ async def initiate_otp_email(
   # If not found make a user account with the mobile
 
   # Initiate the OTP process
-  initiate_otp_via_email.apply_async(args=[user.id])
 
   return OTPTriggerResponse(success=True)
 
@@ -67,7 +63,6 @@ async def initiate_otp_sms(request: OTPTriggerSMSRequest,
     user = await User.create(session, **request.dict())
 
   # Initiate the OTP process
-  initiate_otp_via_sms.apply_async(args=[user.id])
 
   return OTPTriggerResponse(success=True)
 

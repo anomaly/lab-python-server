@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...db import get_async_session
 from ...models import User
 from ...schema import SignupRequest
-from ...tasks.email import verification_email
 from ...config import config
 
 router = APIRouter()
@@ -33,5 +32,4 @@ async def signup_user(request: SignupRequest,
 async def verify_user(request: Request):
     """Verify an account
     """
-    verification_email.delay()
     return {"message": "hello world"}

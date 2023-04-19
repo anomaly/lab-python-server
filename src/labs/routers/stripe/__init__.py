@@ -24,7 +24,6 @@ import stripe
 from ...db import get_async_session
 from ...config import config
 
-from ...tasks import payment_method_attached, stripe_subscription_created
  
 """Mounts all the sub routers for the authentication module"""
 router = APIRouter(tags=["stripe"])
@@ -80,13 +79,9 @@ async def stripe_webhook(
   elif event.type == 'invoice.paid':
     payment_intent = event.data.object
   elif event.type == 'payment_method.attached':
-    background_tasks.add_task(payment_method_attached,\
-      session, event
-    )
+    pass
   elif event.type == 'customer.subscription.created':
-    background_tasks.add_task(stripe_subscription_created,\
-      session, event
-    )    
+    pass
   elif event.type == 'customer.subscription.updated':
     subscription = event.data.object
     import logging
