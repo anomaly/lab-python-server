@@ -1296,6 +1296,22 @@ fastapi = "*"
 taskiq = ">=0.3.1,<1"
 
 [[package]]
+name = "taskiq-redis"
+version = "0.3.0"
+description = "Redis integration for taskiq"
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+files = [
+    {file = "taskiq_redis-0.3.0-py3-none-any.whl", hash = "sha256:0d1600b216b7befc92f0de860bb95a6cc16ccadf1fd7e84f0471cf86cdf01d32"},
+    {file = "taskiq_redis-0.3.0.tar.gz", hash = "sha256:5ae41b1cd7c5861c5682dd2d161ce34f7e6cb220eb2186c6f7782e94967d12eb"},
+]
+
+[package.dependencies]
+redis = ">=4.2.0,<5.0.0"
+taskiq = ">=0,<1"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -1565,4 +1581,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "23adf3da87dcbdb2e5e7c440451ce3ddac27edd419f9c106f2ff39fb315b894f"
+content-hash = "6a3da6bf5dada964ba64435daaf4db96f07322121c5fe8f8b4e23fea028df09a"
