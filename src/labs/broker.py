@@ -4,8 +4,6 @@ from .config import config
 # https://pypi.org/project/taskiq-redis/
 from taskiq_redis import ListQueueBroker, RedisAsyncResultBackend
 
-import taskiq_fastapi
-
 redis_async_result = RedisAsyncResultBackend(
     redis_url=config.redis_dsn,
 )
@@ -18,8 +16,3 @@ broker = ListQueueBroker(
     url=config.redis_dsn,
     result_backend=redis_async_result,
 )
-
-# Initialises the FastAPI plugin for TaskIQ which allows sharing 
-# FastAPI dependencies in tasks. This will be handle for sharing
-# the database session in tasks.
-taskiq_fastapi.init(broker, "labs.api:app")

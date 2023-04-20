@@ -12,6 +12,8 @@ from ...models import User
 from ...schema import SignupRequest
 from ...config import config
 
+from .tasks import send_account_verification_email
+
 router = APIRouter()
 
 @router.post("/signup")
@@ -32,4 +34,5 @@ async def signup_user(request: SignupRequest,
 async def verify_user(request: Request):
     """Verify an account
     """
+    await send_account_verification_email.kiq()
     return {"message": "hello world"}
