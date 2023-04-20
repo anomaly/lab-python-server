@@ -88,6 +88,7 @@ services:
     hostname: s3.${PROJ_FQDN}
     volumes:
       - minio-data:/data
+      - .cert:/root/.minio/certs
     ports:
       - "9000:9000"
       - "9001:9001"
@@ -111,5 +112,6 @@ services:
       /bin/sh -c "
       /usr/bin/mc config host add devel http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
       /usr/bin/mc mb -p devel/devel;
+      /usr/bin/mc policy set download devel/devel;
       exit 0;
       "
