@@ -9,6 +9,8 @@ from taskiq_redis import RedisAsyncResultBackend
 # RabbitMQ is recommended as the broker 
 from taskiq_aio_pika import AioPikaBroker
 
+import taskiq_fastapi
+
 redis_result_backend = RedisAsyncResultBackend(
     config.redis_dsn
 )
@@ -17,3 +19,5 @@ broker = AioPikaBroker(
     config.amqp_dsn,
     result_backend=redis_result_backend
 )
+
+taskiq_fastapi.init(broker, "labs.api:app")

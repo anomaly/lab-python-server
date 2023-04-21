@@ -34,5 +34,5 @@ async def signup_user(request: SignupRequest,
 async def verify_user(request: Request):
     """Verify an account
     """
-    # await send_account_verification_email.kiq()
+    await send_account_verification_email.kiq()
     return {"message": "hello world"}

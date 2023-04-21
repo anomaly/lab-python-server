@@ -22,8 +22,8 @@ class Config(BaseSettings):
 
     RABBITMQ_DEFAULT_USER: str
     RABBITMQ_DEFAULT_PASS: SecretStr
-    RABBITMQ_DEFAULT_VHOST: str
     RABBITMQ_NODE_PORT: int = 5672
+    RABBITMQ_HOST: str
 
     # redis is used by celery for workers
     REDIS_HOST: str
@@ -113,13 +113,15 @@ class Config(BaseSettings):
             ":",
             self.RABBITMQ_DEFAULT_PASS.get_secret_value(),
             "@",
-            self.RABBITMQ_DEFAULT_VHOST,
+            self.RABBITMQ_HOST,
             ":",
             str(self.RABBITMQ_NODE_PORT),
         ])
         return AmqpDsn(
             url=amqp_url, 
-            scheme="amqp"
+            scheme="amqp",
+            user=self.RABBITMQ_DEFAULT_USER,
+            password=self.RABBITMQ_DEFAULT_PASS,
         )
     
 # A singleton instance of the configuration

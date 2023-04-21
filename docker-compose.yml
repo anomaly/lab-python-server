@@ -75,21 +75,21 @@ services:
       - rabbitmq
 
   # TaskIQ worker
-  # worker:
-  #   container_name: ${PROJ_NAME}-worker
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile
-  #   command: ["taskiq", "worker", "${PROJ_NAME}.broker:broker"]
-  #   env_file:
-  #     - .env.development
-  #   restart: unless-stopped
-  #   volumes:
-  #     - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
-  #   depends_on:
-  #     - db
-  #     - redis
-  #     - rabbitmq
+  worker:
+    container_name: ${PROJ_NAME}-worker
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["taskiq", "worker", "${PROJ_NAME}.broker:broker"]
+    env_file:
+      - .env.development
+    restart: unless-stopped
+    volumes:
+      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
+    depends_on:
+      - db
+      - redis
+      - rabbitmq
 
   # MinIO server used during development, replaced by object store in prod
   minio:
