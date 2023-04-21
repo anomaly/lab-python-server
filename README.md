@@ -73,7 +73,8 @@ The following Python packages make the standard set of tools for our projects:
 - [**SQLAlchemy**](https://www.sqlalchemy.org) - A Python object relational mapper (ORM)
 - [**alembic**](https://alembic.sqlalchemy.org/en/latest/) - A database migration tool
 - [**FastAPI**](http://fastapi.tiangolo.com) - A fast, simple, and flexible framework for building HTTP APIs
-- **fluent-logger** - A Python logging library that supports fluentd
+- [**pydantic**](https://docs.pydantic.dev) - A data validation library that is central around the design of FastAPI
+- [**TaskIQ**](https://https://taskiq-python.github.io/) - An `asyncio` compatible task queue processor that uses RabbitMQ and Redis and has FastAPI like design e.g Dependencies
 - [**pendulum**](https://pendulum.eustace.io) - A timezone aware datetime library
 - [**pyotp**](https://pyauth.github.io/pyotp/) - A One-Time Password (OTP) generator
 
@@ -114,6 +115,7 @@ Directory structure for our application:
  |   └─ alembic/         -- Alembic migrations
  |   └─ __init__.py
  |   └─ api.py
+ |   └─ broker.py
  |   └─ config.py
  |   └─ db.py
  |   └─ utils.py
@@ -257,9 +259,62 @@ which would result in the client generating a function like `someSpecificIdYouDe
 
 For consistenty FastAPI docs shows a wrapper function that [globally re-writes](https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/?h=operation_id#using-the-path-operation-function-name-as-the-operationid) the `operation_id` to the function name. This does put the onus on the developer to name the function correctly.
 
-# TaskIQ based tasks
+## TaskIQ based tasks
 
-To be filled in once we figure out how TaskIQ works.
+The project uses [`TaskIQ`](https://taskiq-python.github.io) to manage task queues. TaskIQ supports `asyncio` and has FastAPI like design ideas e.g [dependency injection](https://taskiq-python.github.io/guide/state-and-deps.html) and can be tightly [coupled with FastAPI](https://taskiq-python.github.io/guide/taskiq-with-fastapi.html).
+
+
+TaskIQ is configured as recommend for production use with [taskiq-aio-pika](https://pypi.org/project/taskiq-aio-pika/) as the broker and [taskiq-redis](https://pypi.org/project/taskiq-redis/) as the result backend.
+
+`broker.py` in the root of the project configures the broker using:
+
+```python
+broker = AioPikaBroker(
+    config.amqp_dsn,
+    result_backend=redis_result_backend
+)
+```
+
+`api.py` uses `FastAPI` events to `start` and `shutdown` the broker. As their documentation notes:
+
+> Calling the startup method is necessary. If you don't call it, you may get an undefined behaviour.
+
+```python
+# TaskIQ configurartion so we can share FastAPI dependencies in tasks
+@app.on_event("startup")
+async def app_startup():
+    if not broker.is_worker_process:
+        await broker.startup()
+
+# On shutdown, we need to shutdown the broker
+@app.on_event("shutdown")
+async def app_shutdown():
+    if not broker.is_worker_process:
+        await broker.shutdown()
+```
+
+We recommend creating a `tasks.py` file under each router directory to keep the tasks associated to each router group next to them. Tasks can be defined by simply calling the `task` decorator on the `broker`:
+
+```python
+@broker.task
+async def send_account_verification_email() -> None:
+    import logging
+    logging.error("Kicking off send_account_verification_email")
+```
+
+and kick it off simply use the `kiq` method from the FastAPI handlers:
+
+```python
+@router.get("/verify")
+async def verify_user(request: Request):
+    """Verify an account
+    """
+    await send_account_verification_email.kiq()
+    return {"message": "hello world"}
+```
+
+There are various powerful options for queuing tasks both scheduled and periodic tasks are supported.
+
 
 ## SQLAlchemy wisdom
 
@@ -446,10 +501,18 @@ INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 
 [Task](https://taskfile.dev) is a task runner / build tool that aims to be simpler and easier to use than, for example, GNU Make. Wile it's useful to know the actual commands it's easy to use a tool like task to make things easier on a daily basis:
 
-- `task db:revision -- "commit message"` - creates a new revision in the database and uses the parameter as the commit message
-- `task db:migrate` - migrates the schema to the latest version
-- `task dev:psql` - 	postgres shell in the database container
-- `task dev:pyshell` - 	get a `python` session on the api container which should have access to the entire application
+- `eject` - eject the project from a template
+- `build:image` - builds a publishable docker image
+- `crypt:hash` - generate a random cryptographic hash
+- `db:alembic` - arbitrary alembic command in the container
+- `db:heads` - shows the HEAD SHA for alembic migrations
+- `db:init` - initialise the database schema
+- `db:migrate` - migrates models to HEAD
+- `db:rev` - create a database migration, pass a string as commit string
+- `dev:psql` - postgres shell on the db container
+- `dev:pyshell` - get a python session on the api container
+- `dev:sh` - get a bash session on the api container
+- `dev:test` - runs tests inside the server container
 
 ## Docker in Development
 
