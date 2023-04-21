@@ -6,7 +6,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [X] A Redis server for development
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
 - [X] Worker processes that will process tasks in the background (using Celery)
-- [ ] Provide `Dockerfile` for development and production
+- [X] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring ([parseable](https://github.com/parseablehq/parseable))
 - [X] ~~CSRF protection~~ see [#52](https://github.com/anomaly/lab-python-server/issues/52), also see [official guide](https://fastapi.tiangolo.com/tutorial/cors/)
 - [X] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
@@ -54,6 +54,17 @@ The above is wrapped up as a `Task` endpoints, you need to supply the length of 
 ```sh
 task crypt:hash -- 32
 ```
+
+## Exposed ports for development
+
+If you are using the development `docker-compose.yml` it exposes the following ports to the host machine:
+
+- `5432` - standard port for `postgres` so you can use a developer tool to inspect the database
+- `15672` - RabbitMQ web dashboard (HTTP)
+- `9000` - MinIO web server was exchanging S3 compatible objects (HTTPS, see configuration details)
+- `9001` - MinIO web Dashboard (HTTPS)
+
+> Some of these ports should not be exposed in production
 
 ## Python packages
 

@@ -41,7 +41,7 @@ services:
     env_file:
       - .env.development
     ports:
-      - 8080:15672
+      - 15672:15672
 
   # Redis:
   # TaskIQ recommend using redis as the task result backend
