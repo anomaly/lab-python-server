@@ -39,6 +39,7 @@ markupsafe = "^2.1.2"
 taskiq-fastapi = "^0.1.1"
 taskiq-redis = "^0.3.0"
 pycron = "^3.0.0"
+taskiq-aio-pika = "^0.2.0"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"

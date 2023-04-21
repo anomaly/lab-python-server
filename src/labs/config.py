@@ -21,6 +21,11 @@ class Config(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
 
+    RABBITMQ_DEFAULT_USER: SecretStr
+    RABBITMQ_DEFAULT_PASS: SecretStr
+    RABBITMQ_HOST: str
+    RABBITMQ_PORT: int = 5672
+
     # redis is used by celery for workers
     REDIS_HOST: str
     REDIS_PORT: int = 6379
@@ -46,10 +51,10 @@ class Config(BaseSettings):
     # SMTP and SMS related configuration
     SMTP_HOST: str
     SMTP_PORT: int = 587
-    SMTP_USER: str
+    SMTP_USER: SecretStr
     SMTP_PASSWORD: SecretStr
     
-    SMS_API_KEY: str
+    SMS_API_KEY: SecretStr
     SMS_API_SECRET: SecretStr
     SMS_FROM: str
 
@@ -98,7 +103,7 @@ class Config(BaseSettings):
         redis_url=f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
         return RedisDsn(url=redis_url, 
             scheme="redis")
-
+    
 # A singleton instance of the configuration
 config = Config()
 

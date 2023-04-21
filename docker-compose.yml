@@ -32,10 +32,19 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data/
 
+  # RabbitMQ:
+  # TaskIQ recommend using rabbitmq for the broker
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: ${PROJ_NAME}-rabbitmq
+    restart: unless-stopped
+    env_file:
+      - .env.development
+    ports:
+      - 8080:15672
+
   # Redis:
-  # - In development we read secrets from .env.development
-  #   used by Clerey to broker tasks between the api endpoints
-  #   and worker tasks
+  # TaskIQ recommend using redis as the task result backend
   redis:
     image: redis:7-bullseye
     container_name: ${PROJ_NAME}-redis
@@ -56,29 +65,31 @@ services:
       - .env.development
     restart: unless-stopped
     ports:
-      - "8000:80"
+      - 8000:80
     volumes:
       - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
       - ./src/tests:/opt/tests # Mount it so we can keep modifying tests
     depends_on:
       - db
       - redis
+      - rabbitmq
 
   # TaskIQ worker
-  worker:
-    container_name: ${PROJ_NAME}-worker
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["taskiq", "worker", "${PROJ_NAME}.broker:broker"]
-    env_file:
-      - .env.development
-    restart: unless-stopped
-    volumes:
-      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
-    depends_on:
-      - db
-      - redis
+  # worker:
+  #   container_name: ${PROJ_NAME}-worker
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: ["taskiq", "worker", "${PROJ_NAME}.broker:broker"]
+  #   env_file:
+  #     - .env.development
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
+  #   depends_on:
+  #     - db
+  #     - redis
+  #     - rabbitmq
 
   # MinIO server used during development, replaced by object store in prod
   minio:
@@ -90,8 +101,8 @@ services:
       - minio-data:/data
       - .cert:/root/.minio/certs
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - 9000:9000
+      - 9001:9001
     env_file:
       - .env.development
     command: server /data --console-address ":9001"
