@@ -21,10 +21,6 @@ class Config(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
 
-    # fluentd configuration
-    FLUENTD_HOST: str
-    FLUENTD_PORT: int = 24224
-
     # redis is used by celery for workers
     REDIS_HOST: str
     REDIS_PORT: int = 6379
