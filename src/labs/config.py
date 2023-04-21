@@ -2,8 +2,7 @@
 
 """
 
-from functools import lru_cache
-from pydantic import BaseModel, BaseSettings, PostgresDsn, RedisDsn
+from pydantic import BaseSettings, PostgresDsn, RedisDsn, AmqpDsn
 from pydantic.types import SecretStr
 
 class Config(BaseSettings):
@@ -21,10 +20,10 @@ class Config(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
 
-    RABBITMQ_DEFAULT_USER: SecretStr
+    RABBITMQ_DEFAULT_USER: str
     RABBITMQ_DEFAULT_PASS: SecretStr
-    RABBITMQ_HOST: str
-    RABBITMQ_PORT: int = 5672
+    RABBITMQ_DEFAULT_VHOST: str
+    RABBITMQ_NODE_PORT: int = 5672
 
     # redis is used by celery for workers
     REDIS_HOST: str
@@ -101,8 +100,27 @@ class Config(BaseSettings):
         """Construct the DSN for the celery broker
         """
         redis_url=f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
-        return RedisDsn(url=redis_url, 
-            scheme="redis")
+        return RedisDsn(
+            url=redis_url, 
+            scheme="redis"
+        )
+    
+    @property
+    def amqp_dsn(self) -> AmqpDsn:
+        amqp_url = "".join([
+            "amqp://",
+            self.RABBITMQ_DEFAULT_USER,
+            ":",
+            self.RABBITMQ_DEFAULT_PASS.get_secret_value(),
+            "@",
+            self.RABBITMQ_DEFAULT_VHOST,
+            ":",
+            str(self.RABBITMQ_NODE_PORT),
+        ])
+        return AmqpDsn(
+            url=amqp_url, 
+            scheme="amqp"
+        )
     
 # A singleton instance of the configuration
 config = Config()

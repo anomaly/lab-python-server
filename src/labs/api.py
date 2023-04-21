@@ -72,7 +72,7 @@ async def app_shutdown():
     if not broker.is_worker_process:
         await broker.shutdown()
 
-
+# Default handler
 @app.get("/")
 async def root(request: Request):
   """Placeholder for the root endpoint
