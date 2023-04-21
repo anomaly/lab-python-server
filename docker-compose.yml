@@ -14,6 +14,7 @@ volumes:
   redis-data:
   minio-data:
 
+
 services:
 
   # Postgres:
@@ -31,6 +32,12 @@ services:
       - .env.development
     volumes:
       - postgres-data:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   # RabbitMQ:
   # TaskIQ recommend using rabbitmq for the broker
@@ -42,6 +49,12 @@ services:
       - .env.development
     ports:
       - 15672:15672
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   # Redis:
   # TaskIQ recommend using redis as the task result backend
@@ -51,6 +64,12 @@ services:
     volumes:
       - redis-data:/data
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   # Applicaiton API:
   # - In development we read secrets from .env.development
@@ -63,16 +82,19 @@ services:
     command: ["uvicorn", "${PROJ_NAME}.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
     env_file:
       - .env.development
-    restart: unless-stopped
+    # restart: unless-stopped
     ports:
       - 8000:80
     volumes:
       - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
       - ./src/tests:/opt/tests # Mount it so we can keep modifying tests
     depends_on:
-      - db
-      - redis
-      - rabbitmq
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   # TaskIQ worker
   worker:
@@ -87,9 +109,12 @@ services:
     volumes:
       - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
     depends_on:
-      - db
-      - redis
-      - rabbitmq
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   # MinIO server used during development, replaced by object store in prod
   minio:
@@ -121,8 +146,8 @@ services:
       - .env.development
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add devel http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
-      /usr/bin/mc mb -p devel/devel;
-      /usr/bin/mc policy set download devel/devel;
+      /usr/bin/mc config host add $$S3_BUCKET_NAME http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+      /usr/bin/mc mb -p $$S3_BUCKET_NAME/$$S3_BUCKET_NAME;
+      /usr/bin/mc policy set download $$S3_BUCKET_NAME/$$S3_BUCKET_NAME;
       exit 0;
       "
