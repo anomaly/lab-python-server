@@ -496,6 +496,23 @@ INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
 INFO  [alembic.runtime.migration] Will assume transactional DDL.
 INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 ```
+### Joining back with `HEAD`
+
+`task db:heads`
+
+## MinIO wisdom
+
+MinIO is able to run with `TLS` enabled, all you hve to do is provide it a certificate. By default MinIO looks for certificates in `${HOME}/.minio/certs`. You can generate certificates and mount them into the container:
+
+```yaml
+    volumes:
+      - minio-data:/data
+      - .cert:/root/.minio/certs
+```
+
+This will result in the dashboard being available via `HTTPS` and the signed URLs will be TLS enabled. 
+
+Since we use `TLS` enabled endpoints for development, running MinIO in secure mode will satisfy any browser security policies.
 
 ## Taskfile
 
