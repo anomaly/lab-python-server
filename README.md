@@ -514,6 +514,18 @@ This will result in the dashboard being available via `HTTPS` and the signed URL
 
 Since we use `TLS` enabled endpoints for development, running MinIO in secure mode will satisfy any browser security policies.
 
+### S3FileMetadata
+
+The template provides a `SQLAlchemy` table called `S3FileMetadata` this is used to store metadata about file uploads. 
+
+The client sends a request with the file `name`, `size` and `mime type`, the endpoint create a `S3FileMetadata` and returns an pre-signed upload URL, that the client must post the contents of the file to.
+
+The client can take as long as it takes it upload the contents, but must begin uploading within the signed life e.g five minutes from when the URL is generated.
+
+The template is designed to schedule a task to check if the object made it to the store. It continues to check this for a period of time and marks the file to be available if the contents are found on the object store.
+
+The client must keep polling back to the server to see if the file is eventually available.
+
 ## Taskfile
 
 [Task](https://taskfile.dev) is a task runner / build tool that aims to be simpler and easier to use than, for example, GNU Make. Wile it's useful to know the actual commands it's easy to use a tool like task to make things easier on a daily basis:
