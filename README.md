@@ -6,7 +6,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [X] A Redis server for development
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
 - [X] Worker processes that will process tasks in the background (using Celery)
-- [ ] Provide `Dockerfile` for development and production
+- [X] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring ([parseable](https://github.com/parseablehq/parseable))
 - [X] ~~CSRF protection~~ see [#52](https://github.com/anomaly/lab-python-server/issues/52), also see [official guide](https://fastapi.tiangolo.com/tutorial/cors/)
 - [X] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
@@ -55,6 +55,17 @@ The above is wrapped up as a `Task` endpoints, you need to supply the length of 
 task crypt:hash -- 32
 ```
 
+## Exposed ports for development
+
+If you are using the development `docker-compose.yml` it exposes the following ports to the host machine:
+
+- `5432` - standard port for `postgres` so you can use a developer tool to inspect the database
+- `15672` - RabbitMQ web dashboard (HTTP)
+- `9000` - MinIO web server was exchanging S3 compatible objects (HTTPS, see configuration details)
+- `9001` - MinIO web Dashboard (HTTPS)
+
+> Some of these ports should not be exposed in production
+
 ## Python packages
 
 The following Python packages make the standard set of tools for our projects:
@@ -62,8 +73,8 @@ The following Python packages make the standard set of tools for our projects:
 - [**SQLAlchemy**](https://www.sqlalchemy.org) - A Python object relational mapper (ORM)
 - [**alembic**](https://alembic.sqlalchemy.org/en/latest/) - A database migration tool
 - [**FastAPI**](http://fastapi.tiangolo.com) - A fast, simple, and flexible framework for building HTTP APIs
-- [**Celery**](https://docs.celeryq.dev/en/stable/getting-started/introduction.html) - A task queue
-- **fluent-logger** - A Python logging library that supports fluentd
+- [**pydantic**](https://docs.pydantic.dev) - A data validation library that is central around the design of FastAPI
+- [**TaskIQ**](https://https://taskiq-python.github.io/) - An `asyncio` compatible task queue processor that uses RabbitMQ and Redis and has FastAPI like design e.g Dependencies
 - [**pendulum**](https://pendulum.eustace.io) - A timezone aware datetime library
 - [**pyotp**](https://pyauth.github.io/pyotp/) - A One-Time Password (OTP) generator
 
@@ -98,13 +109,13 @@ Directory structure for our application:
  ├─ tests/
  ├─ labs
  |   └─ routers/         -- FastAPI routers
- |   └─ tasks/           -- Celery tasks
+ |   └─ tasks/           -- TaskIQ 
  |   └─ models/          -- SQLAlchemy models
  |   └─ schema/          -- Pydantic schemas
  |   └─ alembic/         -- Alembic migrations
  |   └─ __init__.py
  |   └─ api.py
- |   └─ celery.py
+ |   └─ broker.py
  |   └─ config.py
  |   └─ db.py
  |   └─ utils.py
@@ -248,64 +259,62 @@ which would result in the client generating a function like `someSpecificIdYouDe
 
 For consistenty FastAPI docs shows a wrapper function that [globally re-writes](https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/?h=operation_id#using-the-path-operation-function-name-as-the-operationid) the `operation_id` to the function name. This does put the onus on the developer to name the function correctly.
 
-## Celery based workers
+## TaskIQ based tasks
 
-> *WARNING:* Celery currently *DOES NOT* have support for `asyncio` which comes in the way of our stack, please follow [Issue 21](https://github.com/anomaly/lab-python-server/issues/21) for information on current work arounds and recommendations. We are also actively working with the Celery team to get this resolved.
+The project uses [`TaskIQ`](https://taskiq-python.github.io) to manage task queues. TaskIQ supports `asyncio` and has FastAPI like design ideas e.g [dependency injection](https://taskiq-python.github.io/guide/state-and-deps.html) and can be tightly [coupled with FastAPI](https://taskiq-python.github.io/guide/taskiq-with-fastapi.html).
 
-The projects use `Celery` to manage a queue backed by `redis` to schedule and process background tasks. The celery app is run a separate container. In development we use [watchdog](https://github.com/gorakhargosh/watchdog) to watch for changes to the Python files, this is obviously uncessary in production.
 
-The celery app is configured in `celery.py` which reads from the `redis` configuration in `config.py`.
+TaskIQ is configured as recommend for production use with [taskiq-aio-pika](https://pypi.org/project/taskiq-aio-pika/) as the broker and [taskiq-redis](https://pypi.org/project/taskiq-redis/) as the result backend.
 
-Each task is defined in the `tasks` package with appropriate subpackages. 
+`broker.py` in the root of the project configures the broker using:
 
-To schedule tasks, the API endpoints need to import the task
 ```python
-from ...tasks.email import verification_email
-```
-and call the `apply_async` method on the task:
-```python
-verification_email.apply_async()
+broker = AioPikaBroker(
+    config.amqp_dsn,
+    result_backend=redis_result_backend
+)
 ```
 
-A pieced together example of scheduling a task:
+`api.py` uses `FastAPI` events to `start` and `shutdown` the broker. As their documentation notes:
+
+> Calling the startup method is necessary. If you don't call it, you may get an undefined behaviour.
 
 ```python
-from fastapi import APIRouter, Request, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+# TaskIQ configurartion so we can share FastAPI dependencies in tasks
+@app.on_event("startup")
+async def app_startup():
+    if not broker.is_worker_process:
+        await broker.startup()
 
-from ...db import session_context, session_context
-from ...tasks.email import verification_email
-from ...config import config
+# On shutdown, we need to shutdown the broker
+@app.on_event("shutdown")
+async def app_shutdown():
+    if not broker.is_worker_process:
+        await broker.shutdown()
+```
 
-router = APIRouter()
+We recommend creating a `tasks.py` file under each router directory to keep the tasks associated to each router group next to them. Tasks can be defined by simply calling the `task` decorator on the `broker`:
 
+```python
+@broker.task
+async def send_account_verification_email() -> None:
+    import logging
+    logging.error("Kicking off send_account_verification_email")
+```
+
+and kick it off simply use the `kiq` method from the FastAPI handlers:
+
+```python
 @router.get("/verify")
-async def log(request: Request):
+async def verify_user(request: Request):
     """Verify an account
     """
-    verification_email.apply_async()
+    await send_account_verification_email.kiq()
     return {"message": "hello world"}
 ```
 
-You can send position arguments to the task, for example:
+There are various powerful options for queuing tasks both scheduled and periodic tasks are supported.
 
-```python
-verification_email.apply_async(args=[user_id])
-```
-
-which would be recieved by the task as `user_id` as a positional argument.
-
-> We recommend reading design documentation for the `Celery` project [here](https://docs.celeryproject.org/en/latest/userguide/tasks.html), the general principle is send meta data that the task can use to complete the task not complete, heavy objects. i.e send an ID with some context as opposed to a fully formed object.
-
-### Monitoring the queue
-
-Celery can be monitored using the `flower` package, it provides a web based interfaces. There's also a text based interface available via the command line interface:
-
-```sh
-celery -A labs.celery:app events
-```
-
-you can alternatively use the wrapped Task command `task dev:qwatch`, this is portable across projects if you copy the template.
 
 ## SQLAlchemy wisdom
 
@@ -487,15 +496,52 @@ INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
 INFO  [alembic.runtime.migration] Will assume transactional DDL.
 INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 ```
+### Joining back with `HEAD`
+
+`task db:heads`
+
+## MinIO wisdom
+
+MinIO is able to run with `TLS` enabled, all you hve to do is provide it a certificate. By default MinIO looks for certificates in `${HOME}/.minio/certs`. You can generate certificates and mount them into the container:
+
+```yaml
+    volumes:
+      - minio-data:/data
+      - .cert:/root/.minio/certs
+```
+
+This will result in the dashboard being available via `HTTPS` and the signed URLs will be TLS enabled. 
+
+Since we use `TLS` enabled endpoints for development, running MinIO in secure mode will satisfy any browser security policies.
+
+### S3FileMetadata
+
+The template provides a `SQLAlchemy` table called `S3FileMetadata` this is used to store metadata about file uploads. 
+
+The client sends a request with the file `name`, `size` and `mime type`, the endpoint create a `S3FileMetadata` and returns an pre-signed upload URL, that the client must post the contents of the file to.
+
+The client can take as long as it takes it upload the contents, but must begin uploading within the signed life e.g five minutes from when the URL is generated.
+
+The template is designed to schedule a task to check if the object made it to the store. It continues to check this for a period of time and marks the file to be available if the contents are found on the object store.
+
+The client must keep polling back to the server to see if the file is eventually available.
 
 ## Taskfile
 
 [Task](https://taskfile.dev) is a task runner / build tool that aims to be simpler and easier to use than, for example, GNU Make. Wile it's useful to know the actual commands it's easy to use a tool like task to make things easier on a daily basis:
 
-- `task db:revision -- "commit message"` - creates a new revision in the database and uses the parameter as the commit message
-- `task db:migrate` - migrates the schema to the latest version
-- `task dev:psql` - 	postgres shell in the database container
-- `task dev:pyshell` - 	get a `python` session on the api container which should have access to the entire application
+- `eject` - eject the project from a template
+- `build:image` - builds a publishable docker image
+- `crypt:hash` - generate a random cryptographic hash
+- `db:alembic` - arbitrary alembic command in the container
+- `db:heads` - shows the HEAD SHA for alembic migrations
+- `db:init` - initialise the database schema
+- `db:migrate` - migrates models to HEAD
+- `db:rev` - create a database migration, pass a string as commit string
+- `dev:psql` - postgres shell on the db container
+- `dev:pyshell` - get a python session on the api container
+- `dev:sh` - get a bash session on the api container
+- `dev:test` - runs tests inside the server container
 
 ## Docker in Development
 

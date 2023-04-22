@@ -2,8 +2,7 @@
 
 """
 
-from functools import lru_cache
-from pydantic import BaseModel, BaseSettings, PostgresDsn, RedisDsn
+from pydantic import BaseSettings, PostgresDsn, RedisDsn, AmqpDsn
 from pydantic.types import SecretStr
 
 class Config(BaseSettings):
@@ -21,9 +20,10 @@ class Config(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
 
-    # fluentd configuration
-    FLUENTD_HOST: str
-    FLUENTD_PORT: int = 24224
+    RABBITMQ_DEFAULT_USER: str
+    RABBITMQ_DEFAULT_PASS: SecretStr
+    RABBITMQ_NODE_PORT: int = 5672
+    RABBITMQ_HOST: str
 
     # redis is used by celery for workers
     REDIS_HOST: str
@@ -36,7 +36,7 @@ class Config(BaseSettings):
     S3_ACCESS_KEY: SecretStr
     S3_SECRET_KEY: SecretStr
     S3_REGION: str = "ap-south-1" # Set to Linode Singapore
-    S3_USE_SSL: bool = True # Should only be relaxed for development
+    S3_USE_SSL: bool = True # See docs on using SSL in development
 
     S3_UPLOAD_EXPIRY: int = 5 # In minutes
     S3_DOWNLOAD_EXPIRY: int = 5 # In minutes
@@ -50,10 +50,10 @@ class Config(BaseSettings):
     # SMTP and SMS related configuration
     SMTP_HOST: str
     SMTP_PORT: int = 587
-    SMTP_USER: str
+    SMTP_USER: SecretStr
     SMTP_PASSWORD: SecretStr
     
-    SMS_API_KEY: str
+    SMS_API_KEY: SecretStr
     SMS_API_SECRET: SecretStr
     SMS_FROM: str
 
@@ -100,9 +100,30 @@ class Config(BaseSettings):
         """Construct the DSN for the celery broker
         """
         redis_url=f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
-        return RedisDsn(url=redis_url, 
-            scheme="redis")
-
+        return RedisDsn(
+            url=redis_url, 
+            scheme="redis"
+        )
+    
+    @property
+    def amqp_dsn(self) -> AmqpDsn:
+        amqp_url = "".join([
+            "amqp://",
+            self.RABBITMQ_DEFAULT_USER,
+            ":",
+            self.RABBITMQ_DEFAULT_PASS.get_secret_value(),
+            "@",
+            self.RABBITMQ_HOST,
+            ":",
+            str(self.RABBITMQ_NODE_PORT),
+        ])
+        return AmqpDsn(
+            url=amqp_url, 
+            scheme="amqp",
+            user=self.RABBITMQ_DEFAULT_USER,
+            password=self.RABBITMQ_DEFAULT_PASS,
+        )
+    
 # A singleton instance of the configuration
 config = Config()
 

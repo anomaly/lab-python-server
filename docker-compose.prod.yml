@@ -95,11 +95,6 @@ services:
     volumes:
       - /opt/data/redis:/data
 
-  # fluent-bit:
-  #   image: fluent/fluent-bit:1.5
-  #   container_name: ${PROJ_NAME}-fluentbit
-  #   restart: unless-stopped
-
   # Applicaiton API:
   # - In development we read secrets from .env
   # - Provides a FastAPI based API that runs using uvicorn in development
@@ -130,30 +125,22 @@ services:
       - redis
       - db
 
-  # Worker: is a celery based worker process that runs in the background
+  # TaskIQ worker
   worker:
     container_name: ${PROJ_NAME}-worker
-    image: anomalyhq/${PROJ_NAME}-server:${VERSION}
-    command: ["celery", "--app=${PROJ_NAME}.celery.app", "worker", "--pool=gevent", "--loglevel=INFO", "--queues=celery"]
-    cap_drop:
-      - "all"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["taskiq", "worker", "${PROJ_NAME}.broker:broker"]
     env_file:
-      - .env
+      - .env.development
     restart: unless-stopped
+    volumes:
+      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
     depends_on:
+      - db
       - redis
 
-  beat:
-    container_name: ${PROJ_NAME}-beat
-    image: anomalyhq/${PROJ_NAME}}-server:${VERSION}
-    command: ["celery", "--app=${PROJ_NAME}.celery.app", "beat", "--loglevel=INFO"]
-    cap_drop:
-      - "all"
-    env_file:
-      - .env
-    restart: unless-stopped
-    depends_on:
-      - redis
 
 networks:
   default:

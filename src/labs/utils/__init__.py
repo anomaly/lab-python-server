@@ -14,35 +14,9 @@ minio_client = Minio(
     region=config.S3_REGION,
 )
 
-def create_celery_app(include=None):
-    """Create a Celery app
-    
-    If an array of packages if provided then we load the tasks
-    this is used when the worker is started.
-
-    Otherwise we return a connection to the broker to delay
-    or schedule tasks.
-    """
-    import asyncio
-    from celery import Celery
-
-    from .. import __title__
-    from ..config import config
-
-    app = Celery(__title__, broker=config.redis_dsn)
-    app.autodiscover_tasks()
-
-    if include:
-        app.conf.update(include=include)
-
-    return app
-
 def redis_client():
     """ Creates a redis client that can be used to connect to the
     redis server. 
-
-    While this is not used by the Celery queue processor, it is
-    provided as a utility function for the app.
     """
     import redis
 

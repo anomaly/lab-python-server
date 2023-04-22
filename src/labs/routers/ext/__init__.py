@@ -29,12 +29,9 @@ async def get_health(
     Purpose of this endpoint is to check the health of the server.
     We check for connection to the database, queue and logger
     """
-    from ...utils import redis_client
-    redis = redis_client()
 
     response = HealthCheckResponse()
     response.db_ok = session.is_active
-    response.queue_ok = redis.ping()
 
     # This will be done better with pyndatic 2
     response.all_ok = (

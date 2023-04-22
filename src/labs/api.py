@@ -17,6 +17,7 @@ from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
 from .routers import router_root
+from .broker import broker
 
 api_description = """
 This project provides a reference Python API built using FastAPI, the 
@@ -58,6 +59,20 @@ app = FastAPI(
 # Additional routers of the application described in the routers package
 app.include_router(router_root)
 
+
+# TaskIQ configurartion so we can share FastAPI dependencies in tasks
+@app.on_event("startup")
+async def app_startup():
+    if not broker.is_worker_process:
+        await broker.startup()
+
+# On shutdown, we need to shutdown the broker
+@app.on_event("shutdown")
+async def app_shutdown():
+    if not broker.is_worker_process:
+        await broker.shutdown()
+
+# Default handler
 @app.get("/")
 async def root(request: Request):
   """Placeholder for the root endpoint

@@ -12,8 +12,8 @@ version: "3.8"
 volumes:
   postgres-data:
   redis-data:
-  fluentd-data:
   minio-data:
+
 
 services:
 
@@ -32,17 +32,44 @@ services:
       - .env.development
     volumes:
       - postgres-data:/var/lib/postgresql/data/
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  # RabbitMQ:
+  # TaskIQ recommend using rabbitmq for the broker
+  rabbitmq:
+    image: rabbitmq:3.11-management
+    container_name: ${PROJ_NAME}-rabbitmq
+    restart: unless-stopped
+    env_file:
+      - .env.development
+    ports:
+      - 15672:15672
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   # Redis:
-  # - In development we read secrets from .env.development
-  #   used by Clerey to broker tasks between the api endpoints
-  #   and worker tasks
+  # TaskIQ recommend using redis as the task result backend
   redis:
     image: redis:7-bullseye
     container_name: ${PROJ_NAME}-redis
     volumes:
       - redis-data:/data
     restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
 
   # Applicaiton API:
   # - In development we read secrets from .env.development
@@ -55,48 +82,39 @@ services:
     command: ["uvicorn", "${PROJ_NAME}.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
     env_file:
       - .env.development
-    restart: unless-stopped
+    # restart: unless-stopped
     ports:
-      - "8000:80"
+      - 8000:80
     volumes:
       - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
       - ./src/tests:/opt/tests # Mount it so we can keep modifying tests
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
-  # Worker: is a celery based worker process that runs in the background
+  # TaskIQ worker
   worker:
     container_name: ${PROJ_NAME}-worker
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["watchmedo", "auto-restart", "--directory=./", "--pattern=*.py", "--recursive", "--", "celery", "--app=${PROJ_NAME}.celery.app", "worker", "--pool=gevent", "--loglevel=INFO", "--queues=celery"]
+    command: ["taskiq", "worker", "${PROJ_NAME}.broker:broker"]
     env_file:
       - .env.development
     restart: unless-stopped
     volumes:
       - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
     depends_on:
-      - db
-      - redis
-
-  # Beta is Celery's cron like feature which keepts taps on
-  # repeating tasks defined by the application
-  beat:
-    container_name: ${PROJ_NAME}-beat
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: ["celery", "--app=${PROJ_NAME}.celery.app", "beat", "--loglevel=INFO"]
-    env_file:
-      - .env.development
-    restart: unless-stopped
-    volumes:
-      - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
-    depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
   # MinIO server used during development, replaced by object store in prod
   minio:
@@ -106,9 +124,10 @@ services:
     hostname: s3.${PROJ_FQDN}
     volumes:
       - minio-data:/data
+      - .cert:/root/.minio/certs
     ports:
-      - "9000:9000"
-      - "9001:9001"
+      - 9000:9000
+      - 9001:9001
     env_file:
       - .env.development
     command: server /data --console-address ":9001"
@@ -127,7 +146,8 @@ services:
       - .env.development
     entrypoint: >
       /bin/sh -c "
-      /usr/bin/mc config host add devel http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
-      /usr/bin/mc mb -p devel/devel;
+      /usr/bin/mc config host add $$S3_BUCKET_NAME http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
+      /usr/bin/mc mb -p $$S3_BUCKET_NAME/$$S3_BUCKET_NAME;
+      /usr/bin/mc policy set download $$S3_BUCKET_NAME/$$S3_BUCKET_NAME;
       exit 0;
       "
