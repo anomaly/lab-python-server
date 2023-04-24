@@ -34,3 +34,7 @@ RUN poetry install --no-root
 # uvicorn at this level so it sees the package
 WORKDIR /opt/
 
+# Labels are used to identify the image
+LABEL org.opencontainers.image.source="https://github.com/anomaly/${PROJ_NAME}"
+LABEL org.opencontainers.image.description="A Python web server using FastAPI and Uvicorn"
+LABEL org.opencontainers.image.licenses="Apache-2.0"

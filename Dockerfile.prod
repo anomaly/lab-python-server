@@ -73,5 +73,7 @@ COPY ./src/. .
 # Expose ports which is proxied via traefik
 EXPOSE 80
 
-# ENTRYPOINT ["gunicorn", "--worker-tmp-dir=/dev/shm", "--worker-class=uvicorn.workers.UvicornWorker", "--bind=0.0.0.0:80", "labs.api:app"]
-# CMD []
+# Labels are used to identify the image
+LABEL org.opencontainers.image.source="https://github.com/anomaly/${PROJ_NAME}"
+LABEL org.opencontainers.image.description="A Python web server using FastAPI and Uvicorn"
+LABEL org.opencontainers.image.licenses="Apache-2.0"
