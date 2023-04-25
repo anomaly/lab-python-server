@@ -38,6 +38,7 @@ class OTPTriggerSMSRequest(AppBaseModel):
 class OTPVerifyRequest(AppBaseModel):
     """ OTP sent to the server to verify if it's valid """
     otp: str
+    mobile_number: str
 
 class OTPTriggerResponse(AppBaseModel):
     """ OTP Verification result """
