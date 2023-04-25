@@ -1,4 +1,9 @@
-"""An application user
+""" An application user
+
+ The aim is to provide a set of fields that are common to most
+ applications with a good know set of practices around authentication
+ both via password and one time passwords.
+
 """
 
 from typing import Optional
@@ -62,18 +67,38 @@ class User(
     def check_password(self, plain_text_pass):
         return verify_password(plain_text_pass, self.password)
 
-    def get_otp(self, digits: int, timeout: int):
-        """
+    def get_otp(
+        self, 
+        digits: int = 6, 
+        timeout: int = 30
+    ):
+        """ Get the current OTP for the user
+
+        This is sent to the user via email or SMS and is used to
+        authenticate the user. This should be different based
+        on the timeout and the digits.
         """
         otp = TOTP(self.secret, digits=digits, interval=timeout)
         return otp.now()
     
-    def verify_otp(self, timeout: int, window: int, token: str):
+    def verify_otp(
+            self, 
+            token: str,
+            timeout: int = 30, 
+            window: int = 30
+        ):
+        """
+        """
         otp = TOTP(self.secret, interval=timeout)
         return otp.verify(token, valid_window=window)
 
     @classmethod
     async def get_by_email(cls, session, email):
+        """ A custom getter where the user is found via email 
+
+        The aim is to assist with finding the user by email
+        which is handy when authenticating via passwords
+        """
         query = cls._base_get_query().where(cls.email == email)
         try:
             results = await session.execute(query)
@@ -113,6 +138,19 @@ def receive_init(target, args, kwargs):
     target.otp_secret = random_base32()
 
 def encrypt_password(target, value, oldvalue, initiator):
+    """ Encrypt the password when it is set
+
+    This enables the application logic to simply set the plain
+    text password and the model encrypts it on the way in.
+
+    The idea is to abstract this from the duties of the application.
+    """
     return hash_password(value)
 
-event.listen(User.password, 'set', encrypt_password, retval=True)
+# Support for the above method to run when the password is set
+event.listen(
+    User.password, 
+    'set', 
+    encrypt_password, 
+    retval=True
+)

@@ -24,6 +24,8 @@ def verify_password(
     hashed_password
 ) -> bool:
     """ Use the crypt context to verify the password
+
+    the str.encode is used to convert the string to bytes
     """
     return bcrypt.checkpw(
         str.encode(plain_password),
@@ -36,7 +38,7 @@ def hash_password(password) -> str:
     This is used by the setter in the User model to hash
     the password when the handlers set the property.
 
-    the input string has to be 
+    the input string has to be an byte string
     """
     encoded_password = bcrypt.hashpw(
         str.encode(password),
