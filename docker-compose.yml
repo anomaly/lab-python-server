@@ -102,7 +102,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["taskiq", "worker", "${PROJ_NAME}.broker:broker"]
+    command: ["taskiq", "worker", "-fsd", "${PROJ_NAME}.broker:broker",]
     env_file:
       - .env.development
     restart: unless-stopped
@@ -115,6 +115,26 @@ services:
         condition: service_healthy
       rabbitmq:
         condition: service_healthy
+
+  # TaskIQ scheduler
+  # scheduler:
+  #   container_name: ${PROJ_NAME}-scheduler
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: ["taskiq", "scheduler", "${PROJ_NAME}.broker:scheduler"]
+  #   env_file:
+  #     - .env.development
+  #   restart: unless-stopped
+  #   volumes:
+  #     - ./src/${PROJ_NAME}:/opt/${PROJ_NAME}
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+  #     rabbitmq:
+  #       condition: service_healthy
 
   # MinIO server used during development, replaced by object store in prod
   minio:
