@@ -9,6 +9,10 @@ from taskiq_redis import RedisAsyncResultBackend
 # RabbitMQ is recommended as the broker 
 from taskiq_aio_pika import AioPikaBroker
 
+# Task Scheduler for periodic tasks
+from taskiq.schedule_sources import LabelScheduleSource
+from taskiq.scheduler import TaskiqScheduler
+
 redis_result_backend = RedisAsyncResultBackend(
     config.redis_dsn
 )
@@ -16,4 +20,9 @@ redis_result_backend = RedisAsyncResultBackend(
 broker = AioPikaBroker(
     config.amqp_dsn,
     result_backend=redis_result_backend
+)
+
+scheduler = TaskiqScheduler(
+    broker=broker,
+    sources=[LabelScheduleSource(broker)],
 )
