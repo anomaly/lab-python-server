@@ -10,7 +10,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...db import get_async_session
 from ...models import User
 from ...schema import SignupRequest
-from ...config import config
 
 from .tasks import send_account_verification_email
 
