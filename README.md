@@ -130,16 +130,24 @@ FastAPI is a Python framework for building HTTP APIs. It is a simple, flexible, 
 
 Each submodule must define a `router` where the handlers defined in the submodule are mounted on. This router should then be bubbled up to the main `router` in the `__init__.py` file and so on until we reach the top of the `routers` package.
 
-In the `routers` package we import the top level routers as `router_modulename` and add mount them mto the `router_root`:
+In the `routers` package we import the top level routers as `router_modulename` and add mount them mto the `router_root`. If your router need to be prefixed with a URL then use the `prefix` parameter when mounting the router:
 
 ```python
 from fastapi import APIRouter
 from .auth import router as router_auth
+from .ext import router as router_ext
 
 router_root = APIRouter()
 
+# Auth exposes routes on the root according to the OAuth2 spec
 router_root.include_router(
   router_auth,
+)
+
+# Prefixed router with /ext
+router_root.include_router(
+  router_ext,
+  prefix="/ext",
 )
 ```
 
