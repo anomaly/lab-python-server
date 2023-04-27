@@ -102,7 +102,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "taskiq", "worker", "-fsd", "${PROJ_NAME}.broker:broker" ]
+    command: [ "taskiq", "worker", "${PROJ_NAME}.broker:broker" ]
     env_file:
       - .env.development
     restart: unless-stopped
@@ -122,7 +122,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "taskiq", "scheduler", "-fsd", "${PROJ_NAME}.broker:scheduler" ]
+    command: [ "taskiq", "scheduler", "${PROJ_NAME}.broker:scheduler" ]
     env_file:
       - .env.development
     restart: unless-stopped

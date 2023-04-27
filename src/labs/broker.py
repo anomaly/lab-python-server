@@ -13,6 +13,9 @@ from taskiq_aio_pika import AioPikaBroker
 from taskiq.schedule_sources import LabelScheduleSource
 from taskiq.scheduler import TaskiqScheduler
 
+# FastAPI middleware
+import taskiq_fastapi
+
 redis_result_backend = RedisAsyncResultBackend(
     config.redis_dsn
 )
@@ -26,3 +29,8 @@ scheduler = TaskiqScheduler(
     broker=broker,
     sources=[LabelScheduleSource(broker)],
 )
+
+# The middleware is used to inject the broker into FastAPI
+# it enables broker task discovery for FastAPI applications
+# as well as sharing dependencies between tasks and FastAPI
+taskiq_fastapi.init(broker, "labs.api:app")
