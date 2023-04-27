@@ -102,7 +102,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "taskiq", "worker", "${PROJ_NAME}.broker:broker" ]
+    command: [ "taskiq", "worker", "--reload", "${PROJ_NAME}.broker:broker" ]
     env_file:
       - .env.development
     restart: unless-stopped
