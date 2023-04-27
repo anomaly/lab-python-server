@@ -34,7 +34,7 @@ python-multipart = "^0.0.5"
 pytest = "^7.3.1"
 pytz = "^2023.3"
 httpx = "^0.24.0"
-taskiq = "^0.4.1"
+taskiq = {extras = ["reload"], version = "^0.4.1"}
 markupsafe = "^2.1.2"
 taskiq-fastapi = "^0.1.1"
 taskiq-redis = "^0.3.0"

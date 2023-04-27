@@ -462,7 +462,7 @@ test = ["backports.socketpair", "cffi (>=1.12.2)", "contextvars (==2.4)", "cover
 name = "gitignore-parser"
 version = "0.1.3"
 description = "A spec-compliant gitignore parser for Python 3.5+"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 files = [
@@ -1539,7 +1539,7 @@ standard = ["colorama (>=0.4)", "httptools (>=0.5.0)", "python-dotenv (>=0.13)",
 name = "watchdog"
 version = "2.1.9"
 description = "Filesystem events monitoring"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
@@ -1833,4 +1833,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "c398b20d7e73f0c244961e2da3ae0610646a8b8d8284467bcbf3c2a0513e273a"
+content-hash = "b8de40ebfb05d84fb42662cacde504a59aa34701a3b123ed4e56ee7b30717a87"
