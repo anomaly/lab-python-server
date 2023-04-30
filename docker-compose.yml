@@ -14,7 +14,6 @@ volumes:
   redis-data:
   minio-data:
 
-
 services:
 
   # Postgres:
@@ -79,7 +78,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["uvicorn", "${PROJ_NAME}.api:app", "--host=0.0.0.0", "--port=80", "--root-path=/api", "--reload"]
+    command: ["uvicorn", "${PROJ_NAME}.api:app", "--host=0.0.0.0", "--port=80", "--reload"]
     env_file:
       - .env.development
     # restart: unless-stopped
