@@ -37,6 +37,9 @@ async def login_for_auth_token(
   session: AsyncSession = Depends(get_async_session)
 ) -> Token:
   """ Attempt to authenticate a user and issue JWT token
+
+  If the user does not exists or the password is incorrect
+  then an exception is raised which returns a 4xx response.
   
   """
   user = await User.get_by_email(
@@ -66,12 +69,21 @@ async def login_for_auth_token(
   summary=""" Provides an endpoint for refreshing the JWT token""",
 )
 async def refresh_jwt_token(request: Request,
-  session: AsyncSession = Depends(get_async_session)
+  current_user: User = Depends(get_current_user)
 ) -> Token:
   """ Provides a refresh token for the JWT session.
-  """
-  return {}
 
+  There must be a currently authenticated user for the refresh
+  to work, otherwise an exception is raised.
+  """
+  access_token = create_access_token(
+    subject=str(current_user.id),
+  )
+  
+  return Token(
+    access_token=access_token,
+    token_type="bearer"
+  )
 
 @router.post(
   "/logout",
@@ -81,7 +93,9 @@ async def logout_user(
   session: AsyncSession = Depends(get_async_session)
 ):
   """ Ends a users session
-  
+
+  Essentially invalidates a JWT token and then proceeds returns
+  a success response.
   """
   return {}
 
