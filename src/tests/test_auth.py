@@ -4,7 +4,7 @@ from fastapi import status
 from fastapi.testclient import TestClient
 from fastapi.security import OAuth2PasswordRequestForm
 
-from labs.schema.auth import Token, SignupRequest
+from labs.schema.auth import Token, SignupRequest, SignupResponse
 
 @pytest.fixture()
 def signup_request(faker):
@@ -22,7 +22,15 @@ def test_signup(test_client, signup_request):
         json=signup_request.dict()
     )
 
+    expected_response = SignupResponse(
+        success=True,
+        email=signup_request.email
+    )
+
+    parsed_body = SignupResponse.parse_obj(response.json())
+
     assert response.status_code == status.HTTP_201_CREATED
+    assert parsed_body == expected_response
 
 def test_verify(test_client):
     assert 1 == 1
