@@ -1,6 +1,11 @@
 from datetime import datetime
 
-from pydantic import BaseModel, validator
+from pydantic import BaseModel
+
+
+class EchoResponse(BaseModel):
+    """ A simple echo response """
+    message: str
 
 class HealthCheckResponse(BaseModel):
     """ Provides a health check response with a timestamp
@@ -12,5 +17,4 @@ class HealthCheckResponse(BaseModel):
     all_ok: bool = False
     db_ok: bool = False
     queue_ok: bool = False
-    log_ok: bool = False
     timestamp: datetime = datetime.now()

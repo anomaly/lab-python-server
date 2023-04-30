@@ -15,7 +15,7 @@ from ...schema import OTPTriggerEmailRequest, \
   OTPTriggerSMSRequest, OTPVerifyRequest, OTPTriggerResponse,\
   Token
 
-router = APIRouter(tags=["otp"])
+router = APIRouter()
 
 @router.post(
     "/initiate/email",
