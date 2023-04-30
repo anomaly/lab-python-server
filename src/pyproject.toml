@@ -51,6 +51,7 @@ initdb = "labs.db:initalise"
 pytest = "^7.1.3"
 pytest-order = "^1.0.1"
 taskiq = {extras = ["reload"], version = "^0.4.1"}
+faker = "^18.6.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
