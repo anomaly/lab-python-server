@@ -24,6 +24,14 @@ async def signup_user(
    request: SignupRequest, 
    session: AsyncSession = Depends(get_async_session)
 ) -> SignupResponse:
+  """ Sign up the user using email and password
+
+  The general sign up for uses a email, password and first
+  and last names to create a user. The handler will check
+  to see if the user already exists and if not, create the
+  user and return a success response.
+  """
+
   # Try and get a user by email
   user = await User.get_by_email(session, request.email)
   if user:
