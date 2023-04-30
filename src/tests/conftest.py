@@ -3,7 +3,7 @@
 """
 import pytest
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope='session')
 def test_client():
     from fastapi.testclient import TestClient
     from labs.api import app

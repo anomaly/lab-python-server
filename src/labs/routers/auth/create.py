@@ -4,21 +4,26 @@
 
 """
 
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Request, Depends,\
+  HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
-from ...models import User
-from ...schema import SignupRequest
+from ...models.user import User
+from ...schema.auth import SignupRequest, SignupResponse
 
 from .tasks import send_account_verification_email
 
 router = APIRouter()
 
-@router.post("/signup")
-async def signup_user(request: SignupRequest, 
-  session: AsyncSession = Depends(get_async_session)
-):
+@router.post(
+    "/signup",
+      status_code = status.HTTP_201_CREATED,
+)
+async def signup_user(
+   request: SignupRequest, 
+   session: AsyncSession = Depends(get_async_session)
+) -> SignupResponse:
   # Try and get a user by email
   user = await User.get_by_email(session, request.email)
   if user:
@@ -26,7 +31,10 @@ async def signup_user(request: SignupRequest,
 
   await User.create(session, **request.dict())
 
-  return {}
+  return SignupResponse(
+    success=True,
+    email=request.email
+  )
 
 
 @router.get("/verify")

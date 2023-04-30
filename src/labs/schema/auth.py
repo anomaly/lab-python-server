@@ -24,8 +24,13 @@ class SignupRequest(AppBaseModel):
     """
     password: str
     email: str
+    first_name: str
+    last_name: str
 
 class SignupResponse(AppBaseModel):
+    """
+    
+    """
     success: bool
     email: str
 

@@ -18,6 +18,10 @@ async def send_account_verification_email(
 ) -> None:
     import logging
     logging.error("Kicking off send_account_verification_email")
+    from ...models import User
+    users = await User.get_all(session)
+    for user in users:
+        logging.error(user.email)
 
 @broker.task
 async def sent_otp_sms() -> None:
