@@ -4,7 +4,8 @@ from .utils import AppBaseModel
 class Token(BaseModel):
     """ A model that represents a JWT token
 
-
+    Used to send a newly created token or a refresh token with
+    the type. For most use cases we send a bearer token.
     """
     access_token: str
     token_type: str
@@ -28,24 +29,26 @@ class SignupRequest(AppBaseModel):
     last_name: str
 
 class SignupResponse(AppBaseModel):
-    """
-    
-    """
+    """  Signup Response to confirm that the email address was accepted """
     success: bool
     email: str
 
+
+class VerifyAccountRequest(BaseModel):
+    """ A simple request to verify a user account with a token """
+    token: str
+    email: str
+
 class OTPTriggerEmailRequest(AppBaseModel):
+    """ Triggers an OTP to be sent to the user via email """
     email: str
 
 class OTPTriggerSMSRequest(AppBaseModel):
+    """ Triggers an OTP to be sent to the user via SMS """
     mobile_number: str
 
 class OTPVerifyRequest(AppBaseModel):
     """ OTP sent to the server to verify if it's valid """
     otp: str
     mobile_number: str
-
-class OTPTriggerResponse(AppBaseModel):
-    """ OTP Verification result """
-    success: bool
 
