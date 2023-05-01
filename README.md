@@ -575,21 +575,23 @@ https://www.uvicorn.org/deployment/
 
 ## Distribution
 
-We recommend the use of a registry such as [Docker Hub](https://hub.docker.com) to host your images. Assuming you are using Docker Hub, you can build your images using the following command:
+We recommend the use of a registry such as [Github Container Repository](https://ghcr.io) to host your images. Assuming you are using GitHub, you can build your images using the following command:
 
 ```sh
-docker build -t anomalyhq/python-lab-server-api:v0.1.0 -f Dockerfile.api .
+docker build -t "ghcr.io/anomaly/python-lab-server-api:v0.1.0" -f Dockerfile.api .
 ```
 
-where `v0.1.0` is the version of the image and `Docker.api` is the the `Dockerfile` to use. `python-lab-server` is the the name of the package that will be published on Docker Hub. To publish the image use the following command:
+where `v0.1.0` is the version of the image and `Docker.api` is the the `Dockerfile` to use. `python-lab-server` is the the name of the package that will be published on GitHub Container Registry. To publish the image use the following command:
 
 ```sh
-docker push anomalyhq/python-lab-server-api:v0.1.0
+docker push ghcr.io/anomaly/python-lab-server-api:v0.1.0
 ```
 
-where `anomalyhq` is the organisation on Docker Hub and `v0.1.0` is the version of the image.
+where `anomaly` is the organisation on GitHub and `v0.1.0` is the version of the image.
 
 > Ensure you tag the release on your version control system and write thorough release notes.
+
+Note that if you are building on Apple Silicon by default the images are built for the `arm` architecture, if you are going to deploy to `amd64` you must specify this as an argument `--platform=linux/amd64`.
 
 ## Resources
 
