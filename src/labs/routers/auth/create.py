@@ -45,7 +45,7 @@ async def signup_user(
   )
 
 
-@router.get("/verify")
+@router.post("/verify")
 async def verify_user(request: Request):
     """Verify an account
     """

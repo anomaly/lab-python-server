@@ -21,12 +21,14 @@ from ..utils import get_current_user
 
 from .create import router as router_account_create
 from .otp import router as router_otp
- 
+from .manage import router as router_manage
+
 """Mounts all the sub routers for the authentication module"""
 router = APIRouter(tags=["auth"])
 
 router.include_router(router_account_create)
 router.include_router(router_otp, prefix="/otp")
+router.include_router(router_manage, prefix="/password")
 
 @router.post(
   "/token",

@@ -2,7 +2,7 @@
 
 """
 
-from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...utils.auth import create_access_token
@@ -12,7 +12,7 @@ from ...models import User
 from ...config import config
 
 from ...schema import OTPTriggerEmailRequest, \
-  OTPTriggerSMSRequest, OTPVerifyRequest, OTPTriggerResponse,\
+  OTPTriggerSMSRequest, OTPVerifyRequest,\
   Token
 
 router = APIRouter()
@@ -23,7 +23,7 @@ router = APIRouter()
 async def initiate_otp_email(
   request: OTPTriggerEmailRequest, 
   session: AsyncSession = Depends(get_async_session)
-) -> OTPTriggerResponse:
+):
   """ Attempt to authenticate a user and issue JWT token
 
     The user has provided us their email address and we will
@@ -40,15 +40,13 @@ async def initiate_otp_email(
 
   # Initiate the OTP process
 
-  return OTPTriggerResponse(success=True)
-
 
 @router.post(
   "/initiate/sms",
 )
 async def initiate_otp_sms(request: OTPTriggerSMSRequest, 
   session: AsyncSession = Depends(get_async_session)
-) -> OTPTriggerResponse:
+):
   """ Attempt to authenticate a user and issue JWT token
 
     The user has provided a mobile number and we will text them
@@ -63,8 +61,6 @@ async def initiate_otp_sms(request: OTPTriggerSMSRequest,
     user = await User.create(session, **request.dict())
 
   # Initiate the OTP process
-
-  return OTPTriggerResponse(success=True)
 
 @router.post("/verify")
 async def verify_otp(
