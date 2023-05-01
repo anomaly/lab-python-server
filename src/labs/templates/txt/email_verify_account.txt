@@ -1,0 +1,3 @@
+Thank you for signing up, your verification link is 
+
+{{ verification_link }}
