@@ -7,6 +7,7 @@
 """
 
 from typing import Optional
+from datetime import datetime
 
 from sqlalchemy import event
 from sqlalchemy.exc import NoResultFound
@@ -52,8 +53,11 @@ class User(
     password: Mapped[str]
     otp_secret: Mapped[str]
 
-    first_name: Mapped[Optional[str]]
-    last_name: Mapped[Optional[str]]
+    verification_token: Mapped[Optional[str]]
+    verification_token_expiry: Mapped[Optional[datetime]]
+
+    first_name: Mapped[str]
+    last_name: Mapped[str]
 
     is_admin: Mapped[bool] = mapped_column(
         default=False,
@@ -91,6 +95,13 @@ class User(
         """
         otp = TOTP(self.secret, interval=timeout)
         return otp.verify(token, valid_window=window)
+    
+    def get_verification_token(self):
+        """ Get the verification token for the user
+
+        This is used to verify the user's account
+        """
+        return self.get_otp()
 
     @classmethod
     async def get_by_email(cls, session, email):
@@ -154,3 +165,4 @@ event.listen(
     encrypt_password, 
     retval=True
 )
+
