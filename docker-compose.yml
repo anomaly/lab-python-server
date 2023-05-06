@@ -140,7 +140,6 @@ services:
     image: minio/minio
     container_name: ${PROJ_NAME}-minio
     restart: unless-stopped
-    hostname: s3.${PROJ_FQDN}
     volumes:
       - minio-data:/data
       - .cert:/root/.minio/certs
