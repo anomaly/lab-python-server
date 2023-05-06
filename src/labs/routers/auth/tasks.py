@@ -1,34 +1,58 @@
+from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
 from taskiq import TaskiqDepends
 
 from ...db import get_async_session
+from ...email import sender
+from ...config import config
 from ...broker import broker
 
-@broker.task
-async def send_welcome_email() -> None:
-    pass
+from ...models import User
 
 @broker.task
-async def send_reset_password_email() -> None:
-    pass
+async def send_reset_password_email(
+    user_id: UUID,
+    session: AsyncSession = TaskiqDepends(get_async_session)
+) -> None:
+    user = await User.get(session, user_id)
 
 @broker.task
 async def send_account_verification_email(
+    user_id: UUID,
     session: AsyncSession = TaskiqDepends(get_async_session)
 ) -> None:
-    import logging
-    logging.error("Kicking off send_account_verification_email")
-    from ...models import User
-    users = await User.get_all(session)
-    for user in users:
-        logging.error(user.email)
+
+    user = await User.get(session, user_id)
+
+    sender.send(
+        receivers=[user.email],
+        subject="Your verification email",
+        html_template="email_verify_account.html",
+        body_params={
+            "verification_link": "https://google.com"
+        }
+    )
 
 @broker.task
-async def sent_otp_sms() -> None:
-    pass
+async def send_welcome_email(
+    user_id: UUID,
+    session: AsyncSession = TaskiqDepends(get_async_session)
+) -> None:
+    user = await User.get(session, user_id)
+
 
 @broker.task
-async def send_otp_email() -> None:
-    pass
+async def sent_otp_sms(
+    user_id: UUID,
+    session: AsyncSession = TaskiqDepends(get_async_session)
+) -> None:
+    user = await User.get(session, user_id)
+
+@broker.task
+async def send_otp_email(
+    user_id: UUID,
+    session: AsyncSession = TaskiqDepends(get_async_session)
+) -> None:
+    user = await User.get(session, user_id)
 
 

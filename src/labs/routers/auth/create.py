@@ -46,8 +46,11 @@ async def signup_user(
 
 
 @router.post("/verify")
-async def verify_user(request: Request):
+async def verify_user(
+  session: AsyncSession = Depends(get_async_session)
+):
     """Verify an account
     """
-    await send_account_verification_email.kiq()
+    # user = await User.get_by_email(session, "dev@anomaly.net.au")
+    # await send_account_verification_email.kiq(user.id)
     return {"message": "hello world"}

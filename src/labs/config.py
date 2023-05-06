@@ -25,7 +25,7 @@ class Config(BaseSettings):
     RABBITMQ_NODE_PORT: int = 5672
     RABBITMQ_HOST: str
 
-    # redis is used by celery for workers
+    # redis is used by TaskIQ for workers
     REDIS_HOST: str
     REDIS_PORT: int = 6379
 
@@ -52,6 +52,9 @@ class Config(BaseSettings):
     SMTP_PORT: int = 587
     SMTP_USER: SecretStr
     SMTP_PASSWORD: SecretStr
+    SMTP_STARTTLS: bool = True
+
+    EMAIL_FROM: str
     
     SMS_API_KEY: SecretStr
     SMS_API_SECRET: SecretStr
@@ -97,7 +100,10 @@ class Config(BaseSettings):
 
     @property
     def redis_dsn(self) -> RedisDsn:
-        """Construct the DSN for the celery broker
+        """Construct the DSN for the TaskIQ broker
+
+        This is provided by a container for development, but you 
+        can choose to use a hosted product in production.
         """
         redis_url=f'redis://{self.REDIS_HOST}:{self.REDIS_PORT}'
         return RedisDsn(
@@ -107,6 +113,13 @@ class Config(BaseSettings):
     
     @property
     def amqp_dsn(self) -> AmqpDsn:
+        """ Construct the DSN for the AMQP broker
+
+        This is generally used by TaskIQ to queue tasks for execution
+        and is provided by a container. 
+
+        In production you can choose to use a hosted product.
+        """
         amqp_url = "".join([
             "amqp://",
             self.RABBITMQ_DEFAULT_USER,
