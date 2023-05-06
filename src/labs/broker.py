@@ -1,3 +1,7 @@
+""" TaskIQ broker configuration
+
+"""
+
 from .config import config
 
 # See PyPI for more information about taskiq_redis
@@ -13,6 +17,9 @@ from taskiq_aio_pika import AioPikaBroker
 from taskiq.schedule_sources import LabelScheduleSource
 from taskiq.scheduler import TaskiqScheduler
 
+# Middlewares
+from taskiq import SimpleRetryMiddleware
+
 # FastAPI middleware
 import taskiq_fastapi
 
@@ -23,6 +30,13 @@ redis_result_backend = RedisAsyncResultBackend(
 broker = AioPikaBroker(
     config.amqp_dsn,
     result_backend=redis_result_backend
+)
+
+# Configure the necessary middlewares here, a default retry middleware
+# is configured to retry tasks 3 times before failing you can override this
+# https://bit.ly/3LLyH9M
+broker.add_middlewares(
+    SimpleRetryMiddleware(default_retry_count=config.APP_QUEUE_RETRY_COUNT)
 )
 
 scheduler = TaskiqScheduler(

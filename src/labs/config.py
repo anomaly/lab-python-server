@@ -71,6 +71,8 @@ class Config(BaseSettings):
     APP_TOTP_INTERVAL: int = 30 # How long is a token valid
     APP_TOTP_WINDOW: int = 30 # How far off can you drift
 
+    # How many times should a task be retried by default
+    APP_QUEUE_RETRY_COUNT: int = 3
 
     @property
     def postgres_async_dsn(self) -> PostgresDsn:
