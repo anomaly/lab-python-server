@@ -7,6 +7,11 @@ __pycache__/
 # Certificates for development
 .cert
 
+# Environment files
+.env
+.env.development
+
+
 # C extensions
 *.so
 
