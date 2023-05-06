@@ -103,7 +103,7 @@ class S3FileMetadata(
                 config.S3_BUCKET_NAME,
                 self.s3_key,
                 expires=timedelta(
-                    minutes=config.S3_DOWNLOAD_EXPIRY
+                    seconds=config.S3_DOWNLOAD_LINK_LIFETIME
                 ),
                 response_headers={
                     'response-content-disposition': 
@@ -131,7 +131,7 @@ class S3FileMetadata(
                 config.S3_BUCKET_NAME,
                 self.s3_key,
                 expires=timedelta(
-                    minutes=config.S3_UPLOAD_EXPIRY
+                    seconds=config.S3_UPLOAD_LINK_LIFETIME
                 )
             )
             return url

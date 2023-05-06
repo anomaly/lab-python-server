@@ -20,12 +20,13 @@ class Config(BaseSettings):
     POSTGRES_HOST: str
     POSTGRES_PORT: int = 5432
 
+    # RabbitMQ is used to manage the queues
     RABBITMQ_DEFAULT_USER: str
     RABBITMQ_DEFAULT_PASS: SecretStr
     RABBITMQ_NODE_PORT: int = 5672
     RABBITMQ_HOST: str
 
-    # redis is used by TaskIQ for workers
+    # redis is used by TaskIQ for writing results
     REDIS_HOST: str
     REDIS_PORT: int = 6379
 
@@ -38,14 +39,14 @@ class Config(BaseSettings):
     S3_REGION: str = "ap-south-1" # Set to Linode Singapore
     S3_USE_SSL: bool = True # See docs on using SSL in development
 
-    S3_UPLOAD_EXPIRY: int = 5 # In minutes
-    S3_DOWNLOAD_EXPIRY: int = 5 # In minutes
+    S3_UPLOAD_LINK_LIFETIME: int = 300 # In seconds
+    S3_DOWNLOAD_LINK_LIFETIME: int = 300 # In seconds
 
     # Secrets that the application requires for session
     # and cross domain checking
     JWT_SECRET_KEY: SecretStr
     JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    ACCESS_TOKEN_LIFETIME: int = 1800
 
     # SMTP and SMS related configuration
     SMTP_HOST: str
@@ -73,6 +74,9 @@ class Config(BaseSettings):
 
     # How many times should a task be retried by default
     APP_QUEUE_RETRY_COUNT: int = 3
+
+    # Verification code lifetime
+    APP_VERIFICATION_CODE_LIFE: int = 600 # In seconds
 
     @property
     def postgres_async_dsn(self) -> PostgresDsn:

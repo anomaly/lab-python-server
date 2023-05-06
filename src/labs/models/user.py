@@ -17,6 +17,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from pyotp import TOTP, random_base32
 
 from ..db import Base
+from ..config import config
 from .utils import DateTimeMixin, IdentifierMixin,\
     ModelCRUDMixin
     
@@ -28,7 +29,8 @@ class User(
     DateTimeMixin,
     ModelCRUDMixin
 ):
-    """ A user defines a person that will use various software systems
+    """
+    A user defines a person that will use various software systems
 
     Users have authentication built into the system with support
     for password based auth and one time passwords.
@@ -39,7 +41,8 @@ class User(
     email: Mapped[str] = mapped_column(unique=True)
     mobile_number: Mapped[Optional[str]]
     
-    """ Note that we define the password slightly differently
+    """
+    Note that we define the password slightly differently
 
         The Column knows to provision the field as password
         however we will override the getter and more importantly
@@ -70,6 +73,31 @@ class User(
     # Methods to assist to deal with passwords
     def check_password(self, plain_text_pass):
         return verify_password(plain_text_pass, self.password)
+    
+    def get_verification_code(
+        self,
+    ) -> str:
+        """
+        Generates a new verification code and updates the object and returns the
+        plain string code.
+
+            Returns:
+                verification_code (str): The verification code
+        """
+        # Generate a random secret
+        verification_code = random_base32()
+
+        # Verification code is hashed and only sent back
+        # to the user via email or SMS, this should not be resent
+        # and you should initiate a new verification code if the
+        # user is unable to access the code sent to them 
+        self.__class__.update(
+            self.session,
+            verification_code = hash_password(verification_code),
+
+        )
+
+        return verification_code
 
     def get_otp(
         self, 
