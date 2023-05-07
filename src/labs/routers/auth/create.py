@@ -83,10 +83,11 @@ async def verify_user(
        request.email
     )
 
+     # Even if there's an error we aren't going to reveal the
+     # fact that the user exists or not
     if not user:
       raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, 
-        detail="Unable to process request"
+        status_code=status.HTTP_204_NO_CONTENT,
       )
     
     verification_outcome = await user.verify_user_account(
@@ -96,6 +97,6 @@ async def verify_user(
 
     if not verification_outcome:
       raise HTTPException(
-        status_code=status.HTTP_400_BAD_REQUEST, 
-        detail="Unable to process request"
+        status_code=status.HTTP_406_NOT_ACCEPTABLE,
+        detail="Verification failed" 
       )
