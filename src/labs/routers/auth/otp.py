@@ -15,6 +15,8 @@ from ...schema import OTPTriggerEmailRequest, \
   OTPTriggerSMSRequest, OTPVerifyRequest,\
   Token
 
+from .tasks import send_otp_email, send_otp_sms
+
 router = APIRouter()
 
 @router.post(
@@ -33,13 +35,20 @@ async def initiate_otp_email(
   # Get the user account
   user = await User.get_by_email(session, request.email)
 
+  # Create the user with a random base32 password
+  # this will obviously be unusable by the user
+  # if they wish to login via a password then they will have
+  # to follow the reset_password flow
   if user is None:
-    user = await User.create(session, **request.dict())
+    from pyotp import random_base32
+    user = await User.create(
+      session,
+      email=request.email,
+      password=random_base32()
+    )
 
-  # If not found make a user account with the mobile
-
-  # Initiate the OTP process
-
+  # Initiate the OTP process as a background task
+  await send_otp_email.kiq(user.id)
 
 @router.post(
   "/initiate/sms",
