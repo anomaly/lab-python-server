@@ -44,7 +44,7 @@ fk_user_uuid_req = Annotated[
     )
 ]
 
-timestamp = Annotated[
+timestamp_req = Annotated[
     datetime,
     mapped_column(
         DateTime(timezone=True),
@@ -52,6 +52,15 @@ timestamp = Annotated[
         server_default=func.CURRENT_TIMESTAMP()
     ),
 ]
+
+timestamp = Annotated[
+    datetime,
+    mapped_column(
+        DateTime(timezone=True),
+        nullable=True,
+    ),
+]
+
 
 class IdentifierMixin(object):
     """An ID for a given object
@@ -72,8 +81,8 @@ class DateTimeMixin(object):
     and when the object is update, you will not be required to set these
     values manually.
     """
-    created_at: Mapped[timestamp]
-    updated_at: Mapped[timestamp]
+    created_at: Mapped[timestamp_req]
+    updated_at: Mapped[timestamp_req]
     deleted_at: Mapped[timestamp]
 
 class CUDByMixin(object):

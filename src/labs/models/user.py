@@ -7,11 +7,12 @@
 """
 
 from typing import Optional
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from sqlalchemy import event
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.ext.asyncio import async_object_session
 
 # OTP helpers from pyotp
 from pyotp import TOTP, random_base32
@@ -19,8 +20,8 @@ from pyotp import TOTP, random_base32
 from ..db import Base
 from ..config import config
 from .utils import DateTimeMixin, IdentifierMixin,\
-    ModelCRUDMixin
-    
+    ModelCRUDMixin, timestamp
+ 
 from ..utils.auth import hash_password, verify_password
 
 class User(
@@ -57,7 +58,7 @@ class User(
     otp_secret: Mapped[str]
 
     verification_token: Mapped[Optional[str]]
-    verification_token_expiry: Mapped[Optional[datetime]]
+    verification_token_expiry: Mapped[Optional[timestamp]]
 
     first_name: Mapped[str]
     last_name: Mapped[str]
@@ -74,8 +75,9 @@ class User(
     def check_password(self, plain_text_pass):
         return verify_password(plain_text_pass, self.password)
     
-    def get_verification_code(
+    async def get_verification_code(
         self,
+        async_object_session,
     ) -> str:
         """
         Generates a new verification code and updates the object and returns the
@@ -87,15 +89,18 @@ class User(
         # Generate a random secret
         verification_code = random_base32()
 
+        verification_token_expiry = datetime.utcnow() + \
+            timedelta(seconds=config.APP_VERIFICATION_TOKEN_LIFETIME)
+
         # Verification code is hashed and only sent back
         # to the user via email or SMS, this should not be resent
         # and you should initiate a new verification code if the
-        # user is unable to access the code sent to them 
-        self.__class__.update(
-            self.session,
-            verification_code = hash_password(verification_code),
+        # user is unable to access the code sent to them
+        self.verification_code = hash_password(verification_code),
+        self.verification_token_expiry = verification_token_expiry,
 
-        )
+        async_object_session.add(self)
+        await async_object_session.commit()
 
         return verification_code
 
