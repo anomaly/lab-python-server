@@ -84,6 +84,49 @@ class User(
     def check_password(self, plain_text_pass):
         return verify_password(plain_text_pass, self.password)
     
+    async def verify_user_account(
+        self,
+        async_object_session,
+        verification_token: str,
+    ):
+        """
+        Verifies the user account using the verification token
+        """
+
+        # No verification token or expiry date found, so there's
+        # no point in going any further
+        if not self.verification_token or not self.verification_token_expiry:
+            return False
+        
+        # The expiry token is invalid, so we should clean up the token
+        # and return a false, this is so the token can't be retried
+        if self.verification_token_expiry < datetime.utcnow():
+            self.verification_token = None
+            self.verification_token_expiry = None
+
+            async_object_session.add(self)
+            await async_object_session.commit()
+
+            return False
+        
+        # The token failed to match, so we should return a false
+        if not verify_password(verification_token, self.verification_token):
+            return False
+        
+        # All has gone well, we can make the user active and clear
+        # the token so it can't be used again
+
+        self.verification_token = None
+        self.verification_token_expiry = None
+
+        self.verified = True
+        
+        async_object_session.add(self)
+        await async_object_session.commit()
+
+        return True
+
+    
     async def get_verification_token(
         self,
         async_object_session,

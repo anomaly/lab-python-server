@@ -59,11 +59,43 @@ async def signup_user(
   )
 
 
-@router.post("/verify")
+@router.post(
+  "/verify", 
+  status_code=status.HTTP_202_ACCEPTED
+)
 async def verify_user(
   request: VerifyAccountRequest,
   session: AsyncSession = Depends(get_async_session),
 ):
-    """Verify an account
     """
-    return {"message": "hello world"}
+    Verify an account using a one time token
+
+    The signup process would have emailed the user a one time activation
+    token, pass this token to the user object and we can ask the account
+    to be set as verified.
+
+    If the token is invalid, or was never generated an obscure error 
+    message is to be sent back to the client, so we don't reveal that
+    the token or accounts status is valid
+    """
+    user = await User.get_by_email(
+       session, 
+       request.email
+    )
+
+    if not user:
+      raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, 
+        detail="Unable to process request"
+      )
+    
+    verification_outcome = await user.verify_user_account(
+      session, 
+      request.token
+    )
+
+    if not verification_outcome:
+      raise HTTPException(
+        status_code=status.HTTP_400_BAD_REQUEST, 
+        detail="Unable to process request"
+      )
