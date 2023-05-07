@@ -164,7 +164,7 @@ class User(
         """
         Attempt to verify the reset password token and update the password
 
-        
+
         """
         if not self.reset_password or not self.reset_password_expiry:
             return False
@@ -232,7 +232,12 @@ class User(
         authenticate the user. This should be different based
         on the timeout and the digits.
         """
-        otp = TOTP(self.secret, digits=digits, interval=timeout)
+        otp = TOTP(
+            self.otp_secret, 
+            digits=digits, 
+            interval=timeout
+        )  
+        
         return otp.now()
     
     def verify_otp(
@@ -240,10 +245,11 @@ class User(
             token: str,
             timeout: int = 30, 
             window: int = 30
-        ):
+        ) -> bool:
         """
+        Verifies if the sent OTP is valid for the user
         """
-        otp = TOTP(self.secret, interval=timeout)
+        otp = TOTP(self.otp_secret, interval=timeout)
         return otp.verify(token, valid_window=window)
     
     @classmethod
