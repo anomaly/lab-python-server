@@ -61,17 +61,6 @@ async def initiate_password_reset(
       raise HTTPException(
         status_code=status.HTTP_204_NO_CONTENT,
       )
-    
-    reset_password_token = await user.get_reset_password_token(
-      session, 
-      request.email
-    )
-
-    if not reset_password_token:
-      raise HTTPException(
-        status_code=status.HTTP_406_NOT_ACCEPTABLE,
-        detail="Initiate reset password failed" 
-      )
-    
+        
     # Queue a task to send the verification email
     await send_reset_password_email.kiq(user.id)
