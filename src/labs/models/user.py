@@ -57,16 +57,25 @@ class User(
     password: Mapped[str]
     otp_secret: Mapped[str]
 
+    # Used to store a temporary token to verify the user
     verification_token: Mapped[Optional[str]]
     verification_token_expiry: Mapped[Optional[timestamp]]
 
+    # Used to store a temporary token to reset the password
+    reset_token: Mapped[Optional[str]]
+    reset_token_expiry: Mapped[Optional[timestamp]]
+
+    # Basic user information
     first_name: Mapped[str]
     last_name: Mapped[str]
 
+    # Used to indicate if the user is an admin
     is_admin: Mapped[bool] = mapped_column(
         default=False,
     )
 
+    # Set by the verification endpoint to indicate that the user
+    # was able to get through the verification process
     verified: Mapped[bool] = mapped_column(
         default=False,
     )
@@ -75,7 +84,7 @@ class User(
     def check_password(self, plain_text_pass):
         return verify_password(plain_text_pass, self.password)
     
-    async def get_verification_code(
+    async def get_verification_token(
         self,
         async_object_session,
     ) -> str:
@@ -129,13 +138,6 @@ class User(
         otp = TOTP(self.secret, interval=timeout)
         return otp.verify(token, valid_window=window)
     
-    def get_verification_token(self):
-        """ Get the verification token for the user
-
-        This is used to verify the user's account
-        """
-        return self.get_otp()
-
     @classmethod
     async def get_by_email(cls, session, email):
         """ A custom getter where the user is found via email 
