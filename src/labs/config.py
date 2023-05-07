@@ -12,6 +12,9 @@ class Config(BaseSettings):
     provided via a configuration file or a secret management system
     depending on the environment.
     """
+
+    # PROJ_NAME: str
+    # PROJ_FQDN: str
     
     # Configuration required to construct the Postgres DSN
     POSTGRES_DB: str

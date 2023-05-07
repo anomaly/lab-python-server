@@ -23,13 +23,20 @@ async def send_account_verification_email(
 
     user = await User.get(session, user_id)
 
+    # Create a verification code, this is available
+    # only at the time of calling this 
+    verification_code = await user.get_verification_token(session)
+
     sender.send(
         receivers=[user.email],
         subject="Your verification email",
+        text_template="email_verify_account.txt",
         html_template="email_verify_account.html",
         body_params={
-            "verification_link": "https://google.com"
-        }
+            "domain": "google.com",
+            "verification_code": verification_code,
+            "user": user,
+        },
     )
 
 @broker.task
