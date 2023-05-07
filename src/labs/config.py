@@ -67,16 +67,13 @@ class Config(BaseSettings):
     # While these can be overridden in the container environment,
     # it's recommend that you use the values below.
 
-    APP_VERIFICATION_TOKEN_EXPIRY: int = 600 # In seconds
+    APP_VERIFICATION_TOKEN_LIFETIME: int = 600 # In seconds
     APP_TOTP_NUM_DIGITS: int = 6 # Login code length
     APP_TOTP_INTERVAL: int = 30 # How long is a token valid
     APP_TOTP_WINDOW: int = 30 # How far off can you drift
 
     # How many times should a task be retried by default
     APP_QUEUE_RETRY_COUNT: int = 3
-
-    # Verification code lifetime
-    APP_VERIFICATION_CODE_LIFE: int = 600 # In seconds
 
     @property
     def postgres_async_dsn(self) -> PostgresDsn:
