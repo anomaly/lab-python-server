@@ -36,5 +36,5 @@ templates_path = os.path.join(script_path, "templates")
 
 sender.set_template_paths(
     html=os.path.join(templates_path, "html"),
-    text=os.path.join(templates_path, "text")
+    text=os.path.join(templates_path, "txt")
 )
