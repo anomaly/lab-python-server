@@ -4,13 +4,14 @@
 
 """
 
-from fastapi import APIRouter, Request, Depends,\
+from fastapi import APIRouter, Depends,\
   HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models.user import User
-from ...schema.auth import SignupRequest, SignupResponse
+from ...schema.auth import SignupRequest, SignupResponse,\
+  VerifyAccountRequest
 
 from .tasks import send_account_verification_email
 
@@ -35,22 +36,34 @@ async def signup_user(
   # Try and get a user by email
   user = await User.get_by_email(session, request.email)
   if user:
-    raise HTTPException(status_code=400, detail="User already exists")
+    raise HTTPException(
+       status_code=status.HTTP_400_BAD_REQUEST, 
+       detail="User already exists"
+    )
 
-  await User.create(session, **request.dict())
+  user = await User.create(session, **request.dict())
+
+  # We should have a user here, otherwise something went wrong
+  if not user:
+    raise HTTPException(
+       status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
+       detail="Unable to create user"
+    )
+
+  # Queue a task to send the verification email
+  await send_account_verification_email.kiq(user.id)
 
   return SignupResponse(
     success=True,
-    email=request.email
+    email=user.email
   )
 
 
 @router.post("/verify")
 async def verify_user(
-  session: AsyncSession = Depends(get_async_session)
+  request: VerifyAccountRequest,
+  session: AsyncSession = Depends(get_async_session),
 ):
     """Verify an account
     """
-    # user = await User.get_by_email(session, "dev@anomaly.net.au")
-    # await send_account_verification_email.kiq(user.id)
     return {"message": "hello world"}
