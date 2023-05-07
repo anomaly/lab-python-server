@@ -88,7 +88,7 @@ class User(
         self,
         async_object_session,
         verification_token: str,
-    ):
+    ) -> bool:
         """
         Verifies the user account using the verification token
         """
@@ -126,7 +126,6 @@ class User(
 
         return True
 
-    
     async def get_verification_token(
         self,
         async_object_session,
@@ -142,7 +141,7 @@ class User(
         verification_code = random_base32()
 
         verification_token_expiry = datetime.utcnow() + \
-            timedelta(seconds=config.APP_VERIFICATION_TOKEN_LIFETIME)
+            timedelta(seconds=config.APP_RESET_PASSWORD_TOKEN_LIFETIME)
 
         # Verification code is hashed and only sent back
         # to the user via email or SMS, this should not be resent
@@ -155,6 +154,72 @@ class User(
         await async_object_session.commit()
 
         return verification_code
+    
+    async def reset_password(
+        self,
+        async_object_session,
+        reset_token: str,
+        new_password: str,
+    ) -> bool:
+        """
+        Attempt to verify the reset password token and update the password
+
+        
+        """
+        if not self.reset_password or not self.reset_password_expiry:
+            return False
+        
+        if self.reset_password_expiry < datetime.utcnow():
+            self.reset_password = None
+            self.reset_password_expiry = None
+
+            async_object_session.add(self)
+            await async_object_session.commit()
+
+            return False
+        
+        if not verify_password(reset_token, self.reset_password):
+            return False
+        
+        self.reset_password = None
+        self.reset_password_expiry = None
+
+        self.password = hash_password(new_password)
+
+        async_object_session.add(self)
+        await async_object_session.commit()
+
+        return True
+
+    async def get_reset_password_token(
+        self,
+        async_object_session,
+    ) -> str:
+        """
+        Generates a new reset password code and updates the object 
+        and returns the plain string code.
+
+            Returns:
+                reset_password_token (str): The verification code
+        """
+        # Generate a random secret
+        reset_password_token = random_base32()
+
+        reset_password_token_expiry = datetime.utcnow() + \
+            timedelta(seconds=config.APP_VERIFICATION_TOKEN_LIFETIME)
+
+        # Password reset token is hashed and only sent back
+        # to the user via email or SMS, this should not be resent
+        # and you should initiate a new verification code if the
+        # user is unable to access the code sent to them
+        self.reset_token = hash_password(reset_password_token)
+        self.reset_token_expiry = reset_password_token_expiry
+
+        async_object_session.add(self)
+        await async_object_session.commit()
+
+        return reset_password_token
+
 
     def get_otp(
         self, 
@@ -243,4 +308,3 @@ event.listen(
     encrypt_password, 
     retval=True
 )
-

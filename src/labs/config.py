@@ -70,6 +70,7 @@ class Config(BaseSettings):
     # While these can be overridden in the container environment,
     # it's recommend that you use the values below.
 
+    APP_RESET_PASSWORD_TOKEN_LIFETIME: int = 600 # In seconds
     APP_VERIFICATION_TOKEN_LIFETIME: int = 600 # In seconds
     APP_TOTP_NUM_DIGITS: int = 6 # Login code length
     APP_TOTP_INTERVAL: int = 30 # How long is a token valid
