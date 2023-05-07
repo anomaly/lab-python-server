@@ -96,8 +96,8 @@ class User(
         # to the user via email or SMS, this should not be resent
         # and you should initiate a new verification code if the
         # user is unable to access the code sent to them
-        self.verification_code = hash_password(verification_code),
-        self.verification_token_expiry = verification_token_expiry,
+        self.verification_token = hash_password(verification_code)
+        self.verification_token_expiry = verification_token_expiry
 
         async_object_session.add(self)
         await async_object_session.commit()
