@@ -131,8 +131,8 @@ class ModelCRUDMixin:
             async_db_session, 
             new_instance.id
         )
+
         return updated_instance
-        return new_instance
 
     @classmethod
     async def update(
