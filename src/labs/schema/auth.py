@@ -39,6 +39,23 @@ class VerifyAccountRequest(BaseModel):
     token: str
     email: str
 
+class InitiateResetPasswordRequest(BaseModel):
+    """
+    A user is asking to reset their password
+
+    This will result in a token being sent out to them which they can use
+    with the following model to reset their password
+    """
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    """
+    A request with the previously generated token and the new password
+    """
+    token: str
+    email: str
+    password: str
+
 class OTPTriggerEmailRequest(AppBaseModel):
     """ Triggers an OTP to be sent to the user via email """
     email: str
