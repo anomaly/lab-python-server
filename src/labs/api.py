@@ -21,6 +21,8 @@ from .config import config
 from .routers import router_root
 from .broker import broker
 
+from .schema.ext import RootResponse
+
 api_description = """
 This project provides a reference Python API built using FastAPI, the 
 aim of the project is:
@@ -71,16 +73,16 @@ async def app_shutdown():
         await broker.shutdown()
 
 # Default handler
-@app.get("/")
-async def root(request: Request):
-  """Placeholder for the root endpoint
-  """
-  return JSONResponse(
+@app.get(
+    "/",
     status_code=status.HTTP_200_OK,
-    content={
-      "message": "Welcome to the {} API".format(__name__),
-      "root_path": request.scope.get("root_path")
-    }
+)
+async def root(request: Request) -> RootResponse:
+  """ Placeholder for the root endpoint
+  """
+  return RootResponse(
+    message="Welcome to the {} API".format(__name__),
+    root_path=request.scope.get("root_path")
   )
 
 # Hook up any events worth responding to

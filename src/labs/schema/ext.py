@@ -18,3 +18,12 @@ class HealthCheckResponse(BaseModel):
     db_ok: bool = False
     queue_ok: bool = False
     timestamp: datetime = datetime.now()
+
+class RootResponse(BaseModel):
+    """ Response sent by the root endpoint
+
+    Used to echo back the request and tell the client that
+    the API is ready and available to the world
+    """
+    root_path: str
+    message: str
