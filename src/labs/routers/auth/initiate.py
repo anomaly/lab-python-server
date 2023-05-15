@@ -11,7 +11,8 @@ from ...config import config
 from ...schema.auth import OTPTriggerEmailRequest, \
   OTPTriggerSMSRequest, InitiateResetPasswordRequest
 
-from .tasks import send_reset_password_email
+from .tasks import send_reset_password_email,\
+  send_account_verification_email
 
 router = APIRouter()
 
@@ -91,3 +92,27 @@ async def initiate_password_reset(
         
     # Queue a task to send the verification email
     await send_reset_password_email.kiq(user.id)
+
+
+@router.post(
+    "/verify",
+    status_code=status.HTTP_202_ACCEPTED
+)
+async def initiate_verification_email(
+    request: InitiateResetPasswordRequest,
+    session: AsyncSession = Depends(get_async_session),
+):
+    user = await User.get_by_email(
+       session, 
+       request.email
+    )
+
+     # Even if there's an error we aren't going to reveal the
+     # fact that the user exists or not
+    if not user or user.is_verified:
+      raise HTTPException(
+        status_code=status.HTTP_204_NO_CONTENT,
+      )
+        
+    # Queue a task to send the verification email
+    await send_account_verification_email.kiq(user.id)
