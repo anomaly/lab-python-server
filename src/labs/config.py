@@ -15,7 +15,33 @@ class Config(BaseSettings):
 
     # PROJ_NAME: str
     # PROJ_FQDN: str
-    
+
+    class API_ROUTER:
+        """
+        
+        """
+        TERMS_OF_SERVICE: str = "https://github.com/anomaly/labs"
+        CONTACT: dict = {
+            "name": "Anomaly Labs",
+            "url": "https://github.com/anomaly/labs",
+            "email": "oss@anomaly.ltd",
+       }
+ 
+        LICENSE_INFO: dict = {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0"
+        }
+
+        OPEN_API_TAGS: list = [
+            {
+                "name": "auth",
+                "description": "Authentication related endpoints"
+            }
+        ]
+
+        PATH_ROOT: str = "/api"
+        PATH_DOCS: str = "/docs"
+
     # Configuration required to construct the Postgres DSN
     POSTGRES_DB: str
     POSTGRES_USER: str

@@ -16,6 +16,8 @@ from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
+from .config import config
+
 from .routers import router_root
 from .broker import broker
 
@@ -36,25 +38,21 @@ app = FastAPI(
   title=__title__,
   version=__version__,
   description=api_description,
-  docs_url="/docs",
-  root_path="/api",
-  terms_of_service="https://github.com/anomaly/labs",
-  contact={
-    "name": "Anomaly Software",
-    "url": "https://github.com/anomaly/labs",
-    "email": "oss@anomaly.ltd"
-  },
-  license_info={
-    "name": "Apache 2.0",
-    "url": "https://www.apache.org/licenses/LICENSE-2.0"
-  },
-  openapi_tags=[
-    {
-      "name": "auth",
-      "description": "Authentication related endpoints"
-    }
-  ]
+  docs_url=config.API_ROUTER.PATH_DOCS,
+  root_path=config.API_ROUTER.PATH_ROOT,
+  terms_of_service=config.API_ROUTER.TERMS_OF_SERVICE,
+  contact=config.API_ROUTER.CONTACT,
+  license_info=config.API_ROUTER.LICENSE_INFO,
+  openapi_tags=config.API_ROUTER.OPEN_API_TAGS
 )
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+  await websocket.accept()
+  while True:
+    data = await websocket.receive_text()
+    await websocket.send_text(f"Message text was: {data}")
+
 
 # Additional routers of the application described in the routers package
 app.include_router(router_root)
@@ -84,13 +82,6 @@ async def root(request: Request):
       "root_path": request.scope.get("root_path")
     }
   )
-
-@app.websocket("/ws")
-async def websocket_endpoint(websocket: WebSocket):
-  await websocket.accept()
-  while True:
-    data = await websocket.receive_text()
-    await websocket.send_text(f"Message text was: {data}")
 
 # Hook up any events worth responding to
 # https://fastapi.tiangolo.com/advanced/events/
