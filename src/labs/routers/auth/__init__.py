@@ -20,15 +20,17 @@ from ...utils.auth import create_access_token
 from ..utils import get_current_user
 
 from .create import router as router_account_create
-from .otp import router as router_otp
 from .manage import router as router_manage
+from .initiate import router as router_initiate
+from .verify import router as router_verify
 
 """Mounts all the sub routers for the authentication module"""
 router = APIRouter(tags=["auth"])
 
 router.include_router(router_account_create)
-router.include_router(router_otp, prefix="/otp")
 router.include_router(router_manage, prefix="/password")
+router.include_router(router_initiate, prefix="/initiate")
+router.include_router(router_verify, prefix="/verify")
 
 @router.post(
   "/token",

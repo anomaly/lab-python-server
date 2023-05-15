@@ -10,8 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models.user import User
-from ...schema.auth import SignupRequest, SignupResponse,\
-  VerifyAccountRequest
+from ...schema.auth import SignupRequest, SignupResponse
 
 from .tasks import send_account_verification_email
 
@@ -58,45 +57,3 @@ async def signup_user(
     email=user.email
   )
 
-
-@router.post(
-  "/verify", 
-  status_code=status.HTTP_202_ACCEPTED
-)
-async def verify_user(
-  request: VerifyAccountRequest,
-  session: AsyncSession = Depends(get_async_session),
-):
-    """
-    Verify an account using a one time token
-
-    The signup process would have emailed the user a one time activation
-    token, pass this token to the user object and we can ask the account
-    to be set as verified.
-
-    If the token is invalid, or was never generated an obscure error 
-    message is to be sent back to the client, so we don't reveal that
-    the token or accounts status is valid
-    """
-    user = await User.get_by_email(
-       session, 
-       request.email
-    )
-
-     # Even if there's an error we aren't going to reveal the
-     # fact that the user exists or not
-    if not user:
-      raise HTTPException(
-        status_code=status.HTTP_204_NO_CONTENT,
-      )
-    
-    verification_outcome = await user.verify_user_account(
-      session, 
-      request.token
-    )
-
-    if not verification_outcome:
-      raise HTTPException(
-        status_code=status.HTTP_406_NOT_ACCEPTABLE,
-        detail="Verification failed" 
-      )

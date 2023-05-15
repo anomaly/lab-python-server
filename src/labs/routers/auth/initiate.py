@@ -1,26 +1,22 @@
-""" Reference implementation of OTP authentication. 
 
 """
-
-from fastapi import APIRouter, Depends, HTTPException
+"""
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from ...utils.auth import create_access_token
 
 from ...db import get_async_session
 from ...models import User
 from ...config import config
 
-from ...schema import OTPTriggerEmailRequest, \
-  OTPTriggerSMSRequest, OTPVerifyRequest,\
-  Token
+from ...schema.auth import OTPTriggerEmailRequest, \
+  OTPTriggerSMSRequest, InitiateResetPasswordRequest
 
-from .tasks import send_otp_email, send_otp_sms
+from .tasks import send_reset_password_email
 
 router = APIRouter()
 
 @router.post(
-    "/initiate/email",
+    "/otp/email",
 )
 async def initiate_otp_email(
   request: OTPTriggerEmailRequest, 
@@ -51,7 +47,7 @@ async def initiate_otp_email(
   await send_otp_email.kiq(user.id)
 
 @router.post(
-  "/initiate/sms",
+  "/otp/sms",
 )
 async def initiate_otp_sms(request: OTPTriggerSMSRequest, 
   session: AsyncSession = Depends(get_async_session)
@@ -71,37 +67,27 @@ async def initiate_otp_sms(request: OTPTriggerSMSRequest,
 
   # Initiate the OTP process
 
-@router.post("/verify")
-async def verify_otp(
-  request: OTPVerifyRequest, 
-  session: AsyncSession = Depends(get_async_session)
+
+
+@router.post(
+    "/password/reset",
+    status_code=status.HTTP_202_ACCEPTED
+)
+async def initiate_password_reset(
+    request: InitiateResetPasswordRequest,
+    session: AsyncSession = Depends(get_async_session),
 ):
-  """ Attempt to authenticate a user and issue JWT token
-  
-  """
-  # Get the user account
-  user = await User.get_by_phone(session, request.mobile_number)
-
-  if not user:
-    raise HTTPException(status_code=401, detail="Invalid mobile number")
-
-  if not user.verify_otp(
-    config.APP_TOTP_INTERVAL, 
-    config.APP_TOTP_WINDOW,
-    request.otp
-  ):
-    raise HTTPException(
-      status_code=status.HTTP_401_UNAUTHORIZED,
-      detail="Incorrect OTP",
-      headers={"WWW-Authenticate": "Bearer"},
+    user = await User.get_by_email(
+       session, 
+       request.email
     )
 
-  access_token = create_access_token(
-    subject=str(user.id),
-    fresh=True
-  )
-  
-  return Token(
-    access_token=access_token,
-    token_type="bearer"
-  )
+     # Even if there's an error we aren't going to reveal the
+     # fact that the user exists or not
+    if not user:
+      raise HTTPException(
+        status_code=status.HTTP_204_NO_CONTENT,
+      )
+        
+    # Queue a task to send the verification email
+    await send_reset_password_email.kiq(user.id)
