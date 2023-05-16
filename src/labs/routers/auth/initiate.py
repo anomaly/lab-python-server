@@ -109,7 +109,7 @@ async def initiate_verification_email(
 
      # Even if there's an error we aren't going to reveal the
      # fact that the user exists or not
-    if not user or user.is_verified:
+    if not user or user.verified:
       raise HTTPException(
         status_code=status.HTTP_204_NO_CONTENT,
       )
