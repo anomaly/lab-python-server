@@ -44,6 +44,18 @@ fk_user_uuid_req = Annotated[
     )
 ]
 
+fk_s3_file_metadata_uuid = Annotated[
+    UUID,
+    mapped_column(
+        PGUUID(as_uuid=True),
+        ForeignKey(
+            "s3_file_metadata.id",
+            ondelete="SET NULL"
+        ),
+        nullable=True,
+    )
+]
+
 timestamp_req = Annotated[
     datetime,
     mapped_column(
@@ -60,7 +72,6 @@ timestamp = Annotated[
         nullable=True,
     ),
 ]
-
 
 class IdentifierMixin(object):
     """An ID for a given object

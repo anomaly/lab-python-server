@@ -12,7 +12,7 @@ from sqlalchemy.orm import relationship,\
     mapped_column, Mapped
 
 from .utils import DateTimeMixin, IdentifierMixin,\
-    ModelCRUDMixin, fk_user_uuid
+    ModelCRUDMixin, CUDByMixin
 
 from ..db import Base
 from ..utils import minio_client
@@ -22,6 +22,7 @@ class S3FileMetadata(
     Base,
     DateTimeMixin,
     IdentifierMixin,
+    CUDByMixin,
     ModelCRUDMixin
 ):
     """ S3 File object storage and usage pattern.
@@ -84,12 +85,17 @@ class S3FileMetadata(
         default=False
     )
 
-    user_id: Mapped[fk_user_uuid]
+    @property
+    def prefixed_key(self):
+        """ Returns the prefixed key for the object in the store
 
-    user = relationship(
-        "User",
-        uselist=False,
-    )
+        This is the key which is used to store the object in the store, it is
+        prefixed with the prefix attribute of the object.
+        """
+        if self.prefix:
+            return f"{self.prefix}/{self.s3_key}"
+
+        return self.s3_key
 
     @property
     def presigned_download_url(self) -> Union[str, None]:
@@ -101,7 +107,7 @@ class S3FileMetadata(
         try:
             return minio_client.presigned_get_object(
                 config.S3_BUCKET_NAME,
-                self.s3_key,
+                self.prefixed_key,
                 expires=timedelta(
                     seconds=config.S3_DOWNLOAD_LINK_LIFETIME
                 ),
@@ -129,7 +135,7 @@ class S3FileMetadata(
         try:
             url = minio_client.presigned_put_object(
                 config.S3_BUCKET_NAME,
-                self.s3_key,
+                self.prefixed_key,
                 expires=timedelta(
                     seconds=config.S3_UPLOAD_LINK_LIFETIME
                 )
@@ -149,7 +155,7 @@ class S3FileMetadata(
         try:
             minio_client.enable_object_legal_hold(
                 config.S3_BUCKET_NAME,
-                self.s3_key,
+                self.prefixed_key,
             )
             self.legal_hold = True
             return True
@@ -166,7 +172,7 @@ class S3FileMetadata(
         try:
             minio_client.disable_object_legal_hold(
                 config.S3_BUCKET_NAME,
-                self.s3_key,
+                self.prefixed_key,
             )
 
             self.legal_hold = False
@@ -176,9 +182,27 @@ class S3FileMetadata(
             self.legal_hold = True
             return False
         
+    def mark_as_deleted(self, user_id: int) -> bool:
+        """ Marks the object as deleted
+
+        This method will mark the object as deleted, it will not remove the object
+        from the store. It will also queue a job to remove the object from the store
+        if the object is not under a legal hold.
+
+        Note that this method will return a boolean to state the success of the
+        operation. This is not the deleted status of the object.        
+        """
+        try:
+            self.deleted = True
+            self.deleted_by_user_id = user_id
+            return True
+        except Exception:
+            self.deleted = False
+            return False
+            
 
 @event.listens_for(S3FileMetadata, 'init')
-def assigned_s3_key(target, args, kwargs):
+def assign_s3_key(target, args, kwargs):
     """ Assigns a UUID based on the UUID4 standard as the key for the file upload
 
     When the application assigns a new S3FileMetadata object, it will be 
@@ -187,5 +211,14 @@ def assigned_s3_key(target, args, kwargs):
     file.
     """
     target.s3_key = uuid4().hex
-    target.prefix = uuid4().hex
 
+def queue_s3_object_deletion(target, value, oldvalue, initiator):
+    pass
+
+# Support for the above method to run when the password is set
+event.listen(
+    S3FileMetadata.deleted_by_user_id, 
+    'set', 
+    queue_s3_object_deletion, 
+    retval=False
+)
