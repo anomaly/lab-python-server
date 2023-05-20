@@ -70,7 +70,8 @@ tasks:
       We will attempt to create the alebmic_version table and populate
       the version_num field with the current head value.
     vars:
-      HEAD_SHA: ''
+      HEAD_SHA:
+        sh: "task db:alembic:heads | sed -e 's/ (head)//g'"
     cmds:
       - |
         docker compose exec db sh -c "psql \
