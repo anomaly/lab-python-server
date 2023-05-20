@@ -69,13 +69,15 @@ tasks:
 
       We will attempt to create the alebmic_version table and populate
       the version_num field with the current head value.
+    vars:
+      HEAD_SHA: ''
     cmds:
       - |
         docker compose exec db sh -c "psql \
         -U {{.POSTGRES_USER}} \
-        -d {{.POSTGRES_DB}} -c \
-        'CREATE TABLE IF NOT EXISTS alembic_version ( version_num VARHCAR );\
-        INSERT INTO alembic_version (version_num) VALUES ( );'"
+        -d {{.POSTGRES_DB}} -c \" \
+        CREATE TABLE IF NOT EXISTS alembic_version ( version_num VARCHAR ); \
+        INSERT INTO alembic_version ( version_num ) VALUES ( '{{.HEAD_SHA}}' );\""
   eject:
     desc: eject the project from a template
     summary: |
