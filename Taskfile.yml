@@ -74,7 +74,8 @@ tasks:
         docker compose exec db sh -c "psql \
         -U {{.POSTGRES_USER}} \
         -d {{.POSTGRES_DB}} -c \
-        'CREATE TABLE IF NOT EXISTS alembic_version ( version_num VARHCAR );'"
+        'CREATE TABLE IF NOT EXISTS alembic_version ( version_num VARHCAR );\
+        INSERT INTO alembic_version (version_num) VALUES ( );'"
   eject:
     desc: eject the project from a template
     summary: |
