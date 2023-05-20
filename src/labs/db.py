@@ -51,27 +51,14 @@ async def init_models():
 def initialise():
     """ Async IO containers to run the init_models function
 
-    This is called from the command line via poetry
+    This is called from the command line via poetry scripts.
+
+    Note: while import the models package seems useless, it is
+    infact crucial that the models are in context before the
+    create_all is called, otherwise the context has no models
+    defined and none will be created.    
     """
     import asyncio
+    from . import models
     asyncio.run(init_models())
 
-# TODO: Revise implementation in async context
-# Donot use until we have a better understanding of how to use async context
-# @asynccontextmanager
-# async def session_context():
-#     """Provide a transactional scope around a series of operations.
-#     """
-#     try:
-#         yield async_session
-#         await async_session.commit()
-#     except:  # noqa: E722
-#         await async_session.rollback()
-#         raise
-#     finally:
-#         await async_session.close()
-
-
-if __name__ == "__main__":
-    import asyncio
-    asyncio.run(init_models())
