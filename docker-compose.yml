@@ -1,10 +1,10 @@
 # The aim of this docker compose file is to provide a good known
 # way to build your docker-compose file for Anomaly projects
-# 
+#
 # Before you use this template have a look at the README, note that
 # you will require PROJ_NAME and PROJ_FQDN setup in your environment
 # for these template to work
-# 
+#
 # This file provides you a template for your development environment
 # https://docs.docker.com/compose/compose-file/compose-versioning/
 version: "3.8"
@@ -13,6 +13,7 @@ volumes:
   postgres-data:
   redis-data:
   minio-data:
+
 
 services:
 
@@ -32,7 +33,15 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data/
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}" ]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready",
+          "-U",
+          "${POSTGRES_USER}",
+          "-d",
+          "${POSTGRES_DB}"
+        ]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -78,7 +87,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["uvicorn", "${PROJ_NAME}.api:app", "--host=0.0.0.0", "--port=80", "--reload"]
+    command:
+      [
+        "uvicorn",
+        "${PROJ_NAME}.api:app",
+        "--host=0.0.0.0",
+        "--port=80",
+        "--reload"
+      ]
     env_file:
       - .env.development
     # restart: unless-stopped
@@ -101,7 +117,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "taskiq", "worker", "--reload", "${PROJ_NAME}.broker:broker" ]
+    command:
+      [
+        "taskiq",
+        "worker",
+        "--reload",
+        "${PROJ_NAME}.broker:broker"
+      ]
     env_file:
       - .env.development
     restart: unless-stopped
@@ -150,7 +172,13 @@ services:
       - .env.development
     command: server /data --console-address ":9001"
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      test:
+        [
+          "CMD",
+          "curl",
+          "-f",
+          "http://localhost:9000/minio/health/live"
+        ]
       interval: 30s
       timeout: 20s
       retries: 3
@@ -163,9 +191,4 @@ services:
     env_file:
       - .env.development
     entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host add $$S3_BUCKET_NAME http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD;
-      /usr/bin/mc mb -p $$S3_BUCKET_NAME/$$S3_BUCKET_NAME;
-      /usr/bin/mc policy set download $$S3_BUCKET_NAME/$$S3_BUCKET_NAME;
-      exit 0;
-      "
+      /bin/sh -c " /usr/bin/mc config host add $$S3_BUCKET_NAME http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; /usr/bin/mc mb -p $$S3_BUCKET_NAME/$$S3_BUCKET_NAME; /usr/bin/mc policy set download $$S3_BUCKET_NAME/$$S3_BUCKET_NAME; exit 0; "
