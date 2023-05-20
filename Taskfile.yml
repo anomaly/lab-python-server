@@ -6,7 +6,8 @@ tasks:
   build:image:
     desc: builds a publishable docker image
     cmds:
-      - docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER}} -f Dockerfile.api .
+      - |
+        docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER}} -f Dockerfile.api .
   dev:test:
     desc: runs tests inside the server container
     summary: |
@@ -20,7 +21,9 @@ tasks:
   dev:psql:
     desc: postgres shell on the db container
     cmds:
-      - docker compose exec db sh -c "psql -U postgres"
+      - |
+        docker compose exec db sh -c \
+        "psql -U {{.POSTGRES_USER}} -d {{.POSTGRES_DB}}"
   dev:sh:
     desc: get a bash session on the api container
     cmds:
@@ -36,19 +39,42 @@ tasks:
   db:rev:
     desc: create a database migration, pass a string as commit string
     cmds:
-      - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini revision --autogenerate -m {{.CLI_ARGS}}"
+      - | 
+        docker compose exec api sh -c \
+        "alembic -c /opt/$PROJ_NAME/alembic.ini revision \
+        --autogenerate -m {{.CLI_ARGS}}"
   db:migrate:
     desc: migrates models to HEAD
     cmds:
-      - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini upgrade head"
-  db:heads:
-    desc: shows the HEAD SHA for alembic migrations
-    cmds:
-      - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini heads"
+      - | 
+        docker compose exec api sh -c \
+        "alembic -c /opt/$PROJ_NAME/alembic.ini upgrade head"
   db:alembic:
     desc: arbitrary alembic command in the container
     cmds:
-      - docker compose exec api sh -c "alembic -c /opt/$PROJ_NAME/alembic.ini {{.CLI_ARGS}}"
+      - |
+        docker compose exec api sh -c \
+        "alembic -c /opt/$PROJ_NAME/alembic.ini {{.CLI_ARGS}}"
+  db:alembic:heads:
+    desc: shows the HEAD SHA for alembic migrations
+    cmds:
+      - |
+        docker compose exec api sh -c \
+        "alembic -c /opt/$PROJ_NAME/alembic.ini heads"
+  db:alembic:attach:
+    desc: join the database container to alembic migrations
+    summary: |
+      This is useful if you have nuked your database and re-initialised
+      the schema and want to join back to the head alembic migrations.
+
+      We will attempt to create the alebmic_version table and populate
+      the version_num field with the current head value.
+    cmds:
+      - |
+        docker compose exec db sh -c "psql \
+        -U {{.POSTGRES_USER}} \
+        -d {{.POSTGRES_DB}} -c \
+        'CREATE TABLE IF NOT EXISTS alembic_version ( version_num VARHCAR );'"
   eject:
     desc: eject the project from a template
     summary: |
