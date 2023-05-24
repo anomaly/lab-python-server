@@ -503,7 +503,13 @@ INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 ```
 ### Joining back with `HEAD`
 
-`task db:heads`
+During development you may find the need to nuke the database all together and start all over again. We provide a handy way of re-creating the schema using the Task endpoint `task db:init` which simply runs the SQLAlchemy `create_all` method.
+
+You are still left in a position where the database is unaware of `alembic`'s state. This is because the `alembic_version` table is no longer present in the database. To restore the state we need to recreate the table and insert a record with the `HEAD` SHA.
+
+We provide `task db:alembic:heads` which runs the alembic `heads` command. You can also use `task db:alembic:attach` to query the `HEAD` SHA and recreate the table populated with the SHA.
+
+Post this point you should be back where you were and use migrations as you'd expect to.
 
 ## MinIO wisdom
 
@@ -539,7 +545,8 @@ The client must keep polling back to the server to see if the file is eventually
 - `build:image` - builds a publishable docker image
 - `crypt:hash` - generate a random cryptographic hash
 - `db:alembic` - arbitrary alembic command in the container
-- `db:heads` - shows the HEAD SHA for alembic migrations
+- `db:alembic:heads` - shows the HEAD SHA for alembic migrations
+- `db:alembic:attach` - join the database container to alembic migrations
 - `db:init` - initialise the database schema
 - `db:migrate` - migrates models to HEAD
 - `db:rev` - create a database migration, pass a string as commit string
@@ -608,7 +615,7 @@ SQLAlchemy speciific resources:
 
 ## Developer Tools
 
-- [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) - Jinja syntax highlighting for [VS Code](https://github.com/samuelcolvin/jinjahtml-vscode) by @SamuelColvin (accepted as part of PAP [#47](https://github.com/anomaly/lab-python-server/issues/47)
+- [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) - Jinja syntax highlighting for [VS Code](https://github.com/samuelcolvin/jinjahtml-vscode) by @SamuelColvin (accepted as part of PAP [#47](https://github.com/anomaly/lab-python-server/issues/47))
 
 ## License
 Contents of this repository are licensed under the Apache 2.0 license.
