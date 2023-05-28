@@ -10,8 +10,8 @@ from pydantic.types import SecretStr
 class AMPQSettings(BaseSettings):
 
     # RabbitMQ is used to manage the queues
-    user: str
-    password: SecretStr
+    default_user: str
+    default_password: SecretStr
     port: int = 5672
     host: str
 

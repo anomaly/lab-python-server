@@ -16,3 +16,9 @@ class S3BucketSettings(BaseSettings):
     secret_key: SecretStr
     region: str = "ap-south-1" # Set to Linode Singapore
     tls: bool = True # See docs on using SSL in development
+
+    class Config:
+        """ Env vars are prefixed with S3_ are loaded
+        into instances of this class
+        """
+        env_prefix = "S3_"
