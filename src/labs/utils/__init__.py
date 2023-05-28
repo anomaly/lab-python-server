@@ -7,11 +7,11 @@ from minio import Minio
 from ..config import config
 
 minio_client = Minio(
-    f"{config.S3_ENDPOINT}:{config.S3_PORT}",
-    access_key=config.S3_ACCESS_KEY.get_secret_value(),
-    secret_key=config.S3_SECRET_KEY.get_secret_value(),
-    secure=config.S3_USE_SSL,
-    region=config.S3_REGION,
+    f"{config.storage.endpoint}:{config.storage.port}",
+    access_key=config.storage.access_key.get_secret_value(),
+    secret_key=config.storage.secret_key.get_secret_value(),
+    secure=config.storage,
+    region=config.storage.region,
 )
 
 def redis_client():

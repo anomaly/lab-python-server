@@ -22,6 +22,8 @@ class LifetimeSettings(BaseSettings):
     token_reset_password: int = 600 # In seconds
     token_account_verification: int = 600 # In seconds
 
+    query_retry_count: int = 6 # How many times should a query be retried
+
     APP_TOTP_NUM_DIGITS: int = 6 # Login code length
     APP_TOTP_INTERVAL: int = 30 # How long is a token valid
     APP_TOTP_WINDOW: int = 30 # How far off can you drift

@@ -10,6 +10,7 @@ from .s3 import S3BucketSettings
 from .ampq import AMPQSettings
 from .redis import RedisSettings
 from .comms import SMTPSettings, SMSGatewaySettings
+from .lifetime import LifetimeSettings
 
 class Config(BaseSettings):
     """Configuration for the application
@@ -33,6 +34,8 @@ class Config(BaseSettings):
 
     # TaskIQ writes results to a Redis database
     redis: RedisSettings = RedisSettings()
+
+    lifetime: LifetimeSettings = LifetimeSettings()
 
     # Communication related configuration
     # smtp: SMTPSettings = SMTPSettings()

@@ -94,10 +94,10 @@ class S3FileMetadata(
         """
         try:
             return minio_client.presigned_get_object(
-                config.S3_BUCKET_NAME,
+                config.storage.bucket_name,
                 self.s3_key,
                 expires=timedelta(
-                    minutes=config.S3_DOWNLOAD_LINK_LIFETIME
+                    minutes=config.lifetime.link_s3_download
                 ),
                 response_headers={
                     'response-content-disposition': 
@@ -122,10 +122,10 @@ class S3FileMetadata(
         """
         try:
             url = minio_client.presigned_put_object(
-                config.S3_BUCKET_NAME,
+                config.storage.bucket_name,
                 self.s3_key,
                 expires=timedelta(
-                    minutes=config.S3_UPLOAD_LINK_LIFETIME
+                    minutes=config.lifetime.link_s3_upload
                 )
             )
             return url
@@ -142,7 +142,7 @@ class S3FileMetadata(
         """
         try:
             minio_client.enable_object_legal_hold(
-                config.S3_BUCKET_NAME,
+                config.storage.bucket_name,
                 self.s3_key,
             )
             self.legal_hold = True
@@ -159,7 +159,7 @@ class S3FileMetadata(
         """
         try:
             minio_client.disable_object_legal_hold(
-                config.S3_BUCKET_NAME,
+                config.storage.bucket_name,
                 self.s3_key,
             )
 
