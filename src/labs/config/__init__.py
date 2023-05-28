@@ -3,15 +3,15 @@
 """
 
 from pydantic import BaseSettings
-from pydantic.types import SecretStr
 
 from .postgres import PostgresSettings
 from .s3 import S3BucketSettings
-from .ampq import AMPQSettings
+from .amqp import AMQPSettings
 from .redis import RedisSettings
 from .comms import SMTPSettings, SMSGatewaySettings
 from .lifetime import LifetimeSettings
 from .jwt import JWTSettings
+from .api_router import APIRouterSettings
 
 class Config(BaseSettings):
     """Configuration for the application
@@ -30,8 +30,8 @@ class Config(BaseSettings):
     # S3 Bucket configuration for the application
     storage: S3BucketSettings = S3BucketSettings()
 
-    # AMPQ compatible configuration
-    ampq: AMPQSettings = AMPQSettings()
+    # AMQP compatible configuration
+    amqp: AMQPSettings = AMQPSettings()
 
     # TaskIQ writes results to a Redis database
     redis: RedisSettings = RedisSettings()
@@ -43,7 +43,11 @@ class Config(BaseSettings):
     sms: SMSGatewaySettings = SMSGatewaySettings()
 
     # Secrets that the application requires for session
-    jwt: JWTSettings = JWTSettings()    
+    jwt: JWTSettings = JWTSettings()
+
+    # Overrides for FastAPI root router, the aim of this
+    # is so that the template can maintain api.py
+    api_router: APIRouterSettings = APIRouterSettings()
 
     
 # A singleton instance of the configuration

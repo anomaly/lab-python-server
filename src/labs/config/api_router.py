@@ -30,5 +30,14 @@ class APIRouterSettings(BaseSettings):
         }
     ]
 
+    description: str = """
+        This project provides a reference Python API built using FastAPI, the 
+        aim of the project is:
+
+        - To maintain a good know source of habits
+        - Demonstrate how applications are meant to be put together at Anomaly
+        - Democratize design of robust API
+    """
+
     path_root: str = "/api"
     path_docs: str = "/docs"

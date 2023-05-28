@@ -28,7 +28,7 @@ redis_result_backend = RedisAsyncResultBackend(
 )
 
 broker = AioPikaBroker(
-    config.ampq.dsn,
+    config.amqp.dsn,
     result_backend=redis_result_backend
 )
 
@@ -36,7 +36,9 @@ broker = AioPikaBroker(
 # is configured to retry tasks 3 times before failing you can override this
 # https://bit.ly/3LLyH9M
 broker.add_middlewares(
-    SimpleRetryMiddleware(default_retry_count=config.lifetime.queue_retry_count)
+    SimpleRetryMiddleware(
+        default_retry_count=config.lifetime.queue_retry_count
+    )
 )
 
 scheduler = TaskiqScheduler(

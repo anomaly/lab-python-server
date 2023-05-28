@@ -23,29 +23,18 @@ from .broker import broker
 
 from .schema.ext import RootResponse
 
-api_description = """
-This project provides a reference Python API built using FastAPI, the 
-aim of the project is:
-
-- To maintain a good know source of habits
-- Demonstrate how applications are meant to be put together at Anomaly
-- Democratize design of robust API
-
-"""
-
-
 """A FastAPI application that serves handlers
 """
 app = FastAPI(
   title=__title__,
   version=__version__,
-  description=api_description,
-  docs_url=config.API_ROUTER.PATH_DOCS,
-  root_path=config.API_ROUTER.PATH_ROOT,
-  terms_of_service=config.API_ROUTER.TERMS_OF_SERVICE,
-  contact=config.API_ROUTER.CONTACT,
-  license_info=config.API_ROUTER.LICENSE_INFO,
-  openapi_tags=config.API_ROUTER.OPEN_API_TAGS
+  description=config.api_router.description,
+  docs_url=config.api_router.path_docs,
+  root_path=config.api_router.path_root,
+  terms_of_service=config.api_router.terms_of_service,
+  contact=config.api_router.contact,
+  license_info=config.api_router.license_info,
+  openapi_tags=config.api_router.open_api_tags
 )
 
 @app.websocket("/ws")

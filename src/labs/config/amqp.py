@@ -7,7 +7,7 @@ container or a hosted product by a cloud provider.
 from pydantic import BaseSettings, AmqpDsn
 from pydantic.types import SecretStr
 
-class AMPQSettings(BaseSettings):
+class AMQPSettings(BaseSettings):
 
     # RabbitMQ is used to manage the queues
     user: str
@@ -45,4 +45,4 @@ class AMPQSettings(BaseSettings):
         """ Env vars are prefixed with AMPQ_ are loaded
         into instances of this class
         """
-        env_prefix = "AMPQ_"
+        env_prefix = "AMQP_"
