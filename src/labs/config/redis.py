@@ -30,4 +30,4 @@ class RedisSettings(BaseSettings):
         """ Env vars are prefixed with POSTGRES_ are loaded
         into instances of this class
         """
-        env_prefix = "POSTGRES_"
+        env_prefix = "REDIS_"
