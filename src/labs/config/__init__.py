@@ -11,6 +11,7 @@ from .ampq import AMPQSettings
 from .redis import RedisSettings
 from .comms import SMTPSettings, SMSGatewaySettings
 from .lifetime import LifetimeSettings
+from .jwt import JWTSettings
 
 class Config(BaseSettings):
     """Configuration for the application
@@ -38,21 +39,12 @@ class Config(BaseSettings):
     lifetime: LifetimeSettings = LifetimeSettings()
 
     # Communication related configuration
-    # smtp: SMTPSettings = SMTPSettings()
-    # sms: SMSGatewaySettings = SMSGatewaySettings()
-    
+    smtp: SMTPSettings = SMTPSettings()
+    sms: SMSGatewaySettings = SMSGatewaySettings()
+
     # Secrets that the application requires for session
-    # and cross domain checking
-    # JWT_SECRET_KEY: SecretStr
-    # JWT_ALGORITHM: str = "HS256"
+    jwt: JWTSettings = JWTSettings()    
 
-    # EMAIL_FROM: str
-
-
-    # How many times should a task be retried by default
-    # APP_QUEUE_RETRY_COUNT: int = 3
-
-    
     
 # A singleton instance of the configuration
 config = Config()

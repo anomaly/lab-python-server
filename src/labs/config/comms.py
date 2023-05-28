@@ -18,6 +18,8 @@ class SMTPSettings(BaseSettings):
     password: SecretStr
     start_tls: bool = True
 
+    mail_from: str
+
     class Config:
         """ Env vars are prefixed with SMTP_ are loaded
         into instances of this class
@@ -28,7 +30,7 @@ class SMSGatewaySettings(BaseSettings):
 
     api_id: SecretStr
     api_secret: SecretStr
-    text_from: str
+    from_label: str
 
     class Config:
         """ Env vars are prefixed with SMS_ are loaded

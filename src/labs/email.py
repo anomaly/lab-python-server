@@ -19,16 +19,16 @@ from redmail import EmailSender
 from .config import config
 
 sender = EmailSender(
-    host=config.SMTP_HOST,
-    port=config.SMTP_PORT,
-    username=config.SMTP_USER.get_secret_value(),
-    password=config.SMTP_PASSWORD.get_secret_value(),
-    use_starttls=config.SMTP_STARTTLS,
+    host=config.smtp.host,
+    port=config.smtp.port,
+    username=config.smtp.user.get_secret_value(),
+    password=config.smtp.password.get_secret_value(),
+    use_starttls=config.smtp.start_tls,
 )
 
 # The sender is globally set so each send call does not
 # have to provide this as a parameter
-sender.sender=config.EMAIL_FROM
+sender.sender=config.smtp.mail_from
 
 # Compute the path relative to this script and append "templates"
 script_path = os.path.dirname(os.path.abspath(__file__))
