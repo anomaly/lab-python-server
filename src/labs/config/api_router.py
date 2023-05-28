@@ -41,3 +41,10 @@ class APIRouterSettings(BaseSettings):
 
     path_root: str = "/api"
     path_docs: str = "/docs"
+
+    class Config:
+        """ Env vars are prefixed with FASTAPI_ are loaded
+        into instances of this class
+        """
+        env_prefix = "FASTAPI_"
+    
