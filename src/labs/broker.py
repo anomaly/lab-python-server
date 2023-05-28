@@ -24,11 +24,11 @@ from taskiq import SimpleRetryMiddleware
 import taskiq_fastapi
 
 redis_result_backend = RedisAsyncResultBackend(
-    config.redis_dsn
+    config.redis.dsn
 )
 
 broker = AioPikaBroker(
-    config.amqp_dsn,
+    config.amqp.dsn,
     result_backend=redis_result_backend
 )
 
