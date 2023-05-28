@@ -116,7 +116,7 @@ Directory structure for our application:
  |   └─ __init__.py
  |   └─ api.py
  |   └─ broker.py
- |   └─ config.py
+ |   └─ config
  |   └─ db.py
  |   └─ utils.py
  ├─ pyproject.toml
