@@ -141,7 +141,7 @@ class User(
         verification_code = random_base32()
 
         verification_token_expiry = datetime.utcnow() + \
-            timedelta(seconds=settings.APP_RESET_PASSWORD_TOKEN_LIFETIME)
+            timedelta(seconds=settings.lifetime.token_account_verification)
 
         # Verification code is hashed and only sent back
         # to the user via email or SMS, this should not be resent
@@ -206,7 +206,7 @@ class User(
         reset_password_token = random_base32()
 
         reset_password_token_expiry = datetime.utcnow() + \
-            timedelta(seconds=settings.APP_VERIFICATION_TOKEN_LIFETIME)
+            timedelta(seconds=settings.lifetime.token_reset_password)
 
         # Password reset token is hashed and only sent back
         # to the user via email or SMS, this should not be resent

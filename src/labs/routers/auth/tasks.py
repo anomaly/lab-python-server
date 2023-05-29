@@ -86,7 +86,7 @@ async def send_otp_email(
 
     otp = user.get_otp(
         digits = settings.APP_TOTP_NUM_DIGITS,
-        timeout = settings.APP_TOTP_INTERVAL,
+        timeout = settings.lifetime.totp_token,
     )
 
     sender.send(

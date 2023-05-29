@@ -34,6 +34,13 @@ broker = AioPikaBroker(
     result_backend=redis_result_backend
 )
 
+# Override the broker to use the InMemory backend
+# if FastAPI is being called via pytest
+#if settings.env == "pytest":
+# from taskiq import InMemoryBroker
+# broker = InMemoryBroker()
+
+
 # Configure the necessary middlewares here, a default retry middleware
 # is configured to retry tasks 3 times before failing you can override this
 # https://bit.ly/3LLyH9M
@@ -47,13 +54,6 @@ scheduler = TaskiqScheduler(
     broker=broker,
     sources=[LabelScheduleSource(broker)],
 )
-
-# Override the broker to use the InMemory backend
-# if FastAPI is being called via pytest
-if settings.env == "pytest":
-    from taskiq import InMemoryBroker
-    broker = InMemoryBroker()
-
 
 # The middleware is used to inject the broker into FastAPI
 # it enables broker task discovery for FastAPI applications

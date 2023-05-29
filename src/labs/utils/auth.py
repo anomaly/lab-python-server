@@ -67,7 +67,7 @@ def create_access_token(
     Returns:
         str: The encoded JWT token
     """
-    delta = timedelta(seconds=settings.ACCESS_TOKEN_LIFETIME)
+    delta = timedelta(seconds=settings.lifetime.token_jwt_access)
     to_encode = {
         "sub": subject,
         "fresh": fresh,

@@ -75,8 +75,8 @@ async def verify_otp(
     raise HTTPException(status_code=401, detail="Invalid mobile number")
 
   if not user.verify_otp(
-    settings.APP_TOTP_INTERVAL, 
-    settings.APP_TOTP_WINDOW,
+    settings.lifetime.totp_token, 
+    settings.lifetime.totp_drift_window,
     request.otp
   ):
     raise HTTPException(

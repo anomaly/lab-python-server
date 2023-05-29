@@ -24,7 +24,7 @@ class LifetimeSettings(BaseSettings):
 
     queue_retry_count: int = 6 # How many times should a query be retried
 
-    APP_TOTP_NUM_DIGITS: int = 6 # Login code length
-    APP_TOTP_INTERVAL: int = 30 # How long is a token valid
-    APP_TOTP_WINDOW: int = 30 # How far off can you drift
+    totp_token: int = 30 # How long is a token valid
+    totp_drift_window: int = 30 # How far off can you drift
     
+    APP_TOTP_NUM_DIGITS: int = 6 # Login code length
