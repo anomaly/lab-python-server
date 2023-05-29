@@ -12,10 +12,10 @@ from sqlalchemy.orm import DeclarativeBase,\
     configure_mappers, sessionmaker
 
 
-from .config import config
+from .settings import settings
 
 # SQLAlchemy engine that connects to Postgres
-engine = create_async_engine(config.postgres_async_dsn, echo=True)
+engine = create_async_engine(settings.db.async_dsn, echo=True)
 configure_mappers()
 
 # Get an async session from the engine

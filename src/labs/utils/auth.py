@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 
-from ..config import config
+from ..settings  import settings
 
 def verify_password(
     plain_password,
@@ -67,7 +67,7 @@ def create_access_token(
     Returns:
         str: The encoded JWT token
     """
-    delta = timedelta(seconds=config.ACCESS_TOKEN_LIFETIME)
+    delta = timedelta(seconds=settings.ACCESS_TOKEN_LIFETIME)
     to_encode = {
         "sub": subject,
         "fresh": fresh,
@@ -76,8 +76,8 @@ def create_access_token(
 
     encoded_jwt = jwt.encode(
         to_encode,
-        config.JWT_SECRET_KEY.get_secret_value(),
-        algorithm=config.JWT_ALGORITHM
+        settings.JWT_SECRET_KEY.get_secret_value(),
+        algorithm=settings.JWT_ALGORITHM
     )
     
     return encoded_jwt

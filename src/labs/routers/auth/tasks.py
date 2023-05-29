@@ -5,7 +5,7 @@ from taskiq import TaskiqDepends
 from ...db import get_async_session
 from ...email import sender
 from ...broker import broker
-from ...config import config
+from ...settings import settings
 
 from ...models import User
 
@@ -85,8 +85,8 @@ async def send_otp_email(
     user = await User.get(session, user_id)
 
     otp = user.get_otp(
-        digits = config.APP_TOTP_NUM_DIGITS,
-        timeout = config.APP_TOTP_INTERVAL,
+        digits = settings.APP_TOTP_NUM_DIGITS,
+        timeout = settings.APP_TOTP_INTERVAL,
     )
 
     sender.send(

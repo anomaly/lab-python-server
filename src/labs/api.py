@@ -16,36 +16,25 @@ from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
-from .config import config
+from .settings import settings
 
 from .routers import router_root
 from .broker import broker
 
 from .schema.ext import RootResponse
 
-api_description = """
-This project provides a reference Python API built using FastAPI, the 
-aim of the project is:
-
-- To maintain a good know source of habits
-- Demonstrate how applications are meant to be put together at Anomaly
-- Democratize design of robust API
-
-"""
-
-
 """A FastAPI application that serves handlers
 """
 app = FastAPI(
   title=__title__,
   version=__version__,
-  description=api_description,
-  docs_url=config.API_ROUTER.PATH_DOCS,
-  root_path=config.API_ROUTER.PATH_ROOT,
-  terms_of_service=config.API_ROUTER.TERMS_OF_SERVICE,
-  contact=config.API_ROUTER.CONTACT,
-  license_info=config.API_ROUTER.LICENSE_INFO,
-  openapi_tags=config.API_ROUTER.OPEN_API_TAGS
+  description=settings.api_router.__doc__,
+  docs_url=settings.api_router.path_docs,
+  root_path=settings.api_router.path_root,
+  terms_of_service=settings.api_router.terms_of_service,
+  contact=settings.api_router.contact,
+  license_info=settings.api_router.license_info,
+  openapi_tags=settings.api_router.open_api_tags
 )
 
 @app.websocket("/ws")

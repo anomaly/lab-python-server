@@ -16,19 +16,19 @@ Redmail docs are located at https://red-mail.readthedocs.io/
 import os
 from redmail import EmailSender
 
-from .config import config
+from .settings import settings
 
 sender = EmailSender(
-    host=config.SMTP_HOST,
-    port=config.SMTP_PORT,
-    username=config.SMTP_USER.get_secret_value(),
-    password=config.SMTP_PASSWORD.get_secret_value(),
-    use_starttls=config.SMTP_STARTTLS,
+    host=settings.smtp.host,
+    port=settings.smtp.port,
+    username=settings.smtp.user.get_secret_value(),
+    password=settings.smtp.password.get_secret_value(),
+    use_starttls=settings.smtp.start_tls,
 )
 
 # The sender is globally set so each send call does not
 # have to provide this as a parameter
-sender.sender=config.EMAIL_FROM
+sender.sender=settings.smtp.mail_from
 
 # Compute the path relative to this script and append "templates"
 script_path = os.path.dirname(os.path.abspath(__file__))
