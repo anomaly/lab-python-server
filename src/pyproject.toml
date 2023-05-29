@@ -51,6 +51,14 @@ pytest-order = "^1.0.1"
 taskiq = { extras = ["reload"], version = "^0.4.1" }
 faker = "^18.6.0"
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning",
+    "ignore:.*unclosed.*:ResourceWarning",
+]
+env = ["ENV=pytest"]
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"

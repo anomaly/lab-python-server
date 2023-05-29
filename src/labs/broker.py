@@ -23,6 +23,8 @@ from taskiq import SimpleRetryMiddleware
 # FastAPI middleware
 import taskiq_fastapi
 
+from .settings import settings
+
 redis_result_backend = RedisAsyncResultBackend(
     settings.redis.dsn
 )
@@ -45,6 +47,13 @@ scheduler = TaskiqScheduler(
     broker=broker,
     sources=[LabelScheduleSource(broker)],
 )
+
+# Override the broker to use the InMemory backend
+# if FastAPI is being called via pytest
+if settings.env == "pytest":
+    from taskiq import InMemoryBroker
+    broker = InMemoryBroker()
+
 
 # The middleware is used to inject the broker into FastAPI
 # it enables broker task discovery for FastAPI applications
