@@ -5,7 +5,7 @@ from taskiq import TaskiqDepends
 from ...db import get_async_session
 from ...email import sender
 from ...broker import broker
-from ...config import settings
+from ...settings import settings
 
 from ...models import User
 

@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import get_current_user
 
 from ...db import get_async_session
-from ...config import settings
+from ...settings import settings
 from ...models import S3FileMetadata, User
 from ...schema import FileUploadRequest, FileUploadResponse
 

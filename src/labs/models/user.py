@@ -18,7 +18,7 @@ from sqlalchemy.ext.asyncio import async_object_session
 from pyotp import TOTP, random_base32
 
 from ..db import Base
-from ..config import settings
+from ..settings  import settings
 from .utils import DateTimeMixin, IdentifierMixin,\
     ModelCRUDMixin, timestamp
  

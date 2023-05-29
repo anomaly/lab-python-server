@@ -11,7 +11,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 import jwt
 
-from ..config import settings
+from ..settings  import settings
 from ..db import get_async_session
 from ..models import User
 from ..schema import TokenData

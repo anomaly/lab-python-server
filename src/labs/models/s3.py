@@ -16,7 +16,7 @@ from .utils import DateTimeMixin, IdentifierMixin,\
 
 from ..db import Base
 from ..utils import minio_client
-from ..config import settings
+from ..settings  import settings
 
 class S3FileMetadata(
     Base,

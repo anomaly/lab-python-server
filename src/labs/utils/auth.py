@@ -17,7 +17,7 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 
-from ..config import settings
+from ..settings  import settings
 
 def verify_password(
     plain_password,

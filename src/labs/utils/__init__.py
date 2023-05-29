@@ -4,7 +4,7 @@
 
 from minio import Minio
 
-from ..config import settings
+from ..settings  import settings
 
 minio_client = Minio(
     f"{settings.storage.endpoint}:{settings.storage.port}",

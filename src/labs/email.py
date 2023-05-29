@@ -16,7 +16,7 @@ Redmail docs are located at https://red-mail.readthedocs.io/
 import os
 from redmail import EmailSender
 
-from .config import settings
+from .settings import settings
 
 sender = EmailSender(
     host=settings.smtp.host,

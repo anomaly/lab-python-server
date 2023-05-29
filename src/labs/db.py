@@ -12,7 +12,7 @@ from sqlalchemy.orm import DeclarativeBase,\
     configure_mappers, sessionmaker
 
 
-from .config import settings
+from .settings import settings
 
 # SQLAlchemy engine that connects to Postgres
 engine = create_async_engine(settings.db.async_dsn, echo=True)

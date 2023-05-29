@@ -16,7 +16,7 @@ from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
-from .config import settings
+from .settings import settings
 
 from .routers import router_root
 from .broker import broker

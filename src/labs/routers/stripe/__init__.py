@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import stripe
 
 from ...db import get_async_session
-from ...config import settings
+from ...settings import settings
 
  
 """Mounts all the sub routers for the authentication module"""
