@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ...utils.auth import create_access_token
 
 from ...db import get_async_session
-from ...config import config
+from ...config import settings
 
 from ...models.user import User
 from ...schema.auth import VerifyAccountRequest, OTPVerifyRequest,\
@@ -75,8 +75,8 @@ async def verify_otp(
     raise HTTPException(status_code=401, detail="Invalid mobile number")
 
   if not user.verify_otp(
-    config.APP_TOTP_INTERVAL, 
-    config.APP_TOTP_WINDOW,
+    settings.APP_TOTP_INTERVAL, 
+    settings.APP_TOTP_WINDOW,
     request.otp
   ):
     raise HTTPException(

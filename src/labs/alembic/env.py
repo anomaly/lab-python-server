@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from alembic import context
 
 # App level imports
-from labs.config import config as app_config
+from labs.config import settings as app_config
 from labs.db import Base
 from labs.models import *
 

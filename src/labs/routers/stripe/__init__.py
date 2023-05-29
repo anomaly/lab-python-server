@@ -22,7 +22,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 import stripe
 
 from ...db import get_async_session
-from ...config import config
+from ...config import settings
 
  
 """Mounts all the sub routers for the authentication module"""
@@ -60,7 +60,7 @@ async def stripe_webhook(
     event = stripe.Webhook.construct_event(
       request_body,
       STRIPE_SIGNATURE,
-      config.STRIPE_WEBHOOK_SECRET.get_secret_value()
+      settings.STRIPE_WEBHOOK_SECRET.get_secret_value()
     )
   except ValueError as e:
     # Invalid payload

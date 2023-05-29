@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models import User
-from ...config import config
+from ...config import settings
 
 from ...schema.auth import OTPTriggerEmailRequest, \
   OTPTriggerSMSRequest, InitiateResetPasswordRequest

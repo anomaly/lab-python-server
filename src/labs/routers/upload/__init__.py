@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..utils import get_current_user
 
 from ...db import get_async_session
-from ...config import config
+from ...config import settings
 from ...models import S3FileMetadata, User
 from ...schema import FileUploadRequest, FileUploadResponse
 
@@ -35,7 +35,7 @@ async def get_upload_url(
 
     response = FileUploadResponse(
         presigned_upload_url=s3_file_metadata.presigned_upload_url,
-        expires=config.S3_UPLOAD_EXPIRY,
+        expires=settings.S3_UPLOAD_EXPIRY,
     )
 
     return response

@@ -2,7 +2,7 @@
 
 """
 
-from .config import config
+from .config import settings
 
 # See PyPI for more information about taskiq_redis
 # https://pypi.org/project/taskiq-redis/
@@ -24,11 +24,11 @@ from taskiq import SimpleRetryMiddleware
 import taskiq_fastapi
 
 redis_result_backend = RedisAsyncResultBackend(
-    config.redis.dsn
+    settings.redis.dsn
 )
 
 broker = AioPikaBroker(
-    config.amqp.dsn,
+    settings.amqp.dsn,
     result_backend=redis_result_backend
 )
 
@@ -37,7 +37,7 @@ broker = AioPikaBroker(
 # https://bit.ly/3LLyH9M
 broker.add_middlewares(
     SimpleRetryMiddleware(
-        default_retry_count=config.lifetime.queue_retry_count
+        default_retry_count=settings.lifetime.queue_retry_count
     )
 )
 

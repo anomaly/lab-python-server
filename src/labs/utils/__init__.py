@@ -4,14 +4,14 @@
 
 from minio import Minio
 
-from ..config import config
+from ..config import settings
 
 minio_client = Minio(
-    f"{config.storage.endpoint}:{config.storage.port}",
-    access_key=config.storage.access_key.get_secret_value(),
-    secret_key=config.storage.secret_key.get_secret_value(),
-    secure=config.storage,
-    region=config.storage.region,
+    f"{settings.storage.endpoint}:{settings.storage.port}",
+    access_key=settings.storage.access_key.get_secret_value(),
+    secret_key=settings.storage.secret_key.get_secret_value(),
+    secure=settings.storage,
+    region=settings.storage.region,
 )
 
 def redis_client():
@@ -21,8 +21,8 @@ def redis_client():
     import redis
 
     client = redis.Redis(
-        host=config.REDIS_HOST,
-        port=config.REDIS_PORT,
+        host=settings.REDIS_HOST,
+        port=settings.REDIS_PORT,
         db=0,
         decode_responses=True
     )

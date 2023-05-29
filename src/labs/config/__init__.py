@@ -13,7 +13,7 @@ from .lifetime import LifetimeSettings
 from .jwt import JWTSettings
 from .api_router import APIRouterSettings
 
-class Config(BaseSettings):
+class Settings(BaseSettings):
     """Configuration for the application
 
     The following values are read from the container environment, it's
@@ -51,5 +51,5 @@ class Config(BaseSettings):
 
     
 # A singleton instance of the configuration
-config = Config()
+settings: Settings = Settings()
 

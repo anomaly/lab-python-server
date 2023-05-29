@@ -16,7 +16,7 @@ from fastapi import FastAPI, Request, status, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 
-from .config import config
+from .config import settings
 
 from .routers import router_root
 from .broker import broker
@@ -28,13 +28,13 @@ from .schema.ext import RootResponse
 app = FastAPI(
   title=__title__,
   version=__version__,
-  description=config.api_router.description,
-  docs_url=config.api_router.path_docs,
-  root_path=config.api_router.path_root,
-  terms_of_service=config.api_router.terms_of_service,
-  contact=config.api_router.contact,
-  license_info=config.api_router.license_info,
-  openapi_tags=config.api_router.open_api_tags
+  description=settings.api_router.__doc__,
+  docs_url=settings.api_router.path_docs,
+  root_path=settings.api_router.path_root,
+  terms_of_service=settings.api_router.terms_of_service,
+  contact=settings.api_router.contact,
+  license_info=settings.api_router.license_info,
+  openapi_tags=settings.api_router.open_api_tags
 )
 
 @app.websocket("/ws")

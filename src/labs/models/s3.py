@@ -16,7 +16,7 @@ from .utils import DateTimeMixin, IdentifierMixin,\
 
 from ..db import Base
 from ..utils import minio_client
-from ..config import config
+from ..config import settings
 
 class S3FileMetadata(
     Base,
@@ -94,10 +94,10 @@ class S3FileMetadata(
         """
         try:
             return minio_client.presigned_get_object(
-                config.storage.bucket_name,
+                settings.storage.bucket_name,
                 self.s3_key,
                 expires=timedelta(
-                    minutes=config.lifetime.link_s3_download
+                    minutes=settings.lifetime.link_s3_download
                 ),
                 response_headers={
                     'response-content-disposition': 
@@ -122,10 +122,10 @@ class S3FileMetadata(
         """
         try:
             url = minio_client.presigned_put_object(
-                config.storage.bucket_name,
+                settings.storage.bucket_name,
                 self.s3_key,
                 expires=timedelta(
-                    minutes=config.lifetime.link_s3_upload
+                    minutes=settings.lifetime.link_s3_upload
                 )
             )
             return url
@@ -142,7 +142,7 @@ class S3FileMetadata(
         """
         try:
             minio_client.enable_object_legal_hold(
-                config.storage.bucket_name,
+                settings.storage.bucket_name,
                 self.s3_key,
             )
             self.legal_hold = True
@@ -159,7 +159,7 @@ class S3FileMetadata(
         """
         try:
             minio_client.disable_object_legal_hold(
-                config.storage.bucket_name,
+                settings.storage.bucket_name,
                 self.s3_key,
             )
 
