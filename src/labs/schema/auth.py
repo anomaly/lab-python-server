@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from .utils import AppBaseModel
 
 class Token(BaseModel):
@@ -24,20 +24,20 @@ class SignupRequest(AppBaseModel):
     """ A simple request to sign up a user with an email and password    
     """
     password: str
-    email: str
+    email: EmailStr
     first_name: str
     last_name: str
 
 class SignupResponse(AppBaseModel):
     """  Signup Response to confirm that the email address was accepted """
     success: bool
-    email: str
+    email: EmailStr
 
 
 class VerifyAccountRequest(BaseModel):
     """ A simple request to verify a user account with a token """
     token: str
-    email: str
+    email: EmailStr
 
 class InitiateResetPasswordRequest(BaseModel):
     """
@@ -46,19 +46,19 @@ class InitiateResetPasswordRequest(BaseModel):
     This will result in a token being sent out to them which they can use
     with the following model to reset their password
     """
-    email: str
+    email: EmailStr
 
 class ResetPasswordRequest(BaseModel):
     """
     A request with the previously generated token and the new password
     """
     token: str
-    email: str
+    email: EmailStr
     password: str
 
 class OTPTriggerEmailRequest(AppBaseModel):
     """ Triggers an OTP to be sent to the user via email """
-    email: str
+    email: EmailStr
 
 class OTPTriggerSMSRequest(AppBaseModel):
     """ Triggers an OTP to be sent to the user via SMS """

@@ -139,11 +139,11 @@ async def create_user(
     """ Creates a new user based on
     
     """
-    user = await User.get_by_email_or_mobile(
+    user = await User.get_by_email(
         session,
         user_request.email,
-        user_request.mobile_number
     )
+
     if user:
         raise HTTPException(
             status.HTTP_404_NOT_FOUND,
