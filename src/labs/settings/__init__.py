@@ -12,6 +12,7 @@ from .comms import SMTPSettings, SMSGatewaySettings
 from .lifetime import LifetimeSettings
 from .jwt import JWTSettings
 from .api_router import APIRouterSettings
+from .verbosity import VerbositySettings
 
 class Settings(BaseSettings):
     """Configuration for the application
@@ -19,6 +20,16 @@ class Settings(BaseSettings):
     The following values are read from the container environment, it's
     provided via a configuration file or a secret management system
     depending on the environment.
+
+    Note: pydatic sub models allows for the configuration to be
+    broken up into classes, it will convert uppercase environment
+    variables into lower case python variables and take prefixes
+    and break it into sub models.
+
+    e.g DB_HOST will be converted to db.host
+
+    There are many variables that default values assigned and are not
+    required to be set in the environment.
     """
 
     # Environment the application is running in
@@ -36,8 +47,6 @@ class Settings(BaseSettings):
     # TaskIQ writes results to a Redis database
     redis: RedisSettings = RedisSettings()
 
-    lifetime: LifetimeSettings = LifetimeSettings()
-
     # Communication related configuration
     smtp: SMTPSettings = SMTPSettings()
     sms: SMSGatewaySettings = SMSGatewaySettings()
@@ -48,6 +57,12 @@ class Settings(BaseSettings):
     # Overrides for FastAPI root router, the aim of this
     # is so that the template can maintain api.py
     api_router: APIRouterSettings = APIRouterSettings()
+
+    # Lifetime of various security related items
+    lifetime: LifetimeSettings = LifetimeSettings()
+
+    # Verbosity of various tokens
+    verbosity: VerbositySettings = VerbositySettings()
 
     
 # A singleton instance of the configuration

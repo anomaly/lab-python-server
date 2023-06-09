@@ -8,6 +8,7 @@
 
 from typing import Optional
 from datetime import datetime, timedelta
+from secrets import token_urlsafe
 
 from sqlalchemy import event
 from sqlalchemy.exc import NoResultFound
@@ -15,7 +16,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import async_object_session
 
 # OTP helpers from pyotp
-from pyotp import TOTP, random_base32
+from pyotp import TOTP
 
 from ..db import Base
 from ..settings  import settings
@@ -138,7 +139,9 @@ class User(
                 verification_code (str): The verification code
         """
         # Generate a random secret
-        verification_code = random_base32()
+        verification_code = token_urlsafe(
+            settings.verbosity.verification_token
+        )
 
         verification_token_expiry = datetime.utcnow() + \
             timedelta(seconds=settings.lifetime.token_account_verification)
@@ -203,7 +206,9 @@ class User(
                 reset_password_token (str): The verification code
         """
         # Generate a random secret
-        reset_password_token = random_base32()
+        reset_password_token = token_urlsafe(
+            settings.verbosity.reset_password_token
+        )
 
         reset_password_token_expiry = datetime.utcnow() + \
             timedelta(seconds=settings.lifetime.token_reset_password)
