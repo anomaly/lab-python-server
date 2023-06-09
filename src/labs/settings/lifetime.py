@@ -27,4 +27,3 @@ class LifetimeSettings(BaseSettings):
     totp_token: int = 30 # How long is a token valid
     totp_drift_window: int = 30 # How far off can you drift
     
-    totp_length: int = 6 # Login code length

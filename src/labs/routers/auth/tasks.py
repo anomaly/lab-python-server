@@ -85,7 +85,7 @@ async def send_otp_email(
     user = await User.get(session, user_id)
 
     otp = user.get_otp(
-        digits = settings.lifetime.totp_length,
+        digits = settings.verbosity.totp_length,
         timeout = settings.lifetime.totp_token,
     )
 
