@@ -9,7 +9,7 @@ class UserRequest(
     """ User profile 
     """
     email: str
-    password: str
+    # password: str
     first_name: str
     last_name: str
 
