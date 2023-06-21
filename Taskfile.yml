@@ -7,7 +7,7 @@ tasks:
     desc: builds a publishable docker image
     cmds:
       - |
-        docker build -t anomalyhq/python-lab-server-api:v{{.PROJ_VER}} -f Dockerfile.api .
+        docker buildx build --platform=linux/amd64,linux/arm64 --push -t ghcr.io/anomaly/ghcr.io/{{.ORG_NAME}}/{{.PROJ_NAME}}:v{{.PROJ_VER}} -t ghcr.io/ghcr.io/{{.ORG_NAME}}/{{.PROJ_NAME}}:latest -f Dockerfile .
   dev:test:
     desc: runs tests inside the server container
     summary: |
