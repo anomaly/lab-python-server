@@ -1,0 +1,226 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.28.0 (HEAD)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: db
+  name: db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.28.0 (HEAD)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/lab-python-server-default: "true"
+        io.kompose.service: db
+    spec:
+      containers:
+        - env:
+            - name: AMQP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: AMQP_HOST
+                  name: env-development
+            - name: AMQP_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: AMQP_PASSWORD
+                  name: env-development
+            - name: AMQP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: AMQP_PORT
+                  name: env-development
+            - name: AMQP_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: AMQP_USER
+                  name: env-development
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: JWT_SECRET_KEY
+                  name: env-development
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: MINIO_ROOT_PASSWORD
+                  name: env-development
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: MINIO_ROOT_USER
+                  name: env-development
+            - name: PGADMIN_DEFAULT_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: PGADMIN_DEFAULT_PASSWORD
+                  name: env-development
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_DB
+                  name: env-development
+            - name: POSTGRES_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_HOST
+                  name: env-development
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PASSWORD
+                  name: env-development
+            - name: POSTGRES_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_PORT
+                  name: env-development
+            - name: POSTGRES_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: POSTGRES_USER
+                  name: env-development
+            - name: RABBITMQ_DEFAULT_PASS
+              valueFrom:
+                configMapKeyRef:
+                  key: RABBITMQ_DEFAULT_PASS
+                  name: env-development
+            - name: RABBITMQ_DEFAULT_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: RABBITMQ_DEFAULT_USER
+                  name: env-development
+            - name: RABBITMQ_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: RABBITMQ_HOST
+                  name: env-development
+            - name: RABBITMQ_NODE_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: RABBITMQ_NODE_PORT
+                  name: env-development
+            - name: REDIS_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_HOST
+                  name: env-development
+            - name: REDIS_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: REDIS_PORT
+                  name: env-development
+            - name: RESEND_API_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: RESEND_API_KEY
+                  name: env-development
+            - name: S3_ACCESS_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_ACCESS_KEY
+                  name: env-development
+            - name: S3_BUCKET_NAME
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_BUCKET_NAME
+                  name: env-development
+            - name: S3_ENDPOINT
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_ENDPOINT
+                  name: env-development
+            - name: S3_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_PORT
+                  name: env-development
+            - name: S3_REGION
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_REGION
+                  name: env-development
+            - name: S3_SECRET_KEY
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_SECRET_KEY
+                  name: env-development
+            - name: S3_USE_SSL
+              valueFrom:
+                configMapKeyRef:
+                  key: S3_USE_SSL
+                  name: env-development
+            - name: SMS_API_ID
+              valueFrom:
+                configMapKeyRef:
+                  key: SMS_API_ID
+                  name: env-development
+            - name: SMS_API_SECRET
+              valueFrom:
+                configMapKeyRef:
+                  key: SMS_API_SECRET
+                  name: env-development
+            - name: SMS_FROM_LABEL
+              valueFrom:
+                configMapKeyRef:
+                  key: SMS_FROM_LABEL
+                  name: env-development
+            - name: SMTP_HOST
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_HOST
+                  name: env-development
+            - name: SMTP_MAIL_FROM
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_MAIL_FROM
+                  name: env-development
+            - name: SMTP_PASSWORD
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_PASSWORD
+                  name: env-development
+            - name: SMTP_PORT
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_PORT
+                  name: env-development
+            - name: SMTP_USER
+              valueFrom:
+                configMapKeyRef:
+                  key: SMTP_USER
+                  name: env-development
+          image: postgres:14-bullseye
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}
+            failureThreshold: 5
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            timeoutSeconds: 30
+          name: ${proj-name}-postgres
+          ports:
+            - containerPort: 5432
+          resources: {}
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgres-data
+      restartPolicy: Always
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-data
+status: {}
