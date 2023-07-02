@@ -32,7 +32,6 @@ python-multipart = "^0.0.5"
 pytest = "^7.3.1"
 pytz = "^2023.3"
 httpx = "^0.24.0"
-taskiq = "^0.4.3"
 markupsafe = "^2.1.2"
 taskiq-fastapi = "^0.1.1"
 taskiq-redis = "^0.3.0"
@@ -40,6 +39,7 @@ pycron = "^3.0.0"
 taskiq-aio-pika = "^0.2.0"
 faker = "^18.11.2"
 setuptools = "^68.0.0"
+taskiq = {version = "^0.7.2", extras = ["reload"]}
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"
@@ -50,7 +50,6 @@ initdb = "labs.db:initialise"
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.0"
 pytest-order = "^1.1.0"
-taskiq = { extras = ["reload"], version = "^0.4.1" }
 faker = "^18.6.0"
 
 [tool.pytest.ini_options]

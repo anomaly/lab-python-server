@@ -453,12 +453,12 @@ test = ["backports.socketpair", "cffi (>=1.12.2)", "contextvars (==2.4)", "cover
 
 [[package]]
 name = "gitignore-parser"
-version = "0.1.3"
+version = "0.1.4"
 description = "A spec-compliant gitignore parser for Python 3.5+"
 optional = false
 python-versions = "*"
 files = [
-    {file = "gitignore_parser-0.1.3.tar.gz", hash = "sha256:d0150d81889251d00cde6cf38931ab5613ca1109f5b3905a232c8458ff0d6991"},
+    {file = "gitignore_parser-0.1.4.tar.gz", hash = "sha256:15db85be530b14cedbf377f0b2e276c271706b5f408977af62c98714d4846f80"},
 ]
 
 [[package]]
@@ -1344,16 +1344,17 @@ requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
 
 [[package]]
 name = "taskiq"
-version = "0.4.3"
+version = "0.7.2"
 description = "Distributed task queue with full async support"
 optional = false
-python-versions = ">=3.7,<4.0"
+python-versions = ">=3.8.1,<4.0.0"
 files = [
-    {file = "taskiq-0.4.3-py3-none-any.whl", hash = "sha256:1a9305aae8df5ebd5d2388382da74ac96bb0a9434eeb97ad1dd6e9d9ab9d03aa"},
-    {file = "taskiq-0.4.3.tar.gz", hash = "sha256:525644179f587cdacbc356f391639a1d6718ac9625251b36f80d45ee5e64f107"},
+    {file = "taskiq-0.7.2-py3-none-any.whl", hash = "sha256:1e3124440e42400eedae524afafd532f4ad10b4188044f32a634b382c694afb9"},
+    {file = "taskiq-0.7.2.tar.gz", hash = "sha256:3d6911b2679518d85dba8e09939581fe610c38dd32c9c0625917e35fa239a49c"},
 ]
 
 [package.dependencies]
+anyio = ">=3,<4"
 gitignore-parser = {version = ">=0,<1", optional = true, markers = "extra == \"reload\""}
 importlib-metadata = "*"
 pycron = ">=3.0.0,<4.0.0"
@@ -1772,4 +1773,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "1d405a5960bee33a6241c04b3fc0405fe24fe0a8a367a26ee4d1b501f42504ad"
+content-hash = "02fd8a741da8da563e918295e31bbfb305793fc1e75ff3dbf676f87ce8bf6e49"
