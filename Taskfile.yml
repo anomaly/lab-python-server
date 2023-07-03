@@ -8,6 +8,9 @@ tasks:
     cmds:
       - |
         docker buildx build --platform=linux/amd64,linux/arm64 --push -t ghcr.io/anomaly/ghcr.io/{{.ORG_NAME}}/{{.PROJ_NAME}}:v{{.PROJ_VER}} -t ghcr.io/ghcr.io/{{.ORG_NAME}}/{{.PROJ_NAME}}:latest -f Dockerfile .
+    vars:
+      PROJ_VER:
+        sh: "task version"
   dev:test:
     desc: runs tests inside the server container
     summary: |
@@ -79,6 +82,17 @@ tasks:
         -d {{.POSTGRES_DB}} -c \" \
         CREATE TABLE IF NOT EXISTS alembic_version ( version_num VARCHAR ); \
         INSERT INTO alembic_version ( version_num ) VALUES ( '{{.HEAD_SHA}}' );\""
+  version:
+    cmds:
+      - cd src 
+      - python -c "from labs import __version__; print(__version__)"
+  # version:next:
+  #   cmds:
+  #     - |
+  #       git describe --tags --abbrev=0 | \
+  #       awk -F. '{$NF = $NF + 1;} 1' | \
+  #       sed 's/ /./g' | \
+  #       tee .version
   eject:
     desc: eject the project from a template
     summary: |

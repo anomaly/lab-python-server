@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncEngine
 from alembic import context
 
 # App level imports
-from labs.config import settings as app_config
+from labs.settings import settings
 from labs.db import Base
 from labs.models import *
 
@@ -22,7 +22,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Read the app config and set sqlalchemy.url
-config.set_main_option("sqlalchemy.url", app_config.postgres_async_dsn)
+config.set_main_option("sqlalchemy.url", settings.db.async_dsn)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
