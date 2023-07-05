@@ -374,21 +374,22 @@ python-dateutil = ">=2.4"
 
 [[package]]
 name = "fastapi"
-version = "0.100.0b2"
+version = "0.100.0b3"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "fastapi-0.100.0b2-py3-none-any.whl", hash = "sha256:9b382e75d936ad0cd03adf586f61cc37e4c3e834f04901dedf49af44052b52df"},
-    {file = "fastapi-0.100.0b2.tar.gz", hash = "sha256:67882763f965ed0cb3b2d9de4c90a9f15a2d972682c5cc386969237f8961d238"},
+    {file = "fastapi-0.100.0b3-py3-none-any.whl", hash = "sha256:c6e2a839f2f8db31adee343cddadad2c5af6be1511a83ecfca894c10c2fe175e"},
+    {file = "fastapi-0.100.0b3.tar.gz", hash = "sha256:5046988387cfe6e1401db3cf749c2000d8eb33eb1e5846fa68c369ad5d8528ec"},
 ]
 
 [package.dependencies]
-pydantic = ">=1.7.4,<1.8 || >1.8,<1.8.1 || >1.8.1,<3.0.0"
+pydantic = ">=1.7.4,<1.8 || >1.8,<1.8.1 || >1.8.1,<2.0.0 || >2.0.0,<2.0.1 || >2.0.1,<3.0.0"
 starlette = ">=0.27.0,<0.28.0"
+typing-extensions = ">=4.5.0"
 
 [package.extras]
-all = ["email-validator (>=2.0.0)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=2.11.2)", "orjson (>=3.2.1)", "python-multipart (>=0.0.5)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
+all = ["email-validator (>=2.0.0)", "httpx (>=0.23.0)", "itsdangerous (>=1.1.0)", "jinja2 (>=2.11.2)", "orjson (>=3.2.1)", "pydantic-extra-types (>=2.0.0)", "pydantic-settings (>=2.0.0)", "python-multipart (>=0.0.5)", "pyyaml (>=5.3.1)", "ujson (>=4.0.1,!=4.0.2,!=4.1.0,!=4.2.0,!=4.3.0,!=5.0.0,!=5.1.0)", "uvicorn[standard] (>=0.12.0)"]
 
 [[package]]
 name = "gevent"
@@ -1773,4 +1774,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "f5c561a15f7754409ee2d3c1e1181f8ba9809df48dfe784a26c60c0dc59234dd"
+content-hash = "afb18b2d02bc6d107e7032e5384e340962bceabf4ce546b88a80d38f90a6a1fa"
