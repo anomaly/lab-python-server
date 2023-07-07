@@ -374,13 +374,13 @@ python-dateutil = ">=2.4"
 
 [[package]]
 name = "fastapi"
-version = "0.100.0b3"
+version = "0.100.0"
 description = "FastAPI framework, high performance, easy to learn, fast to code, ready for production"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "fastapi-0.100.0b3-py3-none-any.whl", hash = "sha256:c6e2a839f2f8db31adee343cddadad2c5af6be1511a83ecfca894c10c2fe175e"},
-    {file = "fastapi-0.100.0b3.tar.gz", hash = "sha256:5046988387cfe6e1401db3cf749c2000d8eb33eb1e5846fa68c369ad5d8528ec"},
+    {file = "fastapi-0.100.0-py3-none-any.whl", hash = "sha256:271662daf986da8fa98dc2b7c7f61c4abdfdccfb4786d79ed8b2878f172c6d5f"},
+    {file = "fastapi-0.100.0.tar.gz", hash = "sha256:acb5f941ea8215663283c10018323ba7ea737c571b67fc7e88e9469c7eb1d12e"},
 ]
 
 [package.dependencies]
@@ -1774,4 +1774,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "afb18b2d02bc6d107e7032e5384e340962bceabf4ce546b88a80d38f90a6a1fa"
+content-hash = "fb9b47291e6185962e68f1f72c0985eedb220c510e60904070df80cc1e874b8f"
