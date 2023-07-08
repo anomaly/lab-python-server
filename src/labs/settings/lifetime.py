@@ -7,12 +7,13 @@ such as tokens, and links. These values are in seconds.
 from pydantic import BaseSettings
 
 class LifetimeSettings(BaseSettings):
-
-    # The following are recommended values for the app to use for
-    # security tokens, and other cryptography related features.
-    # 
-    # While these can be overridden in the container environment,
-    # it's recommend that you use the values below.
+    """
+    The following are recommended values for the app to use for
+    security tokens, and other cryptography related features.
+    
+    While these can be overridden in the container environment,
+    it's recommend that you use the values below.    
+    """
 
     link_s3_upload: int = 300 # In seconds
     link_s3_download: int = 300 # In seconds
