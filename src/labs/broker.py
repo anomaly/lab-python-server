@@ -29,9 +29,9 @@ redis_result_backend = RedisAsyncResultBackend(
     settings.redis.dsn
 )
 
-broker = AioPikaBroker(
-    settings.amqp.dsn,
-    result_backend=redis_result_backend
+broker = (
+    AioPikaBroker(settings.amqp.dsn,)
+    .with_result_backend(redis_result_backend)
 )
 
 # Override the broker to use the InMemory backend

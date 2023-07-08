@@ -11,7 +11,7 @@ readme = "README.md"
 python = "^3.10"
 pendulum = "^2.1.2"
 SQLAlchemy = "^2.0.17"
-fastapi = "^0.97.0"
+fastapi = "^0.100.0"
 alembic = "^1.11.1"
 uvicorn = "^0.22.0"
 gunicorn = "^20.1.0"
@@ -39,7 +39,7 @@ pycron = "^3.0.0"
 taskiq-aio-pika = "^0.2.0"
 faker = "^18.11.2"
 setuptools = "^68.0.0"
-taskiq = {version = "^0.7.2", extras = ["reload"]}
+taskiq = { version = "^0.7.2", extras = ["reload"] }
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"
