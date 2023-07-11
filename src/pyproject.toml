@@ -39,7 +39,7 @@ pycron = "^3.0.0"
 taskiq-aio-pika = "^0.2.0"
 faker = "^18.11.2"
 setuptools = "^68.0.0"
-taskiq = { version = "^0.7.2", extras = ["reload"] }
+taskiq = {version = "^0.8.0", extras = ["reload"]}
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"
