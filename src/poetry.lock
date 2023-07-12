@@ -1345,13 +1345,13 @@ requests = {version = ">=2.20", markers = "python_version >= \"3.0\""}
 
 [[package]]
 name = "taskiq"
-version = "0.8.0"
+version = "0.8.1"
 description = "Distributed task queue with full async support"
 optional = false
 python-versions = ">=3.8.1,<4.0.0"
 files = [
-    {file = "taskiq-0.8.0-py3-none-any.whl", hash = "sha256:e96114ef627757509caff3d3f1ab701febc7a8ae55d87ca71ba480edd4a82442"},
-    {file = "taskiq-0.8.0.tar.gz", hash = "sha256:37b5610773f425a24f2b428e99211795d08ed437e80b9dba88004534eb86f0bf"},
+    {file = "taskiq-0.8.1-py3-none-any.whl", hash = "sha256:a5b8ed57acd784ac166394c049f9514a52bf230627351d5193522eb85e8175e1"},
+    {file = "taskiq-0.8.1.tar.gz", hash = "sha256:581a7d4fc12198e06678c617e8e9382f7c7566388bf424a631c99f16794dbbec"},
 ]
 
 [package.dependencies]
@@ -1774,4 +1774,4 @@ testing = ["coverage (>=5.0.3)", "zope.event", "zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "8d6a199fcb9d8e7e274d4bdd5f787da3a417f0bd51ccdea59c14036ac99a27e5"
+content-hash = "9fcbc21536907e92ebd548b33d35b889d1d9e9ac6c2fd2100630f107d90648a3"
