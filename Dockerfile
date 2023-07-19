@@ -13,7 +13,7 @@ EXPOSE 80
 # python 3.10 seems to want python3-tk installed
 RUN apt-get update \
     && apt-get -y upgrade \
-    && apt-get install -y --no-install-recommends gcc python3-dev build-essential libpq-dev python3-tk \
+    && apt-get install -y --no-install-recommends gcc python3-dev build-essential libpq-dev python3-tk postgresql-client \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
