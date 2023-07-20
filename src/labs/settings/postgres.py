@@ -4,8 +4,10 @@ Anomaly projects typically use a PostgreSQL database to store data. This
 configuration allows the application to define the database connection 
 and can either be a container or a hosted product by a cloud provider.
 """
-from pydantic import BaseSettings, PostgresDsn
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic.networks import PostgresDsn, MultiHostUrl, UrlConstraints
 from pydantic.types import SecretStr
+
 
 class PostgresSettings(BaseSettings):
 
@@ -36,14 +38,9 @@ class PostgresSettings(BaseSettings):
             self.db])
 
         return PostgresDsn(
-            url=db_url,
-            scheme="postgresql+asyncpg",
-            user=self.user,
-            password=self.password,
+            MultiHostUrl(db_url),
         )
 
-    class Config:
-        """ Env vars are prefixed with POSTGRES_ are loaded
-        into instances of this class
-        """
-        env_prefix = "POSTGRES_"
+    model_config = SettingsConfigDict(
+        env_prefix="POSTGRES_",
+    )

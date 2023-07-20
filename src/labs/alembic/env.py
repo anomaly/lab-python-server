@@ -22,7 +22,7 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Read the app config and set sqlalchemy.url
-config.set_main_option("sqlalchemy.url", settings.db.async_dsn)
+config.set_main_option("sqlalchemy.url", str(settings.db.async_dsn))
 
 # add your model's MetaData object here
 # for 'autogenerate' support

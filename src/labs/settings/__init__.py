@@ -2,7 +2,7 @@
 
 """
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from .postgres import PostgresSettings
 from .s3 import S3BucketSettings

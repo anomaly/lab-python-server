@@ -7,7 +7,8 @@ Some of these are application related so they should ideally be
 updated to represent the application.
 """
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
 
 class APIRouterSettings(BaseSettings):
     """
@@ -41,9 +42,6 @@ class APIRouterSettings(BaseSettings):
     path_root: str = "/api"
     path_docs: str = "/docs"
 
-    class Config:
-        """ Env vars are prefixed with FASTAPI_ are loaded
-        into instances of this class
-        """
-        env_prefix = "FASTAPI_"
-    
+    model_config = SettingsConfigDict(
+        env_prefix="FASTAPI_",
+    )

@@ -26,11 +26,11 @@ import taskiq_fastapi
 from .settings import settings
 
 redis_result_backend = RedisAsyncResultBackend(
-    settings.redis.dsn
+    str(settings.redis.dsn)
 )
 
 broker = (
-    AioPikaBroker(settings.amqp.dsn,)
+    AioPikaBroker(str(settings.amqp.dsn),)
     .with_result_backend(redis_result_backend)
 )
 
