@@ -6,7 +6,7 @@ application to define the SMTP server and credentials.
 By default we should always think about supporting TLS.
 """
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic.types import SecretStr
 
 
@@ -20,11 +20,10 @@ class SMTPSettings(BaseSettings):
 
     mail_from: str
 
-    class Config:
-        """ Env vars are prefixed with SMTP_ are loaded
-        into instances of this class
-        """
-        env_prefix = "SMTP_"
+    model_config = SettingsConfigDict(
+        env_prefix="SMTP_",
+    )
+
 
 class SMSGatewaySettings(BaseSettings):
 
@@ -32,8 +31,6 @@ class SMSGatewaySettings(BaseSettings):
     api_secret: SecretStr
     from_label: str
 
-    class Config:
-        """ Env vars are prefixed with SMS_ are loaded
-        into instances of this class
-        """
-        env_prefix = "SMS_"
+    model_config = SettingsConfigDict(
+        env_prefix="SMS_",
+    )

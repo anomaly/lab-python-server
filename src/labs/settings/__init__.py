@@ -2,7 +2,7 @@
 
 """
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 
 from .postgres import PostgresSettings
 from .s3 import S3BucketSettings
@@ -13,6 +13,7 @@ from .lifetime import LifetimeSettings
 from .jwt import JWTSettings
 from .api_router import APIRouterSettings
 from .verbosity import VerbositySettings
+
 
 class Settings(BaseSettings):
     """Configuration for the application
@@ -64,7 +65,6 @@ class Settings(BaseSettings):
     # Verbosity of various tokens
     verbosity: VerbositySettings = VerbositySettings()
 
-    
+
 # A singleton instance of the configuration
 settings: Settings = Settings()
-

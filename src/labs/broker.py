@@ -6,11 +6,11 @@ from .settings import settings
 
 # See PyPI for more information about taskiq_redis
 # https://pypi.org/project/taskiq-redis/
-# 
+#
 # Redis is recommended as the results backend for the tasks
 from taskiq_redis import RedisAsyncResultBackend
 
-# RabbitMQ is recommended as the broker 
+# RabbitMQ is recommended as the broker
 from taskiq_aio_pika import AioPikaBroker
 
 # Task Scheduler for periodic tasks
@@ -26,17 +26,17 @@ import taskiq_fastapi
 from .settings import settings
 
 redis_result_backend = RedisAsyncResultBackend(
-    settings.redis.dsn
+    str(settings.redis.dsn)
 )
 
-broker = AioPikaBroker(
-    settings.amqp.dsn,
-    result_backend=redis_result_backend
+broker = (
+    AioPikaBroker(str(settings.amqp.dsn),)
+    .with_result_backend(redis_result_backend)
 )
 
 # Override the broker to use the InMemory backend
 # if FastAPI is being called via pytest
-#if settings.env == "pytest":
+# if settings.env == "pytest":
 # from taskiq import InMemoryBroker
 # broker = InMemoryBroker()
 
@@ -52,7 +52,9 @@ broker.add_middlewares(
 
 scheduler = TaskiqScheduler(
     broker=broker,
-    sources=[LabelScheduleSource(broker)],
+    sources=[
+        LabelScheduleSource(broker)
+    ],
 )
 
 # The middleware is used to inject the broker into FastAPI

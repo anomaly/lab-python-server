@@ -2,8 +2,9 @@
 
 """
 
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 from pydantic.types import SecretStr
+
 
 class JWTSettings(BaseSettings):
 
@@ -12,9 +13,6 @@ class JWTSettings(BaseSettings):
     secret_key: SecretStr
     algorithm: str = "HS256"
 
-
-    class Config:
-        """ Env vars are prefixed with JWT_ are loaded
-        into instances of this class
-        """
-        env_prefix = "JWT_"
+    model_config = SettingsConfigDict(
+        env_prefix="JWT_",
+    )

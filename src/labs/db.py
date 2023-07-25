@@ -15,10 +15,17 @@ from sqlalchemy.orm import DeclarativeBase,\
 from .settings import settings
 
 # SQLAlchemy engine that connects to Postgres
-engine = create_async_engine(settings.db.async_dsn, echo=True)
+engine = create_async_engine(
+    str(settings.db.async_dsn),
+    echo=True
+)
+
+# Configure mapping from classes
 configure_mappers()
 
 # Get an async session from the engine
+
+
 async def get_async_session() -> AsyncSession:
     async_session = sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
@@ -27,6 +34,8 @@ async def get_async_session() -> AsyncSession:
         yield session
 
 # Used by the ORM layer to describe models
+
+
 class Base(DeclarativeBase):
     """
     SQLAlchemy 2.0 style declarative base class
@@ -61,4 +70,3 @@ def initialise():
     import asyncio
     from . import models
     asyncio.run(init_models())
-

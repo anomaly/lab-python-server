@@ -4,12 +4,12 @@
 from uuid import UUID
 from datetime import datetime
 
-from pydantic import BaseModel
-from humps import camelize
+from pydantic import BaseModel, ConfigDict
 
-def to_camel_case(string):
+
+def to_camel(string: str) -> str:
     """ Convert a string to camelCase
-    
+
     This is a wrapper function that is used by the pydantic
     models to covert the snake_case field names to camelCase
     for the JSON response.
@@ -18,7 +18,8 @@ def to_camel_case(string):
     and make it as seamless as possible for developers to
     work in each environment
     """
-    return camelize(string)
+    return ''.join(word.capitalize() for word in string.split('_'))
+
 
 class AppBaseModel(BaseModel):
     """ Pydantic base model for applications
@@ -28,16 +29,17 @@ class AppBaseModel(BaseModel):
     translate between camcelCase and snake_case for the JSON
     amongst other default settings.
 
-    ORM mode will allow pydantic to translate SQLAlchemy results
+    from_attributes will allow pydantic to translate SQLAlchemy results
     into serializable models.
 
     For a full set of options, see:
     https://pydantic-docs.helpmanual.io/usage/model_config/
     """
-    class Config:
-        alias_generator = to_camel_case
-        allow_population_by_field_name = True
-        orm_mode = True
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=to_camel,
+    )
+
 
 class IdentityMixin(BaseModel):
     """ Identifier 
@@ -48,6 +50,7 @@ class IdentityMixin(BaseModel):
     """
     id: UUID
 
+
 class DateTimeMixin(BaseModel):
     """ Adds timestamps to relevant models
 
@@ -56,4 +59,3 @@ class DateTimeMixin(BaseModel):
     """
     created_at: datetime
     updated_at: datetime
- 
