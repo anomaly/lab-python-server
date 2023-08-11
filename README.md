@@ -1,23 +1,26 @@
 # Lab - Containerised Python server
 
 This lab aims to outline a recipe for building a standardised Python server that can be run in a container. Our major aims are to be able to:
-- [X] Expose an API that will eventually sit behind a reverse proxy
-- [X] A Postgres server for development
-- [X] A Redis server for development
+
+- [x] Expose an API that will eventually sit behind a reverse proxy
+- [x] A Postgres server for development
+- [x] A Redis server for development
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
-- [X] Worker processes that will process tasks in the background (using Celery)
-- [X] Provide `Dockerfile` for development and production
+- [x] Worker processes that will process tasks in the background (using Celery)
+- [x] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring ([parseable](https://github.com/parseablehq/parseable))
-- [X] ~~CSRF protection~~ see [#52](https://github.com/anomaly/lab-python-server/issues/52), also see [official guide](https://fastapi.tiangolo.com/tutorial/cors/)
-- [X] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
+- [x] ~~CSRF protection~~ see [#52](https://github.com/anomaly/lab-python-server/issues/52), also see [official guide](https://fastapi.tiangolo.com/tutorial/cors/)
+- [x] Basic endpoints for authentication (JWT and OTP based) - along with recommendations for encryption algorithms
 
 Additionally, we provide:
+
 - [ ] Examples of working with Stripe for payments including handling webhooks
 - [ ] Provide a pattern on separating the API endpoints for the hooks for scale
 
 In production (see [Terraform lab project](https://github.com/anomaly/lab-tf-linode)) we will use `Terraform` and `Helm` provision infrastructure and deploy the app in pods. Ideally `Postgres` and `Redis` would be provisioned as a hosted products (Linode is yet to offer this), in the short term they will be installed from official `Charts`.
 
 TODO:
+
 - [ ] Convert the project to be a [Cookiecutter](https://cookiecutter.readthedocs.io/en/1.7.2/) template
 
 > The approach taken in this guide is to document the tools and commands are they are and not build additional tooling or abstractions. The aim is to educate the user on the tools and how to use them.
@@ -37,16 +40,19 @@ All `docker-compose` files depend on the following environment variables, which 
 Python 3.10 requires the Tinker package to be installed, not sure why this is the case and why the the base Docker image does not contain this. Take a look at the `Dockerfile` where we install this package via `apt`.
 
 On macOS we manage this via Homebrew:
+
 ```
 brew install python-tk@3.10
 ```
 
-Handy commands and tools, which we use to help with the infrastructure: 
+Handy commands and tools, which we use to help with the infrastructure:
 
 Use `openssl` to generate a random `hex` string where the `20` is th length:
+
 ```
 openssl rand -hex 20
 ```
+
 > This can be used to generate secrets which the application uses, folllow more notes on how to cycle secrets in this guide.
 
 The above is wrapped up as a `Task` endpoints, you need to supply the length of the hash as a parameter:
@@ -104,12 +110,13 @@ If you haven't installed a particular package e.g. `starlette` then be wary of f
 ## App directory structure
 
 Directory structure for our application:
+
 ```
  src/
  ├─ tests/
  ├─ labs
  |   └─ routers/         -- FastAPI routers
- |   └─ tasks/           -- TaskIQ 
+ |   └─ tasks/           -- TaskIQ
  |   └─ models/          -- SQLAlchemy models
  |   └─ schema/          -- Pydantic schemas
  |   └─ alembic/         -- Alembic migrations
@@ -120,7 +127,7 @@ Directory structure for our application:
  |   └─ db.py
  |   └─ utils.py
  ├─ pyproject.toml
- ├─ poetry.lock  
+ ├─ poetry.lock
 
 ```
 
@@ -153,7 +160,6 @@ router_root.include_router(
 
 `api.py` imports the `router_root` and mounts it, thus mounting all routers in your application. Never modify the `api.py` if you want to keep up to date with the template.
 
-
 > FastAPI camel cases the method name as the short description and uses the docstring as documentation for each endpoint. Markdown is allowed in the docstring.
 
 When running behind a Reverse Proxy (which would almost always be the case for our applications), FastAPI can accept the root path in numerous ways. This tells FastAPI where to mount the application i.e how the requests are going to be forwarded to the top router so it can stripe away the prefix before routing the requests. So for example the `root` FastAPI application might be mounted on `/api` and the FastAPI will need to strip away the `/api` before handling the request.
@@ -182,7 +188,7 @@ from fastapi import APIRouter, Depends,\
     HTTPException, Query, status
 
 @router.get(
-    "/{id}", 
+    "/{id}",
     summary="Get a particular user",
     response_model=UserResponse,
     status_code=status.HTTP_200_OK
@@ -191,9 +197,9 @@ async def get_user_by_id(
     id: UUID,
     session: AsyncSession = Depends(get_async_session)
 ):
-    """ Get a user by their id 
-    
-    
+    """ Get a user by their id
+
+
     """
     user = await User.get(session, id)
     if not user:
@@ -216,22 +222,21 @@ Anomaly puts great emphasis on code readability and standards. These circle arou
 
 Our [web-client](https://github.com/anomaly/lab-web-client) defines the standards for the front end. It's important to note the differences that both environments have and the measure to translate between them. For example:
 
-Python snake case is translated to camel case in JavaScript. So `my_var` becomes `myVar` in JavaScript. This is done by the `pydantic` library when it serialises the data to JSON. 
+Python snake case is translated to camel case in JavaScript. So `my_var` becomes `myVar` in JavaScript. This is done by the `pydantic` library when it serialises the data to JSON.
 
 ```python
 from pydantic import BaseModel
 from humps import camelize
-
-def to_camel(string):
-    return camelize(string)
 
 class User(BaseModel):
     first_name: str
     last_name: str = None
     age: float
 
-    class Config:
-        alias_generator = to_camel
+    model_config = ConfigDict(
+        from_attributes=True,
+        alias_generator=camelize,
+    )
 ```
 
 > Source: [CamelCase Models with FastAPI and Pydantic](https://medium.com/analytics-vidhya/camel-case-models-with-fast-api-and-pydantic-5a8acb6c0eee) by Ahmed Nafies
@@ -253,7 +258,6 @@ class MyModel(AppBaseModel):
 
 As per [this issue](https://github.com/anomaly/lab-python-server/issues/27) we have wrapped this
 
-
 FastAPI will try and generate an `operation_id` based on the path of the router endpoint, which usually ends up being a convoluted string. This was originally reported in [labs-web-client](https://github.com/anomaly/lab-web-client/issues/6). You can provide an `operation_id` in the `decorator` e.g:
 
 ```python
@@ -267,7 +271,6 @@ For consistenty FastAPI docs shows a wrapper function that [globally re-writes](
 ## TaskIQ based tasks
 
 The project uses [`TaskIQ`](https://taskiq-python.github.io) to manage task queues. TaskIQ supports `asyncio` and has FastAPI like design ideas e.g [dependency injection](https://taskiq-python.github.io/guide/state-and-deps.html) and can be tightly [coupled with FastAPI](https://taskiq-python.github.io/guide/taskiq-with-fastapi.html).
-
 
 TaskIQ is configured as recommend for production use with [taskiq-aio-pika](https://pypi.org/project/taskiq-aio-pika/) as the broker and [taskiq-redis](https://pypi.org/project/taskiq-redis/) as the result backend.
 
@@ -320,10 +323,9 @@ async def verify_user(request: Request):
 
 There are various powerful options for queuing tasks both scheduled and periodic tasks are supported.
 
-
 ## SQLAlchemy wisdom
 
-SQLAlchemy is making a move towards their `2.0` syntax, this is available as of `v1.4` which is what we currently target as part of our template. This also brings the use of `asyncpg` which allows us to use `asyncio` with `SQLAlchemy`. 
+SQLAlchemy is making a move towards their `2.0` syntax, this is available as of `v1.4` which is what we currently target as part of our template. This also brings the use of `asyncpg` which allows us to use `asyncio` with `SQLAlchemy`.
 
 First and foremost we use the `asyncpg` driver to connect to PostgreSQL. Refer to the property `postgres_async_dsn` in `config.py`.
 
@@ -377,7 +379,6 @@ class Price(Base):
 
 For you to be able to access the `Products` and then related `Prices` you would have to use the `selectinload` option to ensure that SQLAlchemy is able to load the related objects. This is because the `asyncio` driver does not support `joinedload` which is the default for `SQLAlchemy`.
 
-
 ```python
 from sqlalchemy.orm import selectinload
 
@@ -386,9 +387,10 @@ query = select(cls).options(selectinload(cls.products).\
         where(cls.id == id)
 results = await async_db_session.execute(query)
 ```
+
 > **Note:** how the `selectinload` is chained to the `products` relationship and then the `prices` relationship.
 
-Our base project provides serveral `Mixin`, a handy one being the `ModelCRUDMixin` (in `src/labs/models/utils.py`). It's very likely that you will want to write multiple `getters` for your models. To facilitate this we encourage each Model you have overrides `_base_get_query` and returns a `query` with the `selectinload` options applied. 
+Our base project provides serveral `Mixin`, a handy one being the `ModelCRUDMixin` (in `src/labs/models/utils.py`). It's very likely that you will want to write multiple `getters` for your models. To facilitate this we encourage each Model you have overrides `_base_get_query` and returns a `query` with the `selectinload` options applied.
 
 ```python
 @classmethod
@@ -399,7 +401,7 @@ def _base_get_query(cls):
 ```
 
 This is then used by the `get` method in the `ModelCRUDMixin` to load the related objects and apply any further conditions, or orders:
-    
+
 ```python
 @classmethod
 async def get(cls, async_db_session, id):
@@ -485,22 +487,29 @@ And finally you should be able to run your initial migration:
 ```sh
 docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini revision --autogenerate -m 'init db'"
 ```
+
 producing the following output:
+
 ```
 INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
 INFO  [alembic.runtime.migration] Will assume transactional DDL.
   Generating /opt/labs/alembic/versions/4b2dfa16da8f_init_db.py ...  done
 ```
+
 followed by upgrading to the latest revision:
+
 ```sh
 docker compose exec api sh -c "alembic -c /opt/labs/alembic.ini upgrade head"
 ```
+
 producing the following output
+
 ```
 INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
 INFO  [alembic.runtime.migration] Will assume transactional DDL.
 INFO  [alembic.runtime.migration] Running upgrade  -> 4b2dfa16da8f, init db
 ```
+
 ### Joining back with `HEAD`
 
 During development you may find the need to nuke the database all together and start all over again. We provide a handy way of re-creating the schema using the Task endpoint `task db:init` which simply runs the SQLAlchemy `create_all` method.
@@ -516,18 +525,18 @@ Post this point you should be back where you were and use migrations as you'd ex
 MinIO is able to run with `TLS` enabled, all you hve to do is provide it a certificate. By default MinIO looks for certificates in `${HOME}/.minio/certs`. You can generate certificates and mount them into the container:
 
 ```yaml
-    volumes:
-      - minio-data:/data
-      - .cert:/root/.minio/certs
+volumes:
+  - minio-data:/data
+  - .cert:/root/.minio/certs
 ```
 
-This will result in the dashboard being available via `HTTPS` and the signed URLs will be TLS enabled. 
+This will result in the dashboard being available via `HTTPS` and the signed URLs will be TLS enabled.
 
 Since we use `TLS` enabled endpoints for development, running MinIO in secure mode will satisfy any browser security policies.
 
 ### S3FileMetadata
 
-The template provides a `SQLAlchemy` table called `S3FileMetadata` this is used to store metadata about file uploads. 
+The template provides a `SQLAlchemy` table called `S3FileMetadata` this is used to store metadata about file uploads.
 
 The client sends a request with the file `name`, `size` and `mime type`, the endpoint create a `S3FileMetadata` and returns an pre-signed upload URL, that the client must post the contents of the file to.
 
@@ -567,7 +576,7 @@ The `Dockerfile` for the API simply copies the contents of the `src` directory a
 
 > The `virtualenvs.create` is set to `false` for containers as `virtualenv` are not required
 
-We run the application using `uvicorn` and pass in `--root-path=/api` for FastAPI to work properly when behind a reverse proxy. FastAPI [recommends](https://fastapi.tiangolo.com/advanced/behind-a-proxy/) setting this at the server level, setting the flag in FastAPI is the last resort. 
+We run the application using `uvicorn` and pass in `--root-path=/api` for FastAPI to work properly when behind a reverse proxy. FastAPI [recommends](https://fastapi.tiangolo.com/advanced/behind-a-proxy/) setting this at the server level, setting the flag in FastAPI is the last resort.
 
 `Dockerfile` is the configuration referenced by `docker-compose.yml` for development and `Dockerfile.prod` is the configuration referenced by `docker-compose.prod.yml` for production. For Kubernetes based deployment please reference `Dockerfile.prod`.
 
@@ -578,7 +587,6 @@ https://docs.docker.com/develop/develop-images/multistage-build/
 
 gunicorn vs uvicorn
 https://www.uvicorn.org/deployment/
-
 
 ## Distribution
 
@@ -612,10 +620,10 @@ SQLAlchemy speciific resources:
 - [FastAPI with Async SQLAlchemy, SQLModel, and Alembic](https://testdriven.io/blog/fastapi-sqlmodel/) by [Michael Herman](https://testdriven.io/authors/herman/)
 - [SQLAlchemy Async ORM is Finally Here!](https://ahmed-nafies.medium.com/sqlalchemy-async-orm-is-finally-here-d560dfaa335d) by [Ahmed Nafies](https://ahmed-nafies.medium.com/)
 
-
 ## Developer Tools
 
 - [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml) - Jinja syntax highlighting for [VS Code](https://github.com/samuelcolvin/jinjahtml-vscode) by @SamuelColvin (accepted as part of PAP [#47](https://github.com/anomaly/lab-python-server/issues/47))
 
 ## License
+
 Contents of this repository are licensed under the Apache 2.0 license.
