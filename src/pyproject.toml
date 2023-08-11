@@ -41,6 +41,7 @@ taskiq-fastapi = "^0.2.0"
 taskiq-redis = "^0.4.0"
 pydantic-settings = "^2.0.2"
 pyhumps = "^3.8.0"
+certifi = "^2023.7.22"
 
 [tool.poetry.dev-dependencies]
 watchdog = "^2.1.8"
