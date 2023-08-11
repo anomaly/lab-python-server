@@ -5,20 +5,7 @@ from uuid import UUID
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
-
-
-def to_camel(string: str) -> str:
-    """ Convert a string to camelCase
-
-    This is a wrapper function that is used by the pydantic
-    models to covert the snake_case field names to camelCase
-    for the JSON response.
-
-    It's important to follow standards for both languages
-    and make it as seamless as possible for developers to
-    work in each environment
-    """
-    return ''.join(word.capitalize() for word in string.split('_'))
+from humps import camelize
 
 
 class AppBaseModel(BaseModel):
@@ -37,7 +24,7 @@ class AppBaseModel(BaseModel):
     """
     model_config = ConfigDict(
         from_attributes=True,
-        alias_generator=to_camel,
+        alias_generator=camelize,
     )
 
 
