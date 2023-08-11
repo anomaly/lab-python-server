@@ -16,14 +16,15 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import async_object_session
 
 # OTP helpers from pyotp
-from pyotp import TOTP
+from pyotp import TOTP, random_base32
 
 from ..db import Base
-from ..settings  import settings
+from ..settings import settings
 from .utils import DateTimeMixin, IdentifierMixin,\
     ModelCRUDMixin, timestamp
- 
+
 from ..utils.auth import hash_password, verify_password
+
 
 class User(
     Base,
@@ -37,12 +38,12 @@ class User(
     Users have authentication built into the system with support
     for password based auth and one time passwords.
     """
-    
+
     __tablename__ = "user"
 
     email: Mapped[str] = mapped_column(unique=True)
     mobile_number: Mapped[Optional[str]]
-    
+
     """
     Note that we define the password slightly differently
 
@@ -84,7 +85,7 @@ class User(
     # Methods to assist to deal with passwords
     def check_password(self, plain_text_pass):
         return verify_password(plain_text_pass, self.password)
-    
+
     async def verify_user_account(
         self,
         async_object_session,
@@ -98,7 +99,7 @@ class User(
         # no point in going any further
         if not self.verification_token or not self.verification_token_expiry:
             return False
-        
+
         # The expiry token is invalid, so we should clean up the token
         # and return a false, this is so the token can't be retried
         if self.verification_token_expiry < datetime.utcnow():
@@ -109,11 +110,11 @@ class User(
             await async_object_session.commit()
 
             return False
-        
+
         # The token failed to match, so we should return a false
         if not verify_password(verification_token, self.verification_token):
             return False
-        
+
         # All has gone well, we can make the user active and clear
         # the token so it can't be used again
 
@@ -121,7 +122,7 @@ class User(
         self.verification_token_expiry = None
 
         self.verified = True
-        
+
         async_object_session.add(self)
         await async_object_session.commit()
 
@@ -157,7 +158,7 @@ class User(
         await async_object_session.commit()
 
         return verification_code
-    
+
     async def reset_password(
         self,
         async_object_session,
@@ -171,7 +172,7 @@ class User(
         """
         if not self.reset_password or not self.reset_password_expiry:
             return False
-        
+
         if self.reset_password_expiry < datetime.utcnow():
             self.reset_password = None
             self.reset_password_expiry = None
@@ -180,10 +181,10 @@ class User(
             await async_object_session.commit()
 
             return False
-        
+
         if not verify_password(reset_token, self.reset_password):
             return False
-        
+
         self.reset_password = None
         self.reset_password_expiry = None
 
@@ -225,10 +226,9 @@ class User(
 
         return reset_password_token
 
-
     def get_otp(
-        self, 
-        digits: int = 6, 
+        self,
+        digits: int = 6,
         timeout: int = 30
     ):
         """ Get the current OTP for the user
@@ -238,25 +238,25 @@ class User(
         on the timeout and the digits.
         """
         otp = TOTP(
-            self.otp_secret, 
-            digits=digits, 
+            self.otp_secret,
+            digits=digits,
             interval=timeout
-        )  
-        
+        )
+
         return otp.now()
-    
+
     def verify_otp(
-            self, 
-            token: str,
-            timeout: int = 30, 
-            window: int = 30
-        ) -> bool:
+        self,
+        token: str,
+        timeout: int = 30,
+        window: int = 30
+    ) -> bool:
         """
         Verifies if the sent OTP is valid for the user
         """
         otp = TOTP(self.otp_secret, interval=timeout)
         return otp.verify(token, valid_window=window)
-    
+
     @classmethod
     async def get_by_email(cls, session, email):
         """ A custom getter where the user is found via email 
@@ -269,7 +269,7 @@ class User(
             results = await session.execute(query)
             (result,) = results.one()
             return result
-        except NoResultFound: # noqa: E722
+        except NoResultFound:  # noqa: E722
             return None
 
     @classmethod
@@ -281,18 +281,18 @@ class User(
             results = await session.execute(query)
             (result,) = results.one()
             return result
-        except NoResultFound: # noqa: E722
+        except NoResultFound:  # noqa: E722
             return None
 
     @classmethod
     async def get_by_email_or_mobile(cls, session, email, phone):
-        query = cls._base_get_query().where(cls.email == email or\
-            cls.mobile_number == phone)
+        query = cls._base_get_query().where(cls.email == email or
+                                            cls.mobile_number == phone)
         try:
             results = await session.execute(query)
             (result,) = results.one()
             return result
-        except NoResultFound: # noqa: E722
+        except NoResultFound:  # noqa: E722
             return None
 
 
@@ -301,6 +301,7 @@ def receive_init(target, args, kwargs):
     """ When the user is created, generate a secret for the OTP
     """
     target.otp_secret = random_base32()
+
 
 def encrypt_password(target, value, oldvalue, initiator):
     """ Encrypt the password when it is set
@@ -312,10 +313,11 @@ def encrypt_password(target, value, oldvalue, initiator):
     """
     return hash_password(value)
 
+
 # Support for the above method to run when the password is set
 event.listen(
-    User.password, 
-    'set', 
-    encrypt_password, 
+    User.password,
+    'set',
+    encrypt_password,
     retval=True
 )
