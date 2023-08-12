@@ -37,12 +37,12 @@ All `docker-compose` files depend on the following environment variables, which 
 
 ## General notes
 
-Python 3.10 requires the Tinker package to be installed, not sure why this is the case and why the the base Docker image does not contain this. Take a look at the `Dockerfile` where we install this package via `apt`.
+Python 3.11 requires the Tinker package to be installed, not sure why this is the case and why the the base Docker image does not contain this. Take a look at the `Dockerfile` where we install this package via `apt`.
 
 On macOS we manage this via Homebrew:
 
 ```
-brew install python-tk@3.10
+brew install python-tk@3.11
 ```
 
 Handy commands and tools, which we use to help with the infrastructure:
