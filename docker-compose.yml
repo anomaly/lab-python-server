@@ -14,9 +14,7 @@ volumes:
   redis-data:
   minio-data:
 
-
 services:
-
   # Postgres:
   # - In development we read secrets from .env.development
   #   refer to the production config to see how to use secrets
@@ -33,11 +31,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data/
     healthcheck:
-      test:
-        [
-          "CMD-SHELL",
-          "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"
-        ]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -54,7 +48,7 @@ services:
     ports:
       - 15672:15672
     healthcheck:
-      test: [ "CMD", "rabbitmq-diagnostics", "ping" ]
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -69,7 +63,7 @@ services:
       - redis-data:/data
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 30s
       timeout: 30s
       retries: 5
@@ -89,7 +83,7 @@ services:
         "${PROJ_NAME}.api:app",
         "--host=0.0.0.0",
         "--port=80",
-        "--reload"
+        "--reload",
       ]
     env_file:
       - .env.development
@@ -113,13 +107,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command:
-      [
-        "taskiq",
-        "worker",
-        "--reload",
-        "${PROJ_NAME}.broker:broker"
-      ]
+    command: ["taskiq", "worker", "--reload", "${PROJ_NAME}.broker:broker"]
     env_file:
       - .env.development
     restart: unless-stopped
@@ -139,7 +127,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: [ "taskiq", "scheduler", "${PROJ_NAME}.broker:scheduler" ]
+    command: ["taskiq", "scheduler", "${PROJ_NAME}.broker:scheduler"]
     env_file:
       - .env.development
     restart: unless-stopped
@@ -168,13 +156,7 @@ services:
       - .env.development
     command: server /data --console-address ":9001"
     healthcheck:
-      test:
-        [
-          "CMD",
-          "curl",
-          "-f",
-          "http://localhost:9000/minio/health/live"
-        ]
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
       timeout: 20s
       retries: 3
