@@ -1,6 +1,5 @@
-from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession
-from taskiq import TaskiqDepends
+from taskiq_dependencies import Depends
 
 from ...db import get_async_session
 from ...email import sender
@@ -9,15 +8,16 @@ from ...settings import settings
 
 from ...models import User
 
+
 @broker.task
 async def send_reset_password_email(
-    user_id: UUID,
-    session: AsyncSession = TaskiqDepends(get_async_session)
+    user_id: str,
+    session: AsyncSession = Depends(get_async_session)
 ) -> None:
     user = await User.get(session, user_id)
 
     # Create a verification code, this is available
-    # only at the time of calling this 
+    # only at the time of calling this
     reset_password_token = await user.get_verification_token(session)
 
     sender.send(
@@ -32,16 +32,17 @@ async def send_reset_password_email(
         },
     )
 
+
 @broker.task
 async def send_account_verification_email(
-    user_id: UUID,
-    session: AsyncSession = TaskiqDepends(get_async_session)
+    user_id: str,
+    session: AsyncSession = Depends(get_async_session)
 ) -> None:
 
     user = await User.get(session, user_id)
 
     # Create a verification code, this is available
-    # only at the time of calling this 
+    # only at the time of calling this
     verification_token = await user.get_verification_token(session)
 
     sender.send(
@@ -56,25 +57,27 @@ async def send_account_verification_email(
         },
     )
 
+
 @broker.task
 async def send_welcome_email(
-    user_id: UUID,
-    session: AsyncSession = TaskiqDepends(get_async_session)
+    user_id: str,
+    session: AsyncSession = Depends(get_async_session)
 ) -> None:
     user = await User.get(session, user_id)
 
 
 @broker.task
 async def send_otp_sms(
-    user_id: UUID,
-    session: AsyncSession = TaskiqDepends(get_async_session)
+    user_id: str,
+    session: AsyncSession = Depends(get_async_session)
 ) -> None:
     user = await User.get(session, user_id)
 
+
 @broker.task
 async def send_otp_email(
-    user_id: UUID,
-    session: AsyncSession = TaskiqDepends(get_async_session)
+    user_id: str,
+    session: AsyncSession = Depends(get_async_session)
 ) -> None:
     """
     Generates the OTP for a user and email it to them
@@ -85,8 +88,8 @@ async def send_otp_email(
     user = await User.get(session, user_id)
 
     otp = user.get_otp(
-        digits = settings.verbosity.totp_length,
-        timeout = settings.lifetime.totp_token,
+        digits=settings.verbosity.totp_length,
+        timeout=settings.lifetime.totp_token,
     )
 
     sender.send(
@@ -99,5 +102,3 @@ async def send_otp_email(
             "user": user,
         },
     )
-
-
