@@ -17,7 +17,8 @@ from datetime import datetime, timedelta
 import bcrypt
 import jwt
 
-from ..settings  import settings
+from ..settings import settings
+
 
 def verify_password(
     plain_password,
@@ -31,6 +32,7 @@ def verify_password(
         str.encode(plain_password),
         str.encode(hashed_password)
     )
+
 
 def hash_password(password) -> str:
     """ Use the crypt context to hash the password
@@ -79,5 +81,5 @@ def create_access_token(
         settings.jwt.secret_key.get_secret_value(),
         algorithm=settings.jwt.algorithm
     )
-    
+
     return encoded_jwt

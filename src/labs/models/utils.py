@@ -73,6 +73,7 @@ timestamp = Annotated[
     ),
 ]
 
+
 class IdentifierMixin(object):
     """An ID for a given object
 
@@ -81,7 +82,8 @@ class IdentifierMixin(object):
     techniques.
     """
     id: Mapped[pk_uuid]
-    
+
+
 class DateTimeMixin(object):
     """Stores creation and update timestamps
 
@@ -96,6 +98,7 @@ class DateTimeMixin(object):
     updated_at: Mapped[timestamp_req]
     deleted_at: Mapped[timestamp]
 
+
 class CUDByMixin(object):
     """ Adds references to created_by and updated_by users
 
@@ -103,6 +106,7 @@ class CUDByMixin(object):
     created_by_user_id: Mapped[fk_user_uuid_req]
     last_updated_by_user_id: Mapped[fk_user_uuid_req]
     deleted_by_user_id: Mapped[fk_user_uuid]
+
 
 class ModelCRUDMixin:
     """
@@ -134,14 +138,17 @@ class ModelCRUDMixin:
         new_instance = cls(**kwargs)
         async_db_session.add(new_instance)
         await async_db_session.commit()
-        await async_db_session.refresh(new_instance) # Ensure we get the id
+        await async_db_session.refresh(new_instance)  # Ensure we get the id
 
         # This will trigger using the _base_get_query to load any
-        # relationships we need.
-        updated_instance = await cls.get(
-            async_db_session, 
-            new_instance.id
-        )
+        # relationships we need. The if statement is to ensure that tables
+        # like join tables do not always have an id field.
+        updated_instance = new_instance
+        if hasattr(cls, "id"):
+            updated_instance = await cls.get(
+                async_db_session,
+                new_instance.id
+            )
 
         return updated_instance
 
@@ -256,7 +263,6 @@ class ModelCRUDMixin:
         users = await async_db_session.execute(query)
         users = users.scalars().all()
         return users
-
 
     @classmethod
     async def get_all(
