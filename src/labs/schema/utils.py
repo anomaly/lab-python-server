@@ -5,7 +5,14 @@ from uuid import UUID
 from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
-from humps import camelize
+
+
+def to_lower_camel(name: str) -> str:
+    """
+    Converts a snake_case string to lowerCamelCase
+    """
+    upper = "".join(word.capitalize() for word in name.split("_"))
+    return upper[:1].lower() + upper[1:]
 
 
 class AppBaseModel(BaseModel):
@@ -16,15 +23,16 @@ class AppBaseModel(BaseModel):
     translate between camcelCase and snake_case for the JSON
     amongst other default settings.
 
-    from_attributes will allow pydantic to translate SQLAlchemy results
-    into serializable models.
+    populate_by_name will allow pydantic to translate SQLAlchemy 
+    results into serializable models, while being able to translate
+    the aliases back to the original names when serializing to JSON.
 
     For a full set of options, see:
     https://pydantic-docs.helpmanual.io/usage/model_config/
     """
     model_config = ConfigDict(
-        from_attributes=True,
-        alias_generator=camelize,
+        populate_by_name=True,
+        alias_generator=to_lower_camel,
     )
 
 
