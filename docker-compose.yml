@@ -127,7 +127,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: ["taskiq", "scheduler", "${PROJ_NAME}.broker:scheduler"]
+    command:
+      [
+        "taskiq",
+        "worker",
+        "--reload",
+        "--fs-discover",
+        "${PROJ_NAME}.broker:broker",
+      ]
     env_file:
       - .env.development
     restart: unless-stopped
