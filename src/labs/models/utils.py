@@ -10,12 +10,24 @@ from typing_extensions import Annotated
 
 from uuid import UUID
 
-from sqlalchemy import DateTime, ForeignKey, func,\
-    select,\
-    update as sqlalchemy_update,\
+from sqlalchemy import (
+    DateTime, 
+    ForeignKey, 
+    func,
+    select,
+    update as sqlalchemy_update,
     delete as sqlalchemy_delete
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+)
+
+from sqlalchemy.orm import (
+    Mapped, 
+    mapped_column
+)
+
+from sqlalchemy.dialects.postgresql import (
+    UUID as PGUUID,
+    JSONB
+)
 
 pk_uuid = Annotated[
     UUID,
@@ -73,6 +85,24 @@ timestamp = Annotated[
     ),
 ]
 
+timestamp_auto = Annotated[
+    datetime,
+    mapped_column(
+        DateTime(timezone=True),
+        nullable=False,
+        server_default=func.now(),
+        onupdate=func.now()
+    ),
+]
+
+jsonb = Annotated[
+    dict|list,
+    mapped_column(
+        JSONB,
+        nullable=True,
+    ),
+]
+
 
 class IdentifierMixin(object):
     """An ID for a given object
@@ -95,7 +125,7 @@ class DateTimeMixin(object):
     values manually.
     """
     created_at: Mapped[timestamp_req]
-    updated_at: Mapped[timestamp_req]
+    updated_at: Mapped[timestamp_auto]
     deleted_at: Mapped[timestamp]
 
 
@@ -141,14 +171,11 @@ class ModelCRUDMixin:
         await async_db_session.refresh(new_instance)  # Ensure we get the id
 
         # This will trigger using the _base_get_query to load any
-        # relationships we need. The if statement is to ensure that tables
-        # like join tables do not always have an id field.
-        updated_instance = new_instance
-        if hasattr(cls, "id"):
-            updated_instance = await cls.get(
-                async_db_session,
-                new_instance.id
-            )
+        # relationships we need.
+        updated_instance = await cls.get(
+            async_db_session,
+            new_instance.id
+        )
 
         return updated_instance
 
@@ -231,7 +258,7 @@ class ModelCRUDMixin:
     async def get(
         cls,
         async_db_session,
-        id
+        id: [UUID, str]
     ):
         """ Get a single record from the database by ID
 
