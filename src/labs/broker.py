@@ -57,6 +57,14 @@ scheduler = TaskiqScheduler(
     ],
 )
 
+# For testing we use the InMemory broker, this is set
+# if an environment variables is set, please note you
+# will require pytest-env for environment vars to work
+env = os.environ.get("ENVIRONMENT")
+if env and env == "pytest":
+    from taskiq import InMemoryBroker
+    broker = InMemoryBroker()
+
 # The middleware is used to inject the broker into FastAPI
 # it enables broker task discovery for FastAPI applications
 # as well as sharing dependencies between tasks and FastAPI
