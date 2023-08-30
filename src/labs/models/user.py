@@ -12,16 +12,27 @@ from secrets import token_urlsafe
 
 from sqlalchemy import event
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column
+)
+
 from sqlalchemy.ext.asyncio import async_object_session
 
 # OTP helpers from pyotp
-from pyotp import TOTP, random_base32
+from pyotp import (
+    TOTP,
+    random_base32
+)
 
 from ..db import Base
 from ..settings import settings
-from .utils import DateTimeMixin, IdentifierMixin,\
-    ModelCRUDMixin, timestamp
+from .utils import (
+    DateTimeMixin,
+    IdentifierMixin,
+    ModelCRUDMixin,
+    timestamp
+)
 
 from ..utils.auth import hash_password, verify_password
 
