@@ -4,6 +4,7 @@ dotenv: ['.env']
 
 tasks:
   build:image:
+    prompt: "Before we build, is the version number up to date?"
     desc: builds a publishable docker image
     cmds:
       - |
@@ -13,6 +14,18 @@ tasks:
           -t ghcr.io/anomaly/ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:v{{.PROJ_VER}} \
           -t ghcr.io/ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:latest \
           -f Dockerfile .
+    vars:
+      PROJ_VER:
+        sh: "task version"
+  release:tag:
+    prompt: "Before we push, is the version number up to date?"
+    desc: tag a release and push to origin
+    summary: |
+      This will tag a release and push it to origin, it will also push
+      the tag to the remote origin.
+    cmds: 
+      - git tag -a v{{.PROJ_VER}} -m "chore release v{{.PROJ_VER}}"
+      - git push origin v{{.PROJ_VER}}
     vars:
       PROJ_VER:
         sh: "task version"
@@ -106,6 +119,7 @@ tasks:
   #       sed 's/ /./g' | \
   #       tee .version
   eject:
+    prompt: "Are you sure you want to eject the template?"
     desc: eject the project from a template
     summary: |
       This process will remove any references to the Anomaly labs template, 
