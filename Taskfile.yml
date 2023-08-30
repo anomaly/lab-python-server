@@ -7,7 +7,12 @@ tasks:
     desc: builds a publishable docker image
     cmds:
       - |
-        docker buildx build --platform=linux/amd64,linux/arm64 --push -t ghcr.io/anomaly/ghcr.io/{{.ORG_NAME}}/{{.PROJ_NAME}}:v{{.PROJ_VER}} -t ghcr.io/ghcr.io/{{.ORG_NAME}}/{{.PROJ_NAME}}:latest -f Dockerfile .
+        docker buildx build \
+          --platform=linux/amd64,linux/arm64 \
+          --push \
+          -t ghcr.io/anomaly/ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:v{{.PROJ_VER}} \
+          -t ghcr.io/ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:latest \
+          -f Dockerfile .
     vars:
       PROJ_VER:
         sh: "task version"
@@ -35,6 +40,12 @@ tasks:
     desc: generate a random cryptographic hash
     cmds:
       - openssl rand -hex {{.CLI_ARGS}}
+  db:dump:
+    desc: dump the database to a file
+    cmds:
+      - |
+        docker compose exec db sh -c \
+        "pg_dump -U {{.POSTGRES_USER}} {{.POSTGRES_DB}}"  > {{.CLI_ARGS}}
   db:init:
     desc: initialise the database schema
     cmds:
@@ -84,8 +95,9 @@ tasks:
         INSERT INTO alembic_version ( version_num ) VALUES ( '{{.HEAD_SHA}}' );\""
   version:
     cmds:
-      - cd src 
-      - python -c "from labs import __version__; print(__version__)"
+      - |
+        docker compose exec api sh \
+          -c "python -c \"from {{.PROJ_NAME}} import __version__; print(__version__)\""
   # version:next:
   #   cmds:
   #     - |

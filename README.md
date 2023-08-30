@@ -226,7 +226,13 @@ Python snake case is translated to camel case in JavaScript. So `my_var` becomes
 
 ```python
 from pydantic import BaseModel
-from humps import camelize
+
+def to_lower_camel(name: str) -> str:
+    """
+    Converts a snake_case string to lowerCamelCase
+    """
+    upper = "".join(word.capitalize() for word in name.split("_"))
+    return upper[:1].lower() + upper[1:]
 
 class User(BaseModel):
     first_name: str
@@ -235,7 +241,7 @@ class User(BaseModel):
 
     model_config = ConfigDict(
         from_attributes=True,
-        alias_generator=camelize,
+        alias_generator=to_lower_camel,
     )
 ```
 
@@ -243,7 +249,7 @@ class User(BaseModel):
 
 It is important to pay attention to such detail, and doing what is right for the environment and language.
 
-To assist with this `src/labs/schema/utils.py` provides the class `AppBaseModel` which inherits from `pydantic`'s `BaseModel` and configures it to use `humps`'s `camelize` function to convert snake case to camel case. To use it simply inherit from `AppBaseModel`:
+To assist with this `src/labs/schema/utils.py` provides the class `AppBaseModel` which inherits from `pydantic`'s `BaseModel` and configures it to use `to_lower_camel` function to convert snake case to camel case. If you inherit from `AppBaseModel` you will automatically get this behaviour:
 
 ```python
 from .utils import AppBaseModel
@@ -253,10 +259,6 @@ class MyModel(AppBaseModel):
     last_name: str = None
     age: float
 ```
-
-> **WARNING:** `humps` is published as `pyhumps` on `pypi`
-
-As per [this issue](https://github.com/anomaly/lab-python-server/issues/27) we have wrapped this
 
 FastAPI will try and generate an `operation_id` based on the path of the router endpoint, which usually ends up being a convoluted string. This was originally reported in [labs-web-client](https://github.com/anomaly/lab-web-client/issues/6). You can provide an `operation_id` in the `decorator` e.g:
 
@@ -268,6 +270,24 @@ which would result in the client generating a function like `someSpecificIdYouDe
 
 For consistenty FastAPI docs shows a wrapper function that [globally re-writes](https://fastapi.tiangolo.com/advanced/path-operation-advanced-configuration/?h=operation_id#using-the-path-operation-function-name-as-the-operationid) the `operation_id` to the function name. This does put the onus on the developer to name the function correctly.
 
+As of FastAPI `0.99.x` it takes a `generate_unique_id_function` parameter as part of the constructor which takes a callable to return the operation id. If you name your python function properly then you can use them as the operation id. `api.py` features this simple function to help with it:
+
+```python
+def generate_operation_id(route: APIRoute) -> str:
+    """
+        With a little help from FastAPI docs
+        https://bit.ly/3rXeAvH
+
+        Globally use the path name as the operation id thus
+        making things a lot more readable, note that this requires
+        you name your functions really well.
+
+        Read  more about this on the FastAPI docs
+        https://shorturl.at/vwz03
+    """
+    return route.name
+```
+
 ## TaskIQ based tasks
 
 The project uses [`TaskIQ`](https://taskiq-python.github.io) to manage task queues. TaskIQ supports `asyncio` and has FastAPI like design ideas e.g [dependency injection](https://taskiq-python.github.io/guide/state-and-deps.html) and can be tightly [coupled with FastAPI](https://taskiq-python.github.io/guide/taskiq-with-fastapi.html).
@@ -277,9 +297,9 @@ TaskIQ is configured as recommend for production use with [taskiq-aio-pika](http
 `broker.py` in the root of the project configures the broker using:
 
 ```python
-broker = AioPikaBroker(
-    config.amqp_dsn,
-    result_backend=redis_result_backend
+broker = (
+    AioPikaBroker(str(settings.amqp.dsn),)
+    .with_result_backend(redis_result_backend)
 )
 ```
 
@@ -322,6 +342,22 @@ async def verify_user(request: Request):
 ```
 
 There are various powerful options for queuing tasks both scheduled and periodic tasks are supported.
+
+Towards the end of `broker.py` you will notice the following override:
+
+```python
+# For testing we use the InMemory broker, this is set
+# if an environment variables is set, please note you
+# will require pytest-env for environment vars to work
+env = os.environ.get("ENVIRONMENT")
+if env and env == "pytest":
+    from taskiq import InMemoryBroker
+    broker = InMemoryBroker()
+```
+
+which allows us to use the `InMemoryBroker` for testing. This is because `FastAPI` provides it's own testing infrastructure which routes the calls internally and the RabbitMQ broker and redis backend is not available.
+
+> Note: that you will need to install `pytest-env` for this to work and be sure to set the `ENVIRONMENT` environment variable to `pytest`. Refer to `pyproject.toml` to see ho we configure it for the template.
 
 ## SQLAlchemy wisdom
 
@@ -580,13 +616,37 @@ We run the application using `uvicorn` and pass in `--root-path=/api` for FastAP
 
 `Dockerfile` is the configuration referenced by `docker-compose.yml` for development and `Dockerfile.prod` is the configuration referenced by `docker-compose.prod.yml` for production. For Kubernetes based deployment please reference `Dockerfile.prod`.
 
-## Docker in Production
+## Containers in production
 
-Multi staged builds
-https://docs.docker.com/develop/develop-images/multistage-build/
+The template provides Docker file for production, this uses [multi staged builds](https://docs.docker.com/develop/develop-images/multistage-build/) to build a slimmer image for production.
 
-gunicorn vs uvicorn
-https://www.uvicorn.org/deployment/
+There's a fair bit of documentation available around deploying [uvicorn for production](https://www.uvicorn.org/deployment/). It does suggest that we use a process manager like `gunicorn` but it might be irrelevant depending on where we are deploying. For example if the application is deployed in a Kubernetes cluster then each `pod` would sit behind a load balancer and/or a content distribution network (CDN) and the process manager would be redundant.
+
+> The production container does have the `postgres` client installed to provide you access to `psql` this is rather handy for initialising the database or performing any manual patches.
+
+### .pgpass
+
+Many a times you will want to interactively get a shell to `postgres` to update the database. Our containers have the postgres client installed. If you have a file called `.pgpass` in `/root/` then you can use `psql` directly without having to enter a password.
+
+Remember that the container has very limited software installed so you will require to save contents of `.pgpass` using:
+
+```sh
+echo "kubernetescluster-aurora-cluster.cluster-cc3g.ap-southeast-2.rds.amazonaws.com:5432:harvest:dbuser:password" > ~/.pgpass
+```
+
+Once you have done that you can use `kubectl` to execute psql directly.
+
+```sh
+kubectl exec -it server-565497855b-md96l -n harvest -- /usr/bin/psql -U dbuser -h kubernetescluster-aurora-cluster.cluster-cc3g.ap-southeast-2.rds.amazonaws.com -d harvest
+```
+
+> Note that you have to specify the hostname and username as well as the database name. The password is read from the `.pgpass` file.
+
+Once you have this working you can pipe the contents of a SQL file from your local machine to the container.
+
+```sh
+cat backup.sql | kubectl exec -it server-565497855b-md96l -n harvest -- /usr/bin/psql -U dbuser -h kubernetescluster-aurora-cluster.cluster-cc3g.ap-southeast-2.rds.amazonaws.com -d harvest
+```
 
 ## Distribution
 
