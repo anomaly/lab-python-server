@@ -8,15 +8,22 @@ from datetime import timedelta
 from typing import Union
 
 from sqlalchemy import event
-from sqlalchemy.orm import relationship,\
-    mapped_column, Mapped
+from sqlalchemy.orm import (
+    mapped_column,
+    Mapped,
+)
 
-from .utils import DateTimeMixin, IdentifierMixin,\
-    ModelCRUDMixin, CUDByMixin
+from .utils import (
+    DateTimeMixin,
+    IdentifierMixin,
+    ModelCRUDMixin,
+    CUDByMixin,
+)
 
 from ..db import Base
 from ..utils import minio_client
-from ..settings  import settings
+from ..settings import settings
+
 
 class S3FileMetadata(
     Base,
@@ -100,7 +107,7 @@ class S3FileMetadata(
                     minutes=settings.lifetime.link_s3_download
                 ),
                 response_headers={
-                    'response-content-disposition': 
+                    'response-content-disposition':
                     f'attachment; filename="{self.file_name}"'
                 },
             )
@@ -131,7 +138,7 @@ class S3FileMetadata(
             return url
         except Exception:
             return None
-        
+
     def enable_legal_hold(self) -> bool:
         """ The Object Lock legal hold operation enables you to place a legal hold 
         on an object version. Like setting a retention period, a legal hold prevents an 
@@ -150,7 +157,7 @@ class S3FileMetadata(
         except Exception:
             self.legal_hold = False
             return False
-        
+
     def disable_legal_hold(self) -> bool:
         """ Disables the legal hold if one is placed on the object.
 
@@ -169,7 +176,7 @@ class S3FileMetadata(
         except Exception:
             self.legal_hold = True
             return False
-        
+
 
 @event.listens_for(S3FileMetadata, 'init')
 def assigned_s3_key(target, args, kwargs):
@@ -181,4 +188,3 @@ def assigned_s3_key(target, args, kwargs):
     file.
     """
     target.s3_key = uuid4().hex
-
