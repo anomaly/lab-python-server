@@ -6,7 +6,7 @@ This lab aims to outline a recipe for building a standardised Python server that
 - [x] A Postgres server for development
 - [x] A Redis server for development
 - [ ] Healthcheck endpoint that will validate that the API can get to the database
-- [x] Worker processes that will process tasks in the background (using Celery)
+- [x] Worker processes that will process tasks in the background (using [TasIQ](https://github.com/taskiq-python/taskiq))
 - [x] Provide `Dockerfile` for development and production
 - [ ] Log aggregation and monitoring ([parseable](https://github.com/parseablehq/parseable))
 - [x] ~~CSRF protection~~ see [#52](https://github.com/anomaly/lab-python-server/issues/52), also see [official guide](https://fastapi.tiangolo.com/tutorial/cors/)
