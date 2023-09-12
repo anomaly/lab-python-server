@@ -10,10 +10,33 @@ tasks:
       - |
         docker buildx build \
           --platform=linux/amd64,linux/arm64 \
+          -t ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:v{{.PROJ_VER}} \
+          -t ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:latest \
+          -f Dockerfile.prod .
+    vars:
+      PROJ_VER:
+        sh: "task version"
+  release:image:
+    prompt: "Before we build, is the version number up to date?"
+    desc: builds a publishable docker image
+    cmds:
+      - |
+        docker buildx build \
+          --platform=linux/amd64,linux/arm64 \
           --push \
           -t ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:v{{.PROJ_VER}} \
           -t ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:latest \
-          -f Dockerfile .
+          -f Dockerfile.prod .
+    vars:
+      PROJ_VER:
+        sh: "task version"
+  release:chart:
+    prompt: "Before we build, is the version number up to date?"
+    desc: builds and publishes the helm chart for this project
+    dir: charts
+    cmds:
+      - helm package {{.PACKAGE_NAME}}
+      - helm push {{.PACKAGE_NAME}}-{{.PROJ_VER}}*.tgz oci://ghcr.io/{{.ORG_NAME}}/charts
     vars:
       PROJ_VER:
         sh: "task version"
