@@ -60,8 +60,12 @@ class S3FileMetadata(
     tables.
 
     """
-
     __tablename__ = "s3_file_metadata"
+
+    # For applications using multiple buckets for different purposes
+    # e.g user generated content and then a public media bucket we store
+    # the bucket name so we know where to target
+    bucket_name: Mapped[str]
 
     # This is the unique key for this object store in the associated bucket
     # which is automatically assigned to the metadata, you do not have to
@@ -179,12 +183,23 @@ class S3FileMetadata(
 
 
 @event.listens_for(S3FileMetadata, 'init')
-def assigned_s3_key(target, args, kwargs):
+def assign_s3_key(target, args, kwargs):
     """ Assigns a UUID based on the UUID4 standard as the key for the file upload
 
     When the application assigns a new S3FileMetadata object, it will be 
     given a UUID to use as the key in the bucket, and this record will act
     as the meta table for translating the object in the bucket to a downloadable
     file.
+
+    Suffix ensures that the file extension is preserved if it is provided in the
+    file_name. While for files that are accessed by presigned_urls this is not
+    required, it is useful for files that are accessed by the public.
     """
-    target.s3_key = uuid4().hex
+    suffix = ""
+
+    if 'file_name' in kwargs:
+        file_name_split = kwargs['file_name'].split('.')
+        if len(file_name_split) > 1:
+            suffix = "." + file_name_split[-1]
+
+    target.s3_key = uuid4().hex + suffix
