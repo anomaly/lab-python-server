@@ -11,8 +11,8 @@ tasks:
         docker buildx build \
           --platform=linux/amd64,linux/arm64 \
           --push \
-          -t ghcr.io/anomaly/ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:v{{.PROJ_VER}} \
-          -t ghcr.io/ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:latest \
+          -t ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:v{{.PROJ_VER}} \
+          -t ghcr.io/{{.ORG_NAME}}/{{.PACKAGE_NAME}}:latest \
           -f Dockerfile .
     vars:
       PROJ_VER:
