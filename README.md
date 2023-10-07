@@ -118,7 +118,7 @@ Directory structure for our application:
  |   └─ routers/         -- FastAPI routers
  |   └─ tasks/           -- TaskIQ
  |   └─ models/          -- SQLAlchemy models
- |   └─ schema/          -- Pydantic schemas
+ |   └─ dto/             -- Data Transfer Objects
  |   └─ alembic/         -- Alembic migrations
  |   └─ __init__.py
  |   └─ api.py
