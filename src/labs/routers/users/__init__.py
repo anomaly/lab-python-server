@@ -12,13 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models import User
-from ...schema import UserResponse, UserRequest
+from ...dto import UserResponse, UserRequest
 from ..utils import get_admin_user
 
 router = APIRouter(tags=["user"])
 
+
 @router.get(
-    "", 
+    "",
     summary="Query users between limits",
     status_code=status.HTTP_200_OK
 )
@@ -35,8 +36,9 @@ async def get_users_with_limits(
     )
     return users
 
+
 @router.get(
-    "/infinite", 
+    "/infinite",
     summary="Get all users",
     status_code=status.HTTP_200_OK
 )
@@ -50,7 +52,7 @@ async def get_users(
 
 
 @router.get(
-    "/{id}", 
+    "/{id}",
     summary="Get a particular user",
     status_code=status.HTTP_200_OK
 )
@@ -60,8 +62,8 @@ async def get_user_by_id(
     current_user: User = Depends(get_admin_user),
 ) -> UserResponse:
     """ Get a user by their id 
-    
-    
+
+
     """
     user = await User.get(session, id)
     if not user:
@@ -72,8 +74,9 @@ async def get_user_by_id(
 
     return user
 
+
 @router.delete(
-    "/{id}", 
+    "/{id}",
     summary="Delete a particular user",
     status_code=status.HTTP_204_NO_CONTENT,
 )
@@ -100,10 +103,11 @@ async def delete_user(
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR,
             "Unable to delete user"
-        )    
+        )
+
 
 @router.patch(
-    "/{id}", 
+    "/{id}",
     summary="Update a particular user",
     status_code=status.HTTP_202_ACCEPTED
 )
@@ -126,8 +130,9 @@ async def update_user(
         **user_request.dict()
     )
 
+
 @router.post(
-    "", 
+    "",
     summary="Create a new user",
     status_code=status.HTTP_201_CREATED,
 )
@@ -137,7 +142,7 @@ async def create_user(
     current_user: User = Depends(get_admin_user),
 ) -> UserResponse:
     """ Creates a new user based on
-    
+
     """
     user = await User.get_by_email(
         session,

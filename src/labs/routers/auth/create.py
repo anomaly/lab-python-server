@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models.user import User
-from ...schema.auth import SignupRequest, SignupResponse
+from ...dto.auth import SignupRequest, SignupResponse
 
 from .tasks import send_account_verification_email
 

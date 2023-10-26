@@ -4,29 +4,30 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
 from ...models.user import User
-from ...schema.auth import ResetPasswordRequest
+from ...dto.auth import ResetPasswordRequest
 
 router = APIRouter()
+
 
 @router.post(
     "/reset",
 )
 async def reset_password(
     request: ResetPasswordRequest,
-    session: AsyncSession = Depends(get_async_session),   
+    session: AsyncSession = Depends(get_async_session),
 ):
     user = await User.get_by_email(
-       session, 
-       request.email
+        session,
+        request.email
     )
 
-     # Even if there's an error we aren't going to reveal the
-     # fact that the user exists or not
+    # Even if there's an error we aren't going to reveal the
+    # fact that the user exists or not
     if not user:
-      raise HTTPException(
-        status_code=status.HTTP_204_NO_CONTENT,
-      )
-    
+        raise HTTPException(
+            status_code=status.HTTP_204_NO_CONTENT,
+        )
+
     reset_password_outcome = await user.reset_password(
         session,
         request.reset_token,
@@ -34,9 +35,7 @@ async def reset_password(
     )
 
     if not reset_password_outcome:
-      raise HTTPException(
-        status_code=status.HTTP_406_NOT_ACCEPTABLE,
-        detail="Reset password failed" 
-      )
-
-
+        raise HTTPException(
+            status_code=status.HTTP_406_NOT_ACCEPTABLE,
+            detail="Reset password failed"
+        )

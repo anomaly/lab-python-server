@@ -5,9 +5,10 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ...db import get_async_session
-from ...schema.ext import HealthCheckResponse, EchoResponse
+from ...dto.ext import HealthCheckResponse, EchoResponse
 
 router = APIRouter(tags=["ext"])
+
 
 @router.get("/echo")
 async def echo() -> EchoResponse:
@@ -19,6 +20,7 @@ async def echo() -> EchoResponse:
     return EchoResponse(
         message="Hello World"
     )
+
 
 @router.get(
     "/healthcheck",
@@ -37,10 +39,9 @@ async def get_health(
 
     # This will be done better with pyndatic 2
     response.all_ok = (
-        response.db_ok and\
-        response.queue_ok and\
+        response.db_ok and
+        response.queue_ok and
         response.log_ok
     )
-    
-    return response
 
+    return response

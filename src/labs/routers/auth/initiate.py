@@ -8,7 +8,7 @@ from ...db import get_async_session
 from ...models import User
 from ...settings import settings
 
-from ...schema.auth import OTPTriggerEmailRequest, \
+from ...dto.auth import OTPTriggerEmailRequest, \
     OTPTriggerSMSRequest, InitiateResetPasswordRequest
 
 from .tasks import send_reset_password_email,\

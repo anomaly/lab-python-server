@@ -12,9 +12,10 @@ from ..utils import get_current_user
 from ...db import get_async_session
 from ...settings import settings
 from ...models import S3FileMetadata, User
-from ...schema import FileUploadRequest, FileUploadResponse
+from ...dto import FileUploadRequest, FileUploadResponse
 
 router = APIRouter(tags=["file-uploads"])
+
 
 @router.post("")
 async def get_upload_url(
@@ -39,6 +40,3 @@ async def get_upload_url(
     )
 
     return response
-
-
-
