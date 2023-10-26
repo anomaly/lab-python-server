@@ -29,7 +29,7 @@ Ultimately the output of this lab will be consumed as the `app` and `worker` for
 
 ## Using this template
 
-All `docker-compose` files depend on the following environment variables, which can be set by either exporting them before you run the commands or by declaring them in your `.env` file.
+All `docker compose` files depend on the following environment variables, which can be set by either exporting them before you run the commands or by declaring them in your `.env` file.
 
 - `PROJ_NAME` is a prefix that is used to label resources, object stores
 - `PROJ_FQDN` is the domain name of the application, this can be set
@@ -120,12 +120,12 @@ Directory structure for our application:
  |   └─ models/          -- SQLAlchemy models
  |   └─ dto/             -- Data Transfer Objects
  |   └─ alembic/         -- Alembic migrations
- |   └─ __init__.py
- |   └─ api.py
- |   └─ broker.py
- |   └─ config
- |   └─ db.py
- |   └─ utils.py
+ |   └─ __init__.py      -- FastAPI app
+ |   └─ api.py           -- ASGI app that uvicorn serves
+ |   └─ broker.py        -- TaskIQ broker configuration
+ |   └─ settings         -- pyndatic based settings
+ |   └─ db.py            -- SQLALchemy session management
+ |   └─ utils/           -- App wide utility functions
  ├─ pyproject.toml
  ├─ poetry.lock
 
@@ -184,19 +184,23 @@ FastAPI provides a really nice, clean way to build out endpoints. We recommend t
 - Provide a summary of the operation (no matter how trivial) which will make for better documentation
 
 ```python
-from fastapi import APIRouter, Depends,\
-    HTTPException, Query, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    status
+)
 
 @router.get(
     "/{id}",
     summary="Get a particular user",
-    response_model=UserResponse,
     status_code=status.HTTP_200_OK
 )
 async def get_user_by_id(
     id: UUID,
     session: AsyncSession = Depends(get_async_session)
-):
+) -> UserResponse:
     """ Get a user by their id
 
 
@@ -488,7 +492,7 @@ you need to import the following in `env.py`, relative imports don't seem to be 
 
 ```python
 # App level imports
-from labs.config import config as app_config
+from labs.settings import config as settings
 from labs.db import Base
 from labs.models import *
 ```
@@ -501,7 +505,7 @@ and then in `env.py` import the application configuration and set the environmen
 config = context.config
 
 # Read the app config and set sqlalchemy.url
-config.set_main_option("sqlalchemy.url", app_config.postgres_dsn)
+config.set_main_option("sqlalchemy.url", settings.postgres_dsn)
 ```
 
 lastly you have to assign your `declerative_base` to the `target_metadata` varaible in `env.py`, so find the line:
