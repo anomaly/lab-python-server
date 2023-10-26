@@ -21,7 +21,7 @@ from .settings import settings
 from .routers import router_root
 from .broker import broker
 
-from .schema.ext import RootResponse
+from .dto.ext import RootResponse
 
 
 def generate_operation_id(route: APIRoute) -> str:

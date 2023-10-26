@@ -1,6 +1,7 @@
 """ TaskIQ broker configuration
 
 """
+import os
 
 from .settings import settings
 

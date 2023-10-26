@@ -1,12 +1,13 @@
 from fastapi import status
 
-from labs.schema.ext import EchoResponse
+from labs.dto.ext import EchoResponse
+
 
 def test_echo(test_client):
-    
+
     response = test_client.get("/ext/echo")
     parsed_response = EchoResponse.parse_obj(response.json())
-    
+
     expected_response = EchoResponse(
         message="Hello World"
     )
