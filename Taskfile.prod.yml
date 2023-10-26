@@ -1,0 +1,38 @@
+version: '3'
+
+dotenv: ['.env']
+
+tasks:
+  db:alembic:
+    desc: arbitrary alembic command in the container
+    cmds:
+      - |
+        alembic -c /opt/$PROJ_NAME/alembic.ini {{.CLI_ARGS}}
+  db:migrate:
+    desc: migrates models to HEAD
+    cmds:
+      - | 
+        alembic -c /opt/$PROJ_NAME/alembic.ini upgrade head
+  db:alembic:heads:
+    desc: shows the HEAD SHA for alembic migrations
+    cmds:
+      - |
+        alembic -c /opt/$PROJ_NAME/alembic.ini heads
+  db:alembic:attach:
+    desc: join the database container to alembic migrations
+    summary: |
+      This is useful if you have nuked your database and re-initialised
+      the schema and want to join back to the head alembic migrations.
+
+      We will attempt to create the alebmic_version table and populate
+      the version_num field with the current head value.
+    vars:
+      HEAD_SHA:
+        sh: "task db:alembic:heads | sed -e 's/ (head)//g'"
+    cmds:
+      - |
+        psql \
+        -U {{.POSTGRES_USER}} \
+        -d {{.POSTGRES_DB}} -c \" \
+        CREATE TABLE IF NOT EXISTS alembic_version ( version_num VARCHAR ); \
+        INSERT INTO alembic_version ( version_num ) VALUES ( '{{.HEAD_SHA}}' );\"
