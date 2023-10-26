@@ -177,3 +177,7 @@ services:
       - .env.development
     entrypoint: >
       /bin/sh -c " /usr/bin/mc config host add $$S3_BUCKET_NAME http://minio:9000 $$MINIO_ROOT_USER $$MINIO_ROOT_PASSWORD; /usr/bin/mc mb -p $$S3_BUCKET_NAME/$$S3_BUCKET_NAME; /usr/bin/mc policy set download $$S3_BUCKET_NAME/$$S3_BUCKET_NAME; exit 0; "
+
+networks:
+  default:
+    name: ${PROJ_NAME}-network
