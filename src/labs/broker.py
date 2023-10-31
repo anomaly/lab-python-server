@@ -16,7 +16,7 @@ from taskiq_aio_pika import AioPikaBroker
 
 # Task Scheduler for periodic tasks
 from taskiq.schedule_sources import LabelScheduleSource
-from taskiq.scheduler import TaskiqScheduler
+from taskiq import TaskiqScheduler
 
 # Middlewares
 from taskiq import SimpleRetryMiddleware
