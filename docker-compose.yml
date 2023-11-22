@@ -40,7 +40,7 @@ services:
   # RabbitMQ:
   # TaskIQ recommend using rabbitmq for the broker
   rabbitmq:
-    image: rabbitmq:3.11-management
+    image: rabbitmq:3.12-management
     container_name: ${PROJ_NAME}-rabbitmq
     restart: unless-stopped
     env_file:

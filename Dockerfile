@@ -1,6 +1,6 @@
 # While optional this tells the Docker builder of the version
 # syntax=docker/dockerfile:1
-ARG PYTHON_VERSION=3.11.4-slim-bullseye
+ARG PYTHON_VERSION=3.12-bookworm
 
 # Base image for Python applications
 # This image is particularly for a web server using uvicorn

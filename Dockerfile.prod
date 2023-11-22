@@ -1,7 +1,7 @@
 # While optional this tells the Docker builder of the version
 # syntax=docker/dockerfile:1
 #
-ARG PYTHON_VERSION=3.11.1-slim-bullseye
+ARG PYTHON_VERSION=3.12-bookworm
 
 # This Dockerfile uses a multi stage build to slim down the image
 # https://docs.docker.com/develop/develop-images/multistage-build/
