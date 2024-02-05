@@ -33,7 +33,7 @@ pycron = "^3.0.0"
 faker = "^18.11.2"
 setuptools = "^68.2.2"
 sqlalchemy = "^2.0.25"
-fastapi = "^0.109.0"
+fastapi = "^0.109.1"
 alembic = "^1.13.1"
 taskiq = {version = "^0.10.4", extras = ["reload"]}
 taskiq-aio-pika = "^0.4.0"
