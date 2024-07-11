@@ -6,10 +6,11 @@
 
 """
 
+from typing import AsyncGenerator
 from sqlalchemy.ext.asyncio import create_async_engine,\
-    AsyncSession
+    AsyncSession, async_sessionmaker, AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase,\
-    configure_mappers, sessionmaker
+    configure_mappers
 
 
 from .settings import settings
@@ -24,19 +25,16 @@ engine = create_async_engine(
 configure_mappers()
 
 # Get an async session from the engine
+AsyncSessionFactory = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
-async def get_async_session() -> AsyncSession:
-    async_session = sessionmaker(
-        engine, class_=AsyncSession, expire_on_commit=False
-    )
-    async with async_session() as session:
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    async with AsyncSessionFactory() as session:
         yield session
 
+
 # Used by the ORM layer to describe models
-
-
-class Base(DeclarativeBase):
+class Base(DeclarativeBase, AsyncAttrs):
     """
     SQLAlchemy 2.0 style declarative base class
     https://bit.ly/3WE3Srg
