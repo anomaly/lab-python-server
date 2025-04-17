@@ -14,11 +14,22 @@ reference the configuration and can simply provide the template information
 Redmail docs are located at https://red-mail.readthedocs.io/
 """
 import os
-from redmail import EmailSender
+from redmail.email.sender import EmailSender
 
 from .settings import settings
 
-sender = EmailSender(
+# Custom factory to be able to set the sender globally
+class EmailSenderFactory(EmailSender):
+    @property
+    def sender(self):
+        return self.sender
+    
+    @sender.setter
+    def sender(self, sender: str):
+        self.sender = sender
+
+
+sender = EmailSenderFactory(
     host=settings.smtp.host,
     port=settings.smtp.port,
     username=settings.smtp.user.get_secret_value(),
