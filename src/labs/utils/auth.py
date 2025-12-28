@@ -61,8 +61,6 @@ def create_access_token(
 
     Args:
         subject (str): The subject of the token, usually the email
-        expires_delta (int, optional): The number of seconds the token
-            should be valid for. Defaults to None.
         fresh (bool, optional): Whether the token is fresh or not.
             Defaults to False.
 
