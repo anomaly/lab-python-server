@@ -22,11 +22,11 @@ from .settings import settings
 class EmailSenderFactory(EmailSender):
     @property
     def sender(self):
-        return self.sender
+        return self._sender
     
     @sender.setter
     def sender(self, sender: str):
-        self.sender = sender
+        self._sender = sender
 
 
 sender = EmailSenderFactory(
